@@ -7,10 +7,10 @@ var UI=window.FTUI={lang:lsGet('ft_lang','en'),mute:lsGet('ft_mute','0')==='1'};
 var C=function(){return (window.COACH||{})[UI.lang]||(window.COACH||{}).en||{}};
 var LANGS=[['en','EN'],['hi','हिं'],['bn','বাং'],['as','অস']];
 var TX={
- en:{today:'Today',work:'Work',learn:'Learn',progress:'Progress',msgs:'Messages',says:'Ratan Roy says',listen:'Listen',stop:'Stop',next:'Next',back:'Back',lesson:"Today's lesson",modules:'Modules',situ:'Situations',prod:'Products',quiz:'Quiz',month:'Month',pob:'POB',inc:'Incentive',q4:'Q4 & KPI',coach:'Your coach: Ratan Roy',done:'Lesson done',streak:'day learning streak',start:'Start lesson',what:'What to do',say:'What to say',score:'Score',again:'Try again',stock:'Stock stmt',beat:'Beat change',stockists:'Stockists',appOnly:'Please open the Field Tracker app on your phone. This page works only inside the app.'},
- hi:{today:'आज',work:'काम',learn:'सीखें',progress:'प्रगति',msgs:'संदेश',says:'रतन रॉय कहते हैं',listen:'सुनें',stop:'रोकें',next:'आगे',back:'पीछे',lesson:'आज का पाठ',modules:'मॉड्यूल',situ:'स्थितियाँ',prod:'प्रोडक्ट',quiz:'क्विज़',month:'महीना',pob:'POB',inc:'इंसेंटिव',q4:'Q4 और KPI',coach:'आपके कोच: रतन रॉय',done:'पाठ पूरा',streak:'दिन लगातार सीखना',start:'पाठ शुरू करें',what:'क्या करें',say:'क्या बोलें',score:'स्कोर',again:'फिर से',stock:'स्टॉक स्टेटमेंट',beat:'बीट बदलाव',stockists:'स्टॉकिस्ट',appOnly:'कृपया अपने फ़ोन पर Field Tracker ऐप खोलें।'},
- bn:{today:'আজ',work:'কাজ',learn:'শিখুন',progress:'অগ্রগতি',msgs:'বার্তা',says:'রতন রায় বলেন',listen:'শুনুন',stop:'থামুন',next:'পরের',back:'আগের',lesson:'আজকের পাঠ',modules:'মডিউল',situ:'পরিস্থিতি',prod:'প্রোডাক্ট',quiz:'কুইজ',month:'মাস',pob:'POB',inc:'ইনসেনটিভ',q4:'Q4 ও KPI',coach:'আপনার কোচ: রতন রায়',done:'পাঠ শেষ',streak:'দিন টানা শেখা',start:'পাঠ শুরু',what:'কী করবেন',say:'কী বলবেন',score:'স্কোর',again:'আবার',stock:'স্টক স্টেটমেন্ট',beat:'বিট পরিবর্তন',stockists:'স্টকিস্ট',appOnly:'অনুগ্রহ করে ফোনে Field Tracker অ্যাপ খুলুন।'},
- as:{today:'আজি',work:'কাম',learn:'শিকক',progress:'অগ্ৰগতি',msgs:'বাৰ্তা',says:'ৰতন ৰয়ে কয়',listen:'শুনক',stop:'ৰখক',next:'পিছৰ',back:'আগৰ',lesson:'আজিৰ পাঠ',modules:'মডিউল',situ:'পৰিস্থিতি',prod:'প্ৰডাক্ট',quiz:'কুইজ',month:'মাহ',pob:'POB',inc:'ইনচেণ্টিভ',q4:'Q4 আৰু KPI',coach:'আপোনাৰ কোচ: ৰতন ৰয়',done:'পাঠ সমাপ্ত',streak:'দিন একেৰাহে শিকা',start:'পাঠ আৰম্ভ',what:'কি কৰিব',say:'কি ক\'ব',score:'স্ক\'ৰ',again:'আকৌ',stock:'ষ্টক ষ্টেটমেণ্ট',beat:'বিট সলনি',stockists:'ষ্টকিষ্ট',appOnly:'অনুগ্ৰহ কৰি ফোনত Field Tracker এপ খোলক।'}};
+ en:{today:'Today',work:'Work',learn:'Learn',progress:'Progress',msgs:'Messages',says:'Ratan Roy says',listen:'Listen',stop:'Stop',next:'Next',back:'Back',lesson:"Today's lesson",modules:'Modules',situ:'Situations',prod:'Rates & offers',quiz:'Quiz',month:'Month',pob:'POB',inc:'Incentive',q4:'Q4 & KPI',coach:'Your coach: Ratan Roy',done:'Lesson done',streak:'day learning streak',start:'Start lesson',what:'What to do',say:'What to say',score:'Score',again:'Try again',stock:'Stock stmt',beat:'Beat change',stockists:'Stockists',appOnly:'Please open the Field Tracker app on your phone. This page works only inside the app.'},
+ hi:{today:'आज',work:'काम',learn:'सीखें',progress:'प्रगति',msgs:'संदेश',says:'रतन रॉय कहते हैं',listen:'सुनें',stop:'रोकें',next:'आगे',back:'पीछे',lesson:'आज का पाठ',modules:'मॉड्यूल',situ:'स्थितियाँ',prod:'रेट और ऑफ़र',quiz:'क्विज़',month:'महीना',pob:'POB',inc:'इंसेंटिव',q4:'Q4 और KPI',coach:'आपके कोच: रतन रॉय',done:'पाठ पूरा',streak:'दिन लगातार सीखना',start:'पाठ शुरू करें',what:'क्या करें',say:'क्या बोलें',score:'स्कोर',again:'फिर से',stock:'स्टॉक स्टेटमेंट',beat:'बीट बदलाव',stockists:'स्टॉकिस्ट',appOnly:'कृपया अपने फ़ोन पर Field Tracker ऐप खोलें।'},
+ bn:{today:'আজ',work:'কাজ',learn:'শিখুন',progress:'অগ্রগতি',msgs:'বার্তা',says:'রতন রায় বলেন',listen:'শুনুন',stop:'থামুন',next:'পরের',back:'আগের',lesson:'আজকের পাঠ',modules:'মডিউল',situ:'পরিস্থিতি',prod:'রেট ও অফার',quiz:'কুইজ',month:'মাস',pob:'POB',inc:'ইনসেনটিভ',q4:'Q4 ও KPI',coach:'আপনার কোচ: রতন রায়',done:'পাঠ শেষ',streak:'দিন টানা শেখা',start:'পাঠ শুরু',what:'কী করবেন',say:'কী বলবেন',score:'স্কোর',again:'আবার',stock:'স্টক স্টেটমেন্ট',beat:'বিট পরিবর্তন',stockists:'স্টকিস্ট',appOnly:'অনুগ্রহ করে ফোনে Field Tracker অ্যাপ খুলুন।'},
+ as:{today:'আজি',work:'কাম',learn:'শিকক',progress:'অগ্ৰগতি',msgs:'বাৰ্তা',says:'ৰতন ৰয়ে কয়',listen:'শুনক',stop:'ৰখক',next:'পিছৰ',back:'আগৰ',lesson:'আজিৰ পাঠ',modules:'মডিউল',situ:'পৰিস্থিতি',prod:'ৰেট আৰু অফাৰ',quiz:'কুইজ',month:'মাহ',pob:'POB',inc:'ইনচেণ্টিভ',q4:'Q4 আৰু KPI',coach:'আপোনাৰ কোচ: ৰতন ৰয়',done:'পাঠ সমাপ্ত',streak:'দিন একেৰাহে শিকা',start:'পাঠ আৰম্ভ',what:'কি কৰিব',say:'কি ক\'ব',score:'স্ক\'ৰ',again:'আকৌ',stock:'ষ্টক ষ্টেটমেণ্ট',beat:'বিট সলনি',stockists:'ষ্টকিষ্ট',appOnly:'অনুগ্ৰহ কৰি ফোনত Field Tracker এপ খোলক।'}};
 function t(k){return (TX[UI.lang]||TX.en)[k]||TX.en[k]||k}
 function rs(v){return '₹'+Math.round(v||0).toLocaleString('en-IN')}
 function pc(a,b){return b?Math.round(a/b*100):0}
@@ -108,7 +108,7 @@ function incOf(net,tgt){var a=tgt?net/tgt*100:0;return Math.round(net*rate(net,a
 function calc(hq){var tgt=(TGT[hq]||{}).Total||0,f=S.feeds['ach_'+hq]||{},net=f.total||0,x=S.feeds['inc_'+hq]||{};var a=tgt?net/tgt*100:0,r=rate(net,a);
   var lv=[97,100,110].map(function(p){return{p:p,need:Math.max(0,tgt*p/100-net),inc:incOf(Math.max(net,tgt*p/100),tgt)}});
   var ms=x.by17!=null?x.by17:(TODAY<='2026-11-17'?net:null);
-  var cond=[['Growth vs last year',x.py!=null?(net>x.py?'ok':'bad'):'na',x.py!=null?('LY '+rs(x.py)):'Awaiting LY sales'],['Saleable returns ≤3%',x.returnsPct!=null?(x.returnsPct<=3?'ok':'bad'):'na',x.returnsPct!=null?x.returnsPct+'%':'Awaiting data'],['Outlet coverage ≥90%',x.outletCov!=null?(x.outletCov>=90?'ok':'bad'):'na',x.outletCov!=null?x.outletCov+'%':'Awaiting data'],['HCP coverage ≥95%',x.hcpCov!=null?(x.hcpCov>=95?'ok':'bad'):'na',x.hcpCov!=null?x.hcpCov+'%':'Awaiting data']];
+  var cond=[['Growth vs last year',x.py!=null?(net>x.py?'ok':'bad'):'na',x.py!=null?('LY '+rs(x.py)):'Awaiting LY sales'],['Saleable returns ≤3%',x.returnsPct!=null?(x.returnsPct<=3?'ok':'bad'):'na',x.returnsPct!=null?(x.returnsLbl||'')+x.returnsPct+'%':'Awaiting data'],['Outlet coverage ≥90%',x.outletCov!=null?(x.outletCov>=90?'ok':'bad'):'na',x.outletCov!=null?x.outletCov+'%':'Awaiting data'],['HCP coverage ≥95%',x.hcpCov!=null?(x.hcpCov>=95?'ok':'bad'):'na',x.hcpCov!=null?x.hcpCov+'%':'Awaiting data']];
   return{tgt:tgt,net:net,ach:a,r:r,now:Math.round(net*r/100),lv:lv,bonus:Math.max(net,tgt)>=1000000?6000:4000,ms:ms,cond:cond,asOf:f.asOf||''}}
 window.ftIncentive={calc:calc,rate:rate};
 function chip(s){return s==='ok'?'chip ok':s==='bad'?'chip bad':'chip mut'}
@@ -118,10 +118,20 @@ function incCard(hq){var c=calc(hq);
    h('div',{class:'tbl'},h('table',{},h('tr',{},h('th',{},'Reach'),h('th',{class:'r'},'Sell more'),h('th',{class:'r'},'Incentive')),c.lv.map(function(l){return h('tr',{},h('td',{},l.p+'%'),h('td',{class:'r num'},l.need?rs(l.need):'Done ✓'),h('td',{class:'r num'},rs(l.inc)))}))),
    h('div',{},h('b',{},'Milestone bonus '+rs(c.bonus)),h('small',{style:'display:block;color:var(--muted)'},'Needs 100% for the month AND 40% of target ('+rs(.4*c.tgt)+') by 17 Nov.'+(c.ms!=null?' Now '+rs(c.ms)+(c.ms>=.4*c.tgt?' ✓':' – '+rs(.4*c.tgt-c.ms)+' to go'):''))))}
 function kpiCard(hq){var c=calc(hq);return h('div',{class:'score'},h('b',{},'KPI conditions (all 4 must be met)'),h('div',{style:'display:grid;gap:8px'},c.cond.map(function(k){return h('div',{style:'display:flex;justify-content:space-between;align-items:center'},h('span',{},k[0]),h('span',{class:chip(k[1])},k[2]))})),h('small',{style:'color:var(--muted)'},'Incentive is paid only if all four are met.'))}
-function q4Card(hq){var q=S.feeds['incq_'+hq]||{},a=S.feeds['ach_'+hq]||{b:{}},T=TGT[hq]||{};var B=['Deca Durabolin','Rloc (Tab+Inj)','Skinlite Cream','Dexona'];
-  return h('div',{class:'score'},h('div',{style:'display:flex;justify-content:space-between'},h('b',{},'Q4 incentive & impact brands'),h('span',{class:'chip '+(q.amount?'ok':'mut')},q.amount?rs(q.amount):'Q4')),
-   q.target?h('div',{},h('b',{},(q.label||'Q4')+': '+rs(q.ach)+' of '+rs(q.target)+' ('+pc(q.ach,q.target)+'%)'),bar(pc(q.ach,q.target))):h('small',{style:'color:var(--muted)'},'Q4 targets and slab rates will show here once loaded from the circular.'),
-   h('div',{class:'tbl'},h('table',{},h('tr',{},h('th',{},'Impact brand'),h('th',{class:'r'},'Achieved'),h('th',{class:'r'},'Q4 amount')),B.map(function(b){var qb=(q.brands||{})[b]||{};return h('tr',{},h('td',{},b),h('td',{class:'r num'},qb.target!=null?pc(qb.ach,qb.target)+'%':pc(((a.b||{})[b]||{}).v,(T[b]||{}).v)+'% Nov'),h('td',{class:'r num'},qb.amount!=null?rs(qb.amount):'—'))}))))}
+function q4Card(hq){var q=S.feeds['incq_'+hq]||{},a=S.feeds['ach_'+hq]||{b:{}},T=TGT[hq]||{};
+  var nov=a.total||0,ach=(q.octS||0)+nov,tg=q.target||0;
+  var B=[['Deca Durabolin',['Deca Durabolin']],['R-Loc (all)',['Rloc (Tab+Inj)','Rloc Raft']],['Skinlite (all)',['Skinlite Cream','Skinlite Day Care','Skinlite Facewash']],['Dexona',['Dexona']]];
+  var bv=function(keys,obj,f){return keys.reduce(function(s,k){return s+(((obj||{})[k]||{})[f]||0)},0)};
+  var rows=B.map(function(x){var qb=(q.brands||{})[x[0]]||{};var A=(qb.octS||0)+bv(x[1],a.b,'v');return h('tr',{},h('td',{},x[0]),h('td',{class:'r num'},rs(A)+' / '+rs(qb.target||0)),h('td',{class:'r num'},(qb.target?pc(A,qb.target):0)+'%'))});
+  return h('div',{class:'score'},h('div',{style:'display:flex;justify-content:space-between'},h('b',{},'Q4 (Oct–Dec) progress'),h('span',{class:'chip '+(q.amount?'ok':'mut')},q.amount?rs(q.amount):'Q4')),
+   tg?h('div',{},h('span',{class:'big'},pc(ach,tg)+'%'),h('small',{style:'color:var(--muted)'},'  '+rs(ach)+' of '+rs(tg)),bar(pc(ach,tg)),
+     h('div',{class:'tbl'},h('table',{},h('tr',{},h('th',{},'Month'),h('th',{class:'r'},'Target'),h('th',{class:'r'},'Sales')),
+       h('tr',{},h('td',{},'Oct'),h('td',{class:'r num'},rs(q.octT)),h('td',{class:'r num'},rs(q.octS))),
+       h('tr',{},h('td',{},'Nov'),h('td',{class:'r num'},rs(q.novT)),h('td',{class:'r num'},nov?rs(nov):'—')),
+       h('tr',{},h('td',{},'Dec'),h('td',{class:'r num'},rs(q.decT)),h('td',{class:'r num'},'—')))),
+     h('small',{style:'color:var(--muted)'},'To finish Q4 at 100%: sell '+rs(Math.max(0,tg-ach))+' more in Nov + Dec. Last year Dec: '+rs(q.decLY)+'.')):h('small',{style:'color:var(--muted)'},'Q4 figures will show here once loaded.'),
+   h('b',{},'Impact brands · Q4'),h('div',{class:'tbl'},h('table',{},h('tr',{},h('th',{},'Brand'),h('th',{class:'r'},'Sales / Q4 target'),h('th',{class:'r'},'%')),rows)),
+   h('small',{style:'color:var(--muted)'},q.amount?'':'Q4 incentive amount will show once the quarterly slab table is loaded.'))}
 function mgrInc(){return h('div',{class:'score'},h('b',{},'Incentive · November'),h('div',{class:'tbl'},h('table',{},h('tr',{},h('th',{},'HQ'),h('th',{class:'r'},'Ach'),h('th',{class:'r'},'Earned'),h('th',{class:'r'},'To 100%'),h('th',{class:'r'},'At 100%')),['Agartala','Bongaigaon','Guwahati'].map(function(q){var c=calc(q);return h('tr',{},h('td',{},q),h('td',{class:'r num'},c.ach.toFixed(0)+'%'),h('td',{class:'r num'},rs(c.now)),h('td',{class:'r num'},c.lv[1].need?rs(c.lv[1].need):'✓'),h('td',{class:'r num'},rs(c.lv[1].inc)))}))))}
 function pobCard(hq){var p=S.feeds['pob_'+hq];if(!p)return h('div',{class:'note'},'POB figures appear after the first Ventasys POB file is loaded.');
   var days=p.workingDays||[],mx=Math.max.apply(null,days.map(function(d){return (p.byDate||{})[d]||0}).concat([p.planPerDay||1]));
@@ -168,12 +178,48 @@ function vLearn(app){var r=sub('learn',[['today',t('lesson').replace(/^Today's l
   if(cur==='prod')vProd(app);
   if(cur==='quiz')vQuiz(app)}
 function sitCard(s,openIt){var d=h('details',{class:'lcard sit'});if(openIt)d.open=true;d.append(h('summary',{},'⚡ '+s.q),h('div',{class:'lbl'},t('what')),h('ul',{},(s.do||[]).map(function(x){return h('li',{},x)})),s.say?h('div',{class:'lbl'},t('say')):null,s.say?h('div',{style:'font-style:italic'},'“'+s.say+'”'):null,h('button',{class:'ghost',style:'margin-top:8px',onclick:function(e){e.preventDefault();speak(s.q+'. '+(s.do||[]).join('. ')+'. '+(s.say||''))}},'🔊 '+t('listen')));return d}
-function vProd(app){var P=window.COACH_PRODUCTS||[];var c=C();if(c.prodIntro)app.append(h('div',{class:'quote'},h('div',{class:'who'},'💬 '+t('says')),h('div',{class:'q'},c.prodIntro)));
-  var sel=h('select',{},P.map(function(p,k){return h('option',{value:k},p.n)}));var qty=h('input',{type:'number',inputmode:'numeric',value:'10'});var out=h('div',{class:'big'},''),lots=h('small',{style:'color:var(--muted)'},'');
-  function upd(){var p=P[+sel.value];out.textContent=rs((+qty.value||0)*p.unit);lots.textContent='Scheme lots: '+p.scheme}sel.onchange=upd;qty.oninput=upd;
-  app.append(h('div',{class:'score'},h('b',{},'Order value calculator'),h('label',{},'Product',sel),h('label',{},'Billed quantity (units)',qty),out,lots));upd();
-  P.forEach(function(p){app.append(h('div',{class:'lcard',style:'padding:12px 14px'},h('div',{style:'display:flex;justify-content:space-between;gap:8px'},h('b',{},p.n),h('span',{class:'chip ok'},p.rate)),h('div',{class:'meta'},p.pack+' · Scheme lots: '+p.scheme)))});
-  app.append(h('small',{style:'color:var(--muted);display:block;margin:-4px 0 10px'},'Rate per unit worked out from stockist plan values. Confirm with the current price list.'))}
+function REF(){var f=S.feeds;var k=Object.keys(f).find(function(x){return x.indexOf('rates_')===0});return k?f[k]:null}
+function money(v){return '₹'+(v>=100?Math.round(v).toLocaleString('en-IN'):v.toFixed(2))}
+function vProd(app){var R=REF();if(!R){app.append(h('div',{class:'note'},'Rates and offers are loading…'));return}
+  var r=sub('rates',[['offers','🎁 Offers'],['calc','🧮 Profit calculator'],['list','📋 Price list']]);app.append(r[0]);
+  if(r[1]==='offers'){var w=null;app.append(h('div',{class:'quote'},h('div',{class:'who'},'💬 '+t('says')),h('div',{class:'q'},'Tell every customer the offer AND his profit in rupees. People buy when they see what they earn.')));
+    R.offers.forEach(function(o){app.append(h('div',{class:'lcard sit'},h('div',{style:'display:flex;justify-content:space-between;gap:8px'},h('b',{},'🎁 '+o.t),h('span',{class:'chip '+(o.who==='Retailer'?'ok':'warn')},o.who)),h('div',{style:'margin:6px 0'},o.d),h('div',{class:'lbl'},t('say')),h('div',{style:'font-style:italic'},'“'+o.say+'”'),h('button',{class:'ghost',style:'margin-top:8px',onclick:function(){speak(o.t+'. '+o.d+'. '+o.say)}},'🔊 '+t('listen'))))});
+    app.append(h('div',{class:'note'},R.notes.map(function(n){return h('div',{},'• '+n)})));return}
+  if(r[1]==='list'){R.products.forEach(function(p){var m=mrpOf(p);var g=1+p.gst/100,ptr=m/g*.8;
+    app.append(h('details',{class:'lcard'},h('summary',{},h('b',{},p.n),h('span',{class:'meta'},'  · '+p.u+(m?' · MRP '+(p.mrp?'':'≈')+money(m):''))),
+      m?h('div',{class:'tbl'},h('table',{},h('tr',{},h('th',{},''),h('th',{class:'r'},'Buys at*'),h('th',{class:'r'},'Profit')),
+        h('tr',{},h('td',{},'Retailer 20%'),h('td',{class:'r num'},money(ptr*g)),h('td',{class:'r num'},money(m-ptr*g))),
+        h('tr',{},h('td',{},'Wholesaler 7%'),h('td',{class:'r num'},money(ptr*.93*g)),h('td',{class:'r num'},money(ptr*.07*g))),
+        h('tr',{},h('td',{},'Stockist 10%'),h('td',{class:'r num'},money(ptr*.9*g)),h('td',{class:'r num'},money(ptr*.1*g))))):h('small',{},'Enter MRP from the pack in the calculator.'),
+      h('div',{class:'meta'},['GST '+p.gst+'%',p.sch?'Scheme lots: '+p.sch:'',p.box||'',p.case||'',p.minBill?'Minimum billing: '+p.minBill:'',p.slab||''].filter(Boolean).join(' · ')),
+      p.flat?h('div',{class:'meta'},'Flat rate (direct stockist, one invoice): '+p.flat.map(function(f){return f[0]+' ₹'+f[1]}).join(' · ')):null,
+      p.gift?h('div',{class:'meta',style:'color:var(--accent)'},'🎁 '+p.gift):null))});
+    app.append(h('small',{style:'color:var(--muted);display:block'},'* incl. GST, per unit. ≈ MRP is worked out from the company rate – always check the MRP printed on the pack.'));return}
+  // calculator
+  var P=R.products;var st=S.tab.calc||(S.tab.calc={p:8,who:'Retailer',q:10,lot:0,mrp:''});
+  var sel=h('select',{},P.map(function(p,k){return h('option',{value:k},p.n)}));sel.value=st.p;
+  var who=h('div',{class:'subtabs'},['Retailer','Wholesaler','Stockist'].map(function(x){return h('button',{class:st.who===x?'on':'',onclick:function(){st.who=x;render()}},x)}));
+  var p=P[st.p];var lots=(p.sch||'').split('·').map(function(x){return x.trim()}).filter(Boolean);
+  var lot=h('select',{},[h('option',{value:0},'No scheme')].concat(lots.map(function(l,k){return h('option',{value:k+1},'Scheme '+l)})));lot.value=st.lot;
+  var qty=h('input',{type:'number',inputmode:'numeric',value:st.q});var mrp=h('input',{type:'number',inputmode:'decimal',value:st.mrp||(mrpOf(p)?mrpOf(p).toFixed(2):''),placeholder:'MRP on the pack'});
+  var out=h('div');
+  function calc(){st.q=+qty.value||0;st.lot=+lot.value;st.mrp=mrp.value;var m=+mrp.value||0,g=1+p.gst/100,ptr=m/g*.8;out.innerHTML='';if(!m){out.append(h('div',{class:'note'},'Type the MRP printed on the pack.'));return}
+    var buy=st.who==='Retailer'?ptr*g:st.who==='Wholesaler'?ptr*.93*g:ptr*.9*g,sell=st.who==='Retailer'?m:ptr*g,pct=st.who==='Retailer'?20:st.who==='Wholesaler'?7:10;
+    var paid=st.q,free=0,L=lots[st.lot-1];if(L){var ab=L.split('+').map(Number);free=Math.floor(paid/ab[0])*ab[1]}
+    var cost=paid*buy,rev=(paid+free)*sell,prof=rev-cost,eff=(paid+free)?cost/(paid+free):0,unitP=sell-eff,pp=sell?unitP/sell*100:0;
+    var line=function(a,b){return h('div',{style:'display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line)'},h('span',{},a),h('b',{class:'num'},b))};
+    var unit=p.u.replace(/ of \d+/,'');
+    var say=st.who==='Retailer'?'Sir, you buy at '+money(buy)+' a '+unit+' and sell at MRP '+money(m)+' – that is '+money(m-buy)+' profit on every '+unit+'.'+(free?' With scheme '+L+' you get '+free+' free, so your profit goes up to '+money(unitP)+' a '+unit+' ('+pp.toFixed(0)+'%). On this order you earn '+money(prof)+'.':' On '+paid+' you earn '+money(prof)+'.')
+      :st.who==='Wholesaler'?'You buy at '+money(buy)+' and sell to retailers at '+money(sell)+' – '+money(sell-buy)+' per '+unit+'.'+(free?' Pass the '+L+' scheme to retailers and they will order more.':'')+' This order earns you '+money(prof)+'.'
+      :'Your rate is '+money(buy)+' a '+unit+'. At retailer price '+money(sell)+' you earn 10%; through wholesalers you keep 3%.'+(p.slab?' '+p.slab+'.':'')+(p.flat?' Flat rate available in one invoice.':'');
+    out.append(h('div',{class:'score'},line('Buys at (incl. GST)',money(buy)+' / '+unit),line('Sells at',money(sell)+' / '+unit),line('Order: pays for',paid+' '+unit+(free?' + '+free+' free':'')),line('Bill value',money(cost)),
+      h('div',{style:'display:flex;justify-content:space-between;align-items:end;margin-top:6px'},h('span',{},'Profit on this order'),h('span',{class:'big',style:'color:var(--ok)'},money(prof))),
+      h('small',{style:'color:var(--muted)'},'Profit per '+unit+': '+money(unitP)+' ('+pp.toFixed(1)+'% of selling price, base '+pct+'%'+(free?' + free goods':'')+')')),
+      h('div',{class:'quote'},h('div',{class:'who'},'🗣️ '+t('say')),h('div',{class:'q'},say),h('button',{class:'ghost',style:'margin-top:8px',onclick:function(){speak(say)}},'🔊 '+t('listen'))),
+      (p.slab||p.flat||p.gift||p.minBill||p.case)?h('div',{class:'note'},[p.minBill?'Minimum billing: '+p.minBill:'',p.case||'',p.slab||'',p.flat?'Flat (direct stockist, one invoice): '+p.flat.map(function(f){return f[0]+' ₹'+f[1]}).join(' · '):'',p.gift?'🎁 '+p.gift:''].filter(Boolean).map(function(x){return h('div',{},'• '+x)})):null)}
+  sel.onchange=function(){st.p=+sel.value;st.lot=0;st.mrp='';render()};lot.onchange=function(){var L=lots[+lot.value-1];if(L){var a0=+L.split('+')[0];if((+qty.value||0)<a0)qty.value=a0}calc()};qty.oninput=calc;mrp.oninput=calc;
+  app.append(h('div',{class:'score'},h('b',{},'Price & profit calculator'),h('label',{},'Product',sel),h('label',{},'Customer'),who,h('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:8px'},h('label',{},'Quantity ('+p.u+')',qty),h('label',{},'MRP ₹ (from pack)',mrp)),h('label',{},'Scheme',lot)),out);calc()}
+function mrpOf(p){if(p.mrp)return p.mrp;if(!p.pts)return 0;return Math.round(p.pts*(1+p.gst/100)/.72*100)/100}
 function vQuiz(app){var Q=(C().quiz||[]);if(!Q.length)return;var seed=dayIdx();var pick=[];for(var k=0;k<5&&k<Q.length;k++)pick.push(Q[(seed*7+k*3)%Q.length]);
   var st=S.tab.quizState||(S.tab.quizState={i:0,score:0,ans:null});if(st.day!==TODAY){st.day=TODAY;st.i=0;st.score=0;st.ans=null}
   if(st.i>=pick.length){app.append(h('div',{class:'lcard',style:'text-align:center'},h('div',{class:'big'},st.score+' / '+pick.length),h('div',{},st.score>=4?'🏆 '+(C().quizWin||'Excellent!'):(C().quizTry||'Keep learning!')),h('button',{style:'margin-top:10px',onclick:function(){st.i=0;st.score=0;st.ans=null;render()}},t('again'))));return}
@@ -202,7 +248,7 @@ render=function(){var r=S.route,w=who();
   if(!S.ready||!w){base();return}
   if(!S.mgr&&!inApp()){document.body.innerHTML='';document.body.append(h('div',{class:'apponly'},t('appOnly')));return}
   var app=document.getElementById('app');
-  if(r==='learn'||r==='perf'){app.innerHTML='';app.append(head(),ticker());if(r==='learn'){var q0=quote();if(q0&&S.tab.learn!=='quiz')app.append(q0);vLearn(app)}else vPerf(app);app.append(nav(r));bridge();return}
+  if(r==='learn'||r==='perf'){app.innerHTML='';app.append(head(),ticker());if(r==='learn'){var q0=quote();if(q0&&S.tab.learn!=='quiz'&&S.tab.learn!=='prod')app.append(q0);vLearn(app)}else vPerf(app);app.append(nav(r));bridge();return}
   base();
   app.prepend(head(),ticker());var hd=app.querySelector('.fthead'),tk=app.querySelector('.ftick');
   if(tabOf(r)==='today'){var q=quote();if(q)tk.after(q);if(!S.mgr||S.viewAs){app.querySelectorAll('.score').forEach(function(x){x.remove()})}}
