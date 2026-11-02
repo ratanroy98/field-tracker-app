@@ -1,0 +1,91 @@
+window.COACH=window.COACH||{};
+COACH.en.phases=['Phase 1 · Basics','Phase 2 · Selling skills','Phase 3 · Business & numbers','Phase 4 · Champion'];
+COACH.en.phaseSub=['Your first two weeks','Talk, listen and convince','Margins, stock and stockists','Plan, lead and win'];
+COACH.en.modules2=[
+{icon:'💊',title:'Our products in simple words',sub:'What each brand is for',steps:[
+"R-Loc 150 is ranitidine, for acidity and ulcer pain. R-Loc D adds domperidone, for acidity with nausea or bloating.",
+"R-Loc Raft is for heartburn and reflux (GERD). Tell the doctor: for patients who feel burning after meals.",
+"Skinlite Cream is for dark patches on the face (melasma). It is applied at night and only on a doctor's prescription. In the day the patient needs sunscreen, so Day Care Sunscreen and Bright Facewash go with it.",
+"Deca-Durabolin (injection) and Dexona (tablets and injection) are prescription products used by doctors for specific conditions. Speak only what the detailing aid says.",
+"Oflin, Oflin-O, Ciprobid and Tiniba are anti-infectives. Zipcet is for allergy. Cadiphylate is for cough with breathing trouble.",
+"Never give medical advice yourself. Your job: tell the doctor what our leaflet says, and make sure the chemist has stock."],
+says:'You do not need to be a doctor. Know in one line what each brand is for, and say it with confidence.'},
+{icon:'📱',title:'Using this app in 2 minutes a day',sub:'Less typing, more selling',steps:[
+"Morning: open Today. Tap Check-in, read your priorities and your POB target. That is one minute.",
+"Your brick is already filled in every form. You only pick the doctor or outlet and tap Save.",
+"Stockist and retailer you used last time are remembered. Do not type what the app already knows.",
+"Tap Request stock when samples or inputs run low. No calls, no WhatsApp.",
+"Evening: read Ratan Roy's review in Messages. Reply to the 'Explanation required' points by 11 AM.",
+"Use spare minutes, while waiting at a clinic, for today's 3-minute lesson."],
+says:'The app is your assistant, not your boss. Spend your time with customers, not with your phone.'},
+{icon:'🛡️',title:'Rules you must never break',sub:'Protect yourself and the company',steps:[
+"Prescription products (Skinlite Cream, Deca, R-Loc, Dexona) are sold only against a doctor's prescription. Never push a chemist to sell them over the counter.",
+"Doctor gifts go only to list doctors, as per company policy. Never give doctor gifts to chemists.",
+"Speak only claims from the approved detailing aid. Never compare unfairly or speak against another company.",
+"Report honestly. A wrong report is worse than a low number. Ratan Roy will help with a low number; nobody can help with a false one.",
+"If a patient or doctor reports a side effect, tell Ratan Roy the same day with the details.",
+"Never promise a scheme, rate or gift that the company has not approved."],
+says:'Numbers can be recovered next week. Trust, once lost, never comes back.'},
+{icon:'❓',title:'Questions that open doors',sub:'Ask, listen, then sell',steps:[
+"Ask open questions that start with What, Which, How: 'Which patients come most with acidity?'",
+"Ask about his business, not your product: 'Which skin products move fastest here?'",
+"Listen fully. Nod. Write down one thing he said.",
+"Use his words in your pitch: 'You said many patients have burning after meals – that is exactly where R-Loc Raft helps.'",
+"End with a closing question: 'Shall I book 6 bottles to start?'"],
+says:'The customer who talks more buys more. Your best sales tool is a good question.'},
+{icon:'🧱',title:'Handling objections – the 4-step way',sub:'Listen, agree, answer, ask',steps:[
+"Step 1, Listen: let him finish completely. Do not interrupt.",
+"Step 2, Agree with the feeling, not the fact: 'I understand, sir, price matters.'",
+"Step 3, Answer with one fact: margin in rupees, a doctor who prescribes, or a scheme.",
+"Step 4, Ask again with a smaller step: 'Shall we start with the smallest lot?'",
+"Common objections: costly, no demand, competitor gives more, stock already there, owner not here. Each has a card in Situations."],
+says:'An objection is not a no. It is a question asking you to explain better.'},
+{icon:'💹',title:'Talking margin and profit',sub:'Show him what he earns',steps:[
+"A retailer earns about 20 percent of MRP. A wholesaler earns about 7 percent. A stockist earns about 10 percent.",
+"Do not say 'good margin'. Say the rupees: 'You earn about ₹33 on every tube.'",
+"With a free-goods scheme, profit goes up. Show it: 'With 50 plus 10, your profit becomes about 28 percent.'",
+"Use the Profit calculator in Learn, Rates & offers. Pick the product and customer, and read out the 'What to say' line.",
+"Always check the MRP printed on the pack before you quote."],
+says:'People do not buy products. They buy profit. Show him his profit in rupees.'},
+{icon:'🏬',title:'Working with stockists and wholesalers',sub:'The pipeline that feeds every shop',steps:[
+"Visit your stockists every week. Check stock, pending orders and expiry.",
+"Collect the stock statement by the 7th of every month. It shows what is really selling.",
+"Explain slabs and gifts: for example Dexona injection, 6 cases and above gets 2 percent off.",
+"Flat rates are only for direct Zydus stockists, once per invoice. Never promise them to others.",
+"Wholesalers move volume. Book big lots early in the month, not on the last day."],
+says:'If the stockist is empty, the best detailing in the world will not sell.'},
+{icon:'♻️',title:'Stock, expiry and returns',sub:'Keep returns below 3 percent',steps:[
+"Saleable returns must stay at or below 3 percent, or the incentive is lost.",
+"Book only what will sell. A forced order comes back as a return.",
+"Check near-expiry stock at every chemist. Move it to a faster outlet before it expires.",
+"Rotate stock: old stock in front, new stock behind.",
+"Tell Ratan Roy early about slow stock. Early action saves the return."],
+says:'A sale that comes back is not a sale. Sell what the market can use.'},
+{icon:'🗺️',title:'Planning your brick',sub:'Work smart, not just hard',steps:[
+"Look at your TP calendar. Know which brick you work each day of the month.",
+"For each brick, list: top 5 doctors, top 5 chemists, wholesalers, and NPD outlets.",
+"Plan the route: wholesalers first, doctors mid-day, retailers in the afternoon.",
+"Missed something today? It moves to the next date you visit that brick. Check carried items every morning.",
+"Every brick should give a fair share of your monthly POB. Know that number before you go."],
+says:'A brick visited without a plan is a day spent, not a day invested.'},
+{icon:'🏕️',title:'Running a doctor camp',sub:'Shakti camp, step by step',steps:[
+"Pick a list doctor with good patient flow. Fix the date with him one week ahead.",
+"Arrange the material, register and inputs from your stock. Request stock in the app if short.",
+"On the day, reach early, set up neatly and help the doctor's staff.",
+"Record the number of patients and prescriptions, with photos.",
+"Next day, visit nearby chemists and make sure the prescribed products are in stock."],
+says:'A good camp builds a doctor relationship that lasts years. Plan it like a wedding.'},
+{icon:'⏰',title:'Time and self-motivation',sub:'Own your day',steps:[
+"Start on time. The first call before 10 AM sets the tone for the day.",
+"Keep your phone for work in the field. Social media can wait until evening.",
+"Break the day target into small goals: ₹X before lunch, the rest after.",
+"After a bad call, take one deep breath and walk into the next shop with a smile.",
+"Every evening, write one thing you learned. Small daily progress becomes a big career."],
+says:'Motivation gets you started. Habit keeps you going.'},
+{icon:'🏆',title:'Winning your incentive',sub:'Know the rules, then beat them',steps:[
+"The monthly incentive starts at 97 percent of target. 100 and 110 percent pay much more.",
+"Milestone bonus needs 100 percent for the month and 40 percent of target by the 17th.",
+"All four KPI conditions must be met: growth over last year, returns 3 percent or less, outlet coverage 90 percent, doctor coverage 95 percent.",
+"Check the Progress tab every morning: it shows how much more to sell for each level.",
+"Impact brands (Deca, R-Loc, Skinlite, Dexona) also count for the quarter. Push them every week."],
+says:'The incentive is not luck. It is the result of daily discipline. Track it every day.'}];

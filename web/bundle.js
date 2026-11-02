@@ -639,6 +639,370 @@ quiz:[
 {q:'অৰ্ডাৰ নূন্যতম বিলিংতকৈ কম। আপুনি…',o:['বাতিল কৰিব','আৰু এটা চলা প্ৰডাক্ট যোগ কৰিব','এনেয়ে বুক কৰিব','ষ্টকিষ্টক উপেক্ষা কৰিবলৈ ক\'ব'],a:1,e:'এটা প্ৰডাক্ট যোগ কৰি নূন্যতম পাৰ কৰক, বাস্কেট বঢ়াওক।'},
 {q:'ডিটেলিঙৰ বাবে ভাল মাত?',o:['খৰ আৰু ডাঙৰকৈ','লাহে, স্পষ্ট, ৰৈ ৰৈ','বৰ লাহে','সদায় একে সুৰত'],a:1,e:'লাহে আৰু স্পষ্ট, মূল সুবিধাৰ পিছত অলপ ৰওক।'}]
 };
+window.COACH=window.COACH||{};
+COACH.en.phases=['Phase 1 · Basics','Phase 2 · Selling skills','Phase 3 · Business & numbers','Phase 4 · Champion'];
+COACH.en.phaseSub=['Your first two weeks','Talk, listen and convince','Margins, stock and stockists','Plan, lead and win'];
+COACH.en.modules2=[
+{icon:'💊',title:'Our products in simple words',sub:'What each brand is for',steps:[
+"R-Loc 150 is ranitidine, for acidity and ulcer pain. R-Loc D adds domperidone, for acidity with nausea or bloating.",
+"R-Loc Raft is for heartburn and reflux (GERD). Tell the doctor: for patients who feel burning after meals.",
+"Skinlite Cream is for dark patches on the face (melasma). It is applied at night and only on a doctor's prescription. In the day the patient needs sunscreen, so Day Care Sunscreen and Bright Facewash go with it.",
+"Deca-Durabolin (injection) and Dexona (tablets and injection) are prescription products used by doctors for specific conditions. Speak only what the detailing aid says.",
+"Oflin, Oflin-O, Ciprobid and Tiniba are anti-infectives. Zipcet is for allergy. Cadiphylate is for cough with breathing trouble.",
+"Never give medical advice yourself. Your job: tell the doctor what our leaflet says, and make sure the chemist has stock."],
+says:'You do not need to be a doctor. Know in one line what each brand is for, and say it with confidence.'},
+{icon:'📱',title:'Using this app in 2 minutes a day',sub:'Less typing, more selling',steps:[
+"Morning: open Today. Tap Check-in, read your priorities and your POB target. That is one minute.",
+"Your brick is already filled in every form. You only pick the doctor or outlet and tap Save.",
+"Stockist and retailer you used last time are remembered. Do not type what the app already knows.",
+"Tap Request stock when samples or inputs run low. No calls, no WhatsApp.",
+"Evening: read Ratan Roy's review in Messages. Reply to the 'Explanation required' points by 11 AM.",
+"Use spare minutes, while waiting at a clinic, for today's 3-minute lesson."],
+says:'The app is your assistant, not your boss. Spend your time with customers, not with your phone.'},
+{icon:'🛡️',title:'Rules you must never break',sub:'Protect yourself and the company',steps:[
+"Prescription products (Skinlite Cream, Deca, R-Loc, Dexona) are sold only against a doctor's prescription. Never push a chemist to sell them over the counter.",
+"Doctor gifts go only to list doctors, as per company policy. Never give doctor gifts to chemists.",
+"Speak only claims from the approved detailing aid. Never compare unfairly or speak against another company.",
+"Report honestly. A wrong report is worse than a low number. Ratan Roy will help with a low number; nobody can help with a false one.",
+"If a patient or doctor reports a side effect, tell Ratan Roy the same day with the details.",
+"Never promise a scheme, rate or gift that the company has not approved."],
+says:'Numbers can be recovered next week. Trust, once lost, never comes back.'},
+{icon:'❓',title:'Questions that open doors',sub:'Ask, listen, then sell',steps:[
+"Ask open questions that start with What, Which, How: 'Which patients come most with acidity?'",
+"Ask about his business, not your product: 'Which skin products move fastest here?'",
+"Listen fully. Nod. Write down one thing he said.",
+"Use his words in your pitch: 'You said many patients have burning after meals – that is exactly where R-Loc Raft helps.'",
+"End with a closing question: 'Shall I book 6 bottles to start?'"],
+says:'The customer who talks more buys more. Your best sales tool is a good question.'},
+{icon:'🧱',title:'Handling objections – the 4-step way',sub:'Listen, agree, answer, ask',steps:[
+"Step 1, Listen: let him finish completely. Do not interrupt.",
+"Step 2, Agree with the feeling, not the fact: 'I understand, sir, price matters.'",
+"Step 3, Answer with one fact: margin in rupees, a doctor who prescribes, or a scheme.",
+"Step 4, Ask again with a smaller step: 'Shall we start with the smallest lot?'",
+"Common objections: costly, no demand, competitor gives more, stock already there, owner not here. Each has a card in Situations."],
+says:'An objection is not a no. It is a question asking you to explain better.'},
+{icon:'💹',title:'Talking margin and profit',sub:'Show him what he earns',steps:[
+"A retailer earns about 20 percent of MRP. A wholesaler earns about 7 percent. A stockist earns about 10 percent.",
+"Do not say 'good margin'. Say the rupees: 'You earn about ₹33 on every tube.'",
+"With a free-goods scheme, profit goes up. Show it: 'With 50 plus 10, your profit becomes about 28 percent.'",
+"Use the Profit calculator in Learn, Rates & offers. Pick the product and customer, and read out the 'What to say' line.",
+"Always check the MRP printed on the pack before you quote."],
+says:'People do not buy products. They buy profit. Show him his profit in rupees.'},
+{icon:'🏬',title:'Working with stockists and wholesalers',sub:'The pipeline that feeds every shop',steps:[
+"Visit your stockists every week. Check stock, pending orders and expiry.",
+"Collect the stock statement by the 7th of every month. It shows what is really selling.",
+"Explain slabs and gifts: for example Dexona injection, 6 cases and above gets 2 percent off.",
+"Flat rates are only for direct Zydus stockists, once per invoice. Never promise them to others.",
+"Wholesalers move volume. Book big lots early in the month, not on the last day."],
+says:'If the stockist is empty, the best detailing in the world will not sell.'},
+{icon:'♻️',title:'Stock, expiry and returns',sub:'Keep returns below 3 percent',steps:[
+"Saleable returns must stay at or below 3 percent, or the incentive is lost.",
+"Book only what will sell. A forced order comes back as a return.",
+"Check near-expiry stock at every chemist. Move it to a faster outlet before it expires.",
+"Rotate stock: old stock in front, new stock behind.",
+"Tell Ratan Roy early about slow stock. Early action saves the return."],
+says:'A sale that comes back is not a sale. Sell what the market can use.'},
+{icon:'🗺️',title:'Planning your brick',sub:'Work smart, not just hard',steps:[
+"Look at your TP calendar. Know which brick you work each day of the month.",
+"For each brick, list: top 5 doctors, top 5 chemists, wholesalers, and NPD outlets.",
+"Plan the route: wholesalers first, doctors mid-day, retailers in the afternoon.",
+"Missed something today? It moves to the next date you visit that brick. Check carried items every morning.",
+"Every brick should give a fair share of your monthly POB. Know that number before you go."],
+says:'A brick visited without a plan is a day spent, not a day invested.'},
+{icon:'🏕️',title:'Running a doctor camp',sub:'Shakti camp, step by step',steps:[
+"Pick a list doctor with good patient flow. Fix the date with him one week ahead.",
+"Arrange the material, register and inputs from your stock. Request stock in the app if short.",
+"On the day, reach early, set up neatly and help the doctor's staff.",
+"Record the number of patients and prescriptions, with photos.",
+"Next day, visit nearby chemists and make sure the prescribed products are in stock."],
+says:'A good camp builds a doctor relationship that lasts years. Plan it like a wedding.'},
+{icon:'⏰',title:'Time and self-motivation',sub:'Own your day',steps:[
+"Start on time. The first call before 10 AM sets the tone for the day.",
+"Keep your phone for work in the field. Social media can wait until evening.",
+"Break the day target into small goals: ₹X before lunch, the rest after.",
+"After a bad call, take one deep breath and walk into the next shop with a smile.",
+"Every evening, write one thing you learned. Small daily progress becomes a big career."],
+says:'Motivation gets you started. Habit keeps you going.'},
+{icon:'🏆',title:'Winning your incentive',sub:'Know the rules, then beat them',steps:[
+"The monthly incentive starts at 97 percent of target. 100 and 110 percent pay much more.",
+"Milestone bonus needs 100 percent for the month and 40 percent of target by the 17th.",
+"All four KPI conditions must be met: growth over last year, returns 3 percent or less, outlet coverage 90 percent, doctor coverage 95 percent.",
+"Check the Progress tab every morning: it shows how much more to sell for each level.",
+"Impact brands (Deca, R-Loc, Skinlite, Dexona) also count for the quarter. Push them every week."],
+says:'The incentive is not luck. It is the result of daily discipline. Track it every day.'}];
+window.COACH=window.COACH||{};
+COACH.hi.phases=['चरण 1 · बुनियाद','चरण 2 · बिक्री कौशल','चरण 3 · बिज़नेस और आँकड़े','चरण 4 · चैंपियन'];
+COACH.hi.phaseSub=['आपके पहले दो हफ़्ते','बोलना, सुनना और मनाना','मार्जिन, स्टॉक और स्टॉकिस्ट','प्लान करें, आगे बढ़ें, जीतें'];
+COACH.hi.modules2=[
+{icon:'💊',title:'हमारे प्रोडक्ट आसान शब्दों में',sub:'कौन-सा ब्रांड किस काम का',steps:[
+"R-Loc 150 रैनिटिडीन है, एसिडिटी और अल्सर के दर्द के लिए। R-Loc D में डोमपेरिडोन भी है, जी मिचलाने या पेट फूलने वाली एसिडिटी के लिए।",
+"R-Loc Raft सीने की जलन और रिफ़्लक्स (GERD) के लिए है। डॉक्टर से कहिए: जिन मरीज़ों को खाने के बाद जलन होती है।",
+"Skinlite Cream चेहरे के काले धब्बों (मेलाज़्मा) के लिए है। रात में लगाई जाती है और सिर्फ़ डॉक्टर के पर्चे पर। दिन में सनस्क्रीन ज़रूरी है, इसलिए Day Care Sunscreen और Bright Facewash साथ में।",
+"Deca-Durabolin (इंजेक्शन) और Dexona (टैबलेट और इंजेक्शन) पर्चे वाले प्रोडक्ट हैं, जिन्हें डॉक्टर ख़ास स्थितियों में देते हैं। सिर्फ़ वही बोलिए जो डिटेलिंग एड में लिखा है।",
+"Oflin, Oflin-O, Ciprobid और Tiniba संक्रमण की दवाएँ हैं। Zipcet एलर्जी के लिए है। Cadiphylate साँस की तकलीफ़ वाली खाँसी के लिए है।",
+"ख़ुद कभी दवा की सलाह मत दीजिए। आपका काम: डॉक्टर को लीफ़लेट की बात बताना और केमिस्ट के पास स्टॉक पक्का करना।"],
+says:'आपको डॉक्टर बनने की ज़रूरत नहीं। हर ब्रांड एक लाइन में जानिए और भरोसे से बोलिए।'},
+{icon:'📱',title:'ऐप दिन में सिर्फ़ 2 मिनट',sub:'कम टाइपिंग, ज़्यादा बिक्री',steps:[
+"सुबह: Today खोलिए। Check-in दबाइए, अपनी प्राथमिकताएँ और POB टारगेट पढ़िए। बस एक मिनट।",
+"हर फ़ॉर्म में आपका ब्रिक पहले से भरा है। बस डॉक्टर या दुकान चुनिए और Save दबाइए।",
+"पिछली बार चुना स्टॉकिस्ट और रिटेलर ऐप याद रखता है। जो ऐप जानता है, वह टाइप मत कीजिए।",
+"सैंपल या इनपुट कम हों तो Request stock दबाइए। न फ़ोन, न व्हाट्सऐप।",
+"शाम: Messages में रतन रॉय का रिव्यू पढ़िए। 'Explanation required' का जवाब सुबह 11 बजे तक दीजिए।",
+"क्लिनिक में इंतज़ार के ख़ाली मिनटों में आज का 3 मिनट का पाठ कीजिए।"],
+says:'ऐप आपका सहायक है, मालिक नहीं। समय ग्राहकों को दीजिए, फ़ोन को नहीं।'},
+{icon:'🛡️',title:'नियम जो कभी नहीं तोड़ने',sub:'ख़ुद को और कंपनी को सुरक्षित रखिए',steps:[
+"पर्चे वाले प्रोडक्ट (Skinlite Cream, Deca, R-Loc, Dexona) सिर्फ़ डॉक्टर के पर्चे पर बिकते हैं। केमिस्ट पर बिना पर्चे बेचने का दबाव कभी मत डालिए।",
+"डॉक्टर गिफ़्ट सिर्फ़ लिस्ट डॉक्टरों को, कंपनी नीति के अनुसार। केमिस्ट को डॉक्टर गिफ़्ट कभी नहीं।",
+"सिर्फ़ मंज़ूर डिटेलिंग एड की बातें बोलिए। किसी दूसरी कंपनी के ख़िलाफ़ ग़लत तुलना मत कीजिए।",
+"ईमानदारी से रिपोर्ट कीजिए। ग़लत रिपोर्ट कम आँकड़े से ज़्यादा बुरी है। कम आँकड़े में रतन रॉय मदद करेंगे; झूठ में कोई नहीं कर सकता।",
+"अगर कोई मरीज़ या डॉक्टर दुष्प्रभाव बताए, उसी दिन पूरी जानकारी के साथ रतन रॉय को बताइए।",
+"जो स्कीम, रेट या गिफ़्ट कंपनी ने मंज़ूर नहीं किया, उसका वादा कभी मत कीजिए।"],
+says:'आँकड़े अगले हफ़्ते सुधर सकते हैं। भरोसा एक बार गया तो वापस नहीं आता।'},
+{icon:'❓',title:'सवाल जो दरवाज़े खोलते हैं',sub:'पूछिए, सुनिए, फिर बेचिए',steps:[
+"खुले सवाल पूछिए जो क्या, कौन-सा, कैसे से शुरू हों: 'एसिडिटी के मरीज़ सबसे ज़्यादा किस तरह के आते हैं?'",
+"उनके बिज़नेस के बारे में पूछिए, अपने प्रोडक्ट के नहीं: 'यहाँ कौन-से स्किन प्रोडक्ट सबसे तेज़ बिकते हैं?'",
+"पूरा सुनिए। सिर हिलाइए। उनकी एक बात लिख लीजिए।",
+"अपनी पिच में उनके शब्द इस्तेमाल कीजिए: 'आपने कहा कई मरीज़ों को खाने के बाद जलन होती है – वहीं R-Loc Raft काम आता है।'",
+"एक क्लोज़िंग सवाल से ख़त्म कीजिए: 'शुरुआत में 6 बोतल बुक कर दूँ?'"],
+says:'जो ग्राहक ज़्यादा बोलता है, वह ज़्यादा ख़रीदता है। आपका सबसे बड़ा हथियार एक अच्छा सवाल है।'},
+{icon:'🧱',title:'आपत्ति सँभालना – 4 क़दम',sub:'सुनिए, सहमति, जवाब, फिर पूछिए',steps:[
+"क़दम 1, सुनिए: उन्हें पूरी बात कहने दीजिए। बीच में मत टोकिए।",
+"क़दम 2, भावना से सहमत होइए, तथ्य से नहीं: 'समझता हूँ सर, क़ीमत मायने रखती है।'",
+"क़दम 3, एक तथ्य से जवाब दीजिए: रुपये में मार्जिन, लिखने वाला डॉक्टर, या स्कीम।",
+"क़दम 4, छोटे क़दम के साथ फिर पूछिए: 'सबसे छोटे लॉट से शुरू करें?'",
+"आम आपत्तियाँ: महँगा, माँग नहीं, प्रतियोगी ज़्यादा देता है, स्टॉक पहले से है, मालिक नहीं हैं। हर एक का कार्ड Situations में है।"],
+says:'आपत्ति “ना” नहीं है। यह एक सवाल है कि आप बेहतर समझाइए।'},
+{icon:'💹',title:'मार्जिन और मुनाफ़े की बात',sub:'दिखाइए वे क्या कमाते हैं',steps:[
+"रिटेलर MRP का लगभग 20 प्रतिशत कमाता है। होलसेलर लगभग 7 प्रतिशत। स्टॉकिस्ट लगभग 10 प्रतिशत।",
+"'अच्छा मार्जिन' मत कहिए। रुपये बताइए: 'हर ट्यूब पर आप लगभग ₹33 कमाते हैं।'",
+"फ़्री माल वाली स्कीम से मुनाफ़ा बढ़ता है। दिखाइए: '50+10 में आपका मुनाफ़ा लगभग 28 प्रतिशत हो जाता है।'",
+"Learn में Rates & offers का Profit calculator इस्तेमाल कीजिए। प्रोडक्ट और ग्राहक चुनिए और 'क्या बोलें' वाली लाइन पढ़िए।",
+"रेट बताने से पहले पैक पर छपी MRP ज़रूर देखिए।"],
+says:'लोग प्रोडक्ट नहीं, मुनाफ़ा ख़रीदते हैं। उन्हें रुपये में उनका मुनाफ़ा दिखाइए।'},
+{icon:'🏬',title:'स्टॉकिस्ट और होलसेलर के साथ काम',sub:'वह पाइपलाइन जो हर दुकान भरती है',steps:[
+"हर हफ़्ते स्टॉकिस्ट से मिलिए। स्टॉक, बाक़ी ऑर्डर और एक्सपायरी देखिए।",
+"हर महीने 7 तारीख़ तक स्टॉक स्टेटमेंट लीजिए। इससे पता चलता है असल में क्या बिक रहा है।",
+"स्लैब और गिफ़्ट समझाइए: जैसे Dexona इंजेक्शन, 6 केस या ज़्यादा पर 2 प्रतिशत छूट।",
+"फ़्लैट रेट सिर्फ़ सीधे Zydus स्टॉकिस्ट के लिए, एक इनवॉइस में एक बार। दूसरों से इसका वादा मत कीजिए।",
+"होलसेलर बड़ा माल चलाते हैं। बड़े लॉट महीने की शुरुआत में बुक कीजिए, आख़िरी दिन नहीं।"],
+says:'स्टॉकिस्ट ख़ाली है तो दुनिया की सबसे अच्छी डिटेलिंग भी नहीं बेच पाएगी।'},
+{icon:'♻️',title:'स्टॉक, एक्सपायरी और रिटर्न',sub:'रिटर्न 3 प्रतिशत से कम रखिए',steps:[
+"सेलेबल रिटर्न 3 प्रतिशत या उससे कम रहना चाहिए, वरना इंसेंटिव चला जाता है।",
+"सिर्फ़ उतना बुक कीजिए जितना बिकेगा। ज़बरदस्ती का ऑर्डर रिटर्न बनकर लौटता है।",
+"हर केमिस्ट पर एक्सपायरी के क़रीब का स्टॉक देखिए। एक्सपायर होने से पहले तेज़ दुकान पर पहुँचाइए।",
+"स्टॉक घुमाइए: पुराना आगे, नया पीछे।",
+"धीमे स्टॉक के बारे में रतन रॉय को जल्दी बताइए। जल्दी क़दम रिटर्न बचाता है।"],
+says:'जो बिक्री वापस आ जाए, वह बिक्री नहीं। उतना बेचिए जितना बाज़ार इस्तेमाल कर सके।'},
+{icon:'🗺️',title:'अपने ब्रिक की योजना',sub:'सिर्फ़ मेहनत नहीं, समझदारी से',steps:[
+"अपना TP कैलेंडर देखिए। जानिए महीने के हर दिन कौन-सा ब्रिक है।",
+"हर ब्रिक के लिए लिखिए: टॉप 5 डॉक्टर, टॉप 5 केमिस्ट, होलसेलर और NPD आउटलेट।",
+"रूट तय कीजिए: पहले होलसेलर, दोपहर में डॉक्टर, शाम को रिटेलर।",
+"आज कुछ छूटा? वह उस ब्रिक की अगली तारीख़ पर चला जाता है। हर सुबह आगे बढ़े काम देखिए।",
+"हर ब्रिक से महीने के POB का सही हिस्सा आना चाहिए। निकलने से पहले वह आँकड़ा जानिए।"],
+says:'बिना योजना का ब्रिक दिन ख़र्च करता है, निवेश नहीं करता।'},
+{icon:'🏕️',title:'डॉक्टर कैंप कैसे चलाएँ',sub:'शक्ति कैंप, क़दम दर क़दम',steps:[
+"अच्छे मरीज़ों वाला लिस्ट डॉक्टर चुनिए। एक हफ़्ता पहले उनके साथ तारीख़ तय कीजिए।",
+"सामग्री, रजिस्टर और इनपुट अपने स्टॉक से तैयार कीजिए। कम हो तो ऐप में Request stock कीजिए।",
+"उस दिन जल्दी पहुँचिए, साफ़-सुथरा सेटअप कीजिए और डॉक्टर के स्टाफ़ की मदद कीजिए।",
+"मरीज़ों और पर्चों की संख्या फ़ोटो के साथ दर्ज कीजिए।",
+"अगले दिन पास के केमिस्ट पर जाकर पक्का कीजिए कि लिखे गए प्रोडक्ट स्टॉक में हैं।"],
+says:'अच्छा कैंप सालों चलने वाला रिश्ता बनाता है। इसे शादी की तरह प्लान कीजिए।'},
+{icon:'⏰',title:'समय और ख़ुद की प्रेरणा',sub:'अपने दिन के मालिक बनिए',steps:[
+"समय पर शुरू कीजिए। सुबह 10 बजे से पहले की पहली कॉल पूरे दिन का माहौल बनाती है।",
+"फ़ील्ड में फ़ोन सिर्फ़ काम के लिए। सोशल मीडिया शाम तक रुक सकता है।",
+"दिन का टारगेट छोटे लक्ष्यों में बाँटिए: लंच से पहले ₹X, बाक़ी बाद में।",
+"ख़राब कॉल के बाद एक गहरी साँस लीजिए और मुस्कान के साथ अगली दुकान में जाइए।",
+"हर शाम एक सीखी हुई बात लिखिए। रोज़ की छोटी तरक़्क़ी बड़ा करियर बनाती है।"],
+says:'प्रेरणा शुरुआत कराती है। आदत आगे ले जाती है।'},
+{icon:'🏆',title:'अपना इंसेंटिव जीतिए',sub:'नियम जानिए, फिर उन्हें पार कीजिए',steps:[
+"मासिक इंसेंटिव टारगेट के 97 प्रतिशत से शुरू होता है। 100 और 110 प्रतिशत पर काफ़ी ज़्यादा मिलता है।",
+"माइलस्टोन बोनस के लिए महीने का 100 प्रतिशत और 17 तारीख़ तक 40 प्रतिशत ज़रूरी है।",
+"चारों KPI शर्तें ज़रूरी: पिछले साल से ग्रोथ, रिटर्न 3 प्रतिशत या कम, आउटलेट कवरेज 90 प्रतिशत, डॉक्टर कवरेज 95 प्रतिशत।",
+"हर सुबह Progress टैब देखिए: हर स्तर के लिए कितना और बेचना है, वह दिखता है।",
+"इम्पैक्ट ब्रांड (Deca, R-Loc, Skinlite, Dexona) तिमाही में भी गिने जाते हैं। हर हफ़्ते उन पर ज़ोर दीजिए।"],
+says:'इंसेंटिव क़िस्मत नहीं, रोज़ के अनुशासन का नतीजा है। हर दिन ट्रैक कीजिए।'}];
+window.COACH=window.COACH||{};
+COACH.bn.phases=['ধাপ ১ · ভিত','ধাপ ২ · বিক্রির দক্ষতা','ধাপ ৩ · ব্যবসা ও সংখ্যা','ধাপ ৪ · চ্যাম্পিয়ন'];
+COACH.bn.phaseSub=['আপনার প্রথম দুই সপ্তাহ','বলা, শোনা ও বোঝানো','মার্জিন, স্টক ও স্টকিস্ট','পরিকল্পনা, নেতৃত্ব, জয়'];
+COACH.bn.modules2=[
+{icon:'💊',title:'আমাদের প্রোডাক্ট সহজ কথায়',sub:'কোন ব্র্যান্ড কীসের জন্য',steps:[
+"R-Loc 150 হল র‍্যানিটিডিন, অম্বল আর আলসারের ব্যথার জন্য। R-Loc D-তে ডমপেরিডোনও আছে, বমি-ভাব বা পেট ফাঁপা সহ অম্বলের জন্য।",
+"R-Loc Raft বুক জ্বালা ও রিফ্লাক্সের (GERD) জন্য। ডাক্তারকে বলুন: যে রোগীদের খাওয়ার পরে জ্বালা হয়।",
+"Skinlite Cream মুখের কালো ছোপের (মেলাসমা) জন্য। রাতে লাগাতে হয়, শুধু ডাক্তারের প্রেসক্রিপশনে। দিনে সানস্ক্রিন লাগে, তাই Day Care Sunscreen আর Bright Facewash সঙ্গে চলে।",
+"Deca-Durabolin (ইনজেকশন) আর Dexona (ট্যাবলেট ও ইনজেকশন) প্রেসক্রিপশনের প্রোডাক্ট, ডাক্তার নির্দিষ্ট অবস্থায় দেন। শুধু ডিটেলিং এইডে যা লেখা, তা-ই বলুন।",
+"Oflin, Oflin-O, Ciprobid আর Tiniba সংক্রমণের ওষুধ। Zipcet অ্যালার্জির জন্য। Cadiphylate শ্বাসকষ্ট সহ কাশির জন্য।",
+"নিজে কখনও ওষুধের পরামর্শ দেবেন না। আপনার কাজ: লিফলেটের কথা ডাক্তারকে বলা, আর কেমিস্টের কাছে স্টক নিশ্চিত করা।"],
+says:'আপনাকে ডাক্তার হতে হবে না। প্রতিটি ব্র্যান্ড এক লাইনে জানুন, আর আত্মবিশ্বাসের সঙ্গে বলুন।'},
+{icon:'📱',title:'অ্যাপ দিনে মাত্র ২ মিনিট',sub:'কম টাইপ, বেশি বিক্রি',steps:[
+"সকালে: Today খুলুন। Check-in চাপুন, অগ্রাধিকার আর POB টার্গেট পড়ুন। এক মিনিটই যথেষ্ট।",
+"প্রতিটি ফর্মে আপনার ব্রিক আগে থেকেই ভরা। শুধু ডাক্তার বা দোকান বেছে Save চাপুন।",
+"আগের বার বাছা স্টকিস্ট আর রিটেলার অ্যাপ মনে রাখে। অ্যাপ যা জানে, তা টাইপ করবেন না।",
+"স্যাম্পল বা ইনপুট কমে গেলে Request stock চাপুন। ফোন বা হোয়াটসঅ্যাপ লাগবে না।",
+"সন্ধ্যায়: Messages-এ রতন রায়ের রিভিউ পড়ুন। 'Explanation required'-এর উত্তর সকাল ১১টার মধ্যে দিন।",
+"ক্লিনিকে অপেক্ষার ফাঁকা সময়ে আজকের ৩ মিনিটের পাঠ করে নিন।"],
+says:'অ্যাপ আপনার সহকারী, মালিক নয়। সময় দিন গ্রাহককে, ফোনকে নয়।'},
+{icon:'🛡️',title:'যে নিয়ম কখনও ভাঙবেন না',sub:'নিজেকে আর কোম্পানিকে সুরক্ষিত রাখুন',steps:[
+"প্রেসক্রিপশনের প্রোডাক্ট (Skinlite Cream, Deca, R-Loc, Dexona) শুধু ডাক্তারের প্রেসক্রিপশনে বিক্রি হয়। কেমিস্টকে প্রেসক্রিপশন ছাড়া বেচতে কখনও চাপ দেবেন না।",
+"ডাক্তারের গিফট শুধু লিস্ট ডাক্তারদের, কোম্পানির নীতি মেনে। কেমিস্টকে ডাক্তারের গিফট কখনও নয়।",
+"শুধু অনুমোদিত ডিটেলিং এইডের কথা বলুন। অন্য কোম্পানির বিরুদ্ধে অন্যায্য তুলনা করবেন না।",
+"সৎভাবে রিপোর্ট করুন। ভুল রিপোর্ট কম সংখ্যার চেয়েও খারাপ। কম সংখ্যায় রতন রায় সাহায্য করবেন; মিথ্যায় কেউ পারবে না।",
+"কোনো রোগী বা ডাক্তার পার্শ্বপ্রতিক্রিয়ার কথা বললে, সেদিনই বিস্তারিত সহ রতন রায়কে জানান।",
+"কোম্পানি যে স্কিম, রেট বা গিফট অনুমোদন করেনি, তার প্রতিশ্রুতি কখনও দেবেন না।"],
+says:'সংখ্যা পরের সপ্তাহে ঠিক করা যায়। বিশ্বাস একবার গেলে আর ফেরে না।'},
+{icon:'❓',title:'যে প্রশ্ন দরজা খোলে',sub:'জিজ্ঞেস করুন, শুনুন, তারপর বেচুন',steps:[
+"খোলা প্রশ্ন করুন যা কী, কোন, কীভাবে দিয়ে শুরু: 'অম্বলের কোন ধরনের রোগী সবচেয়ে বেশি আসেন?'",
+"নিজের প্রোডাক্ট নয়, তাঁর ব্যবসা নিয়ে জিজ্ঞেস করুন: 'এখানে কোন স্কিন প্রোডাক্ট সবচেয়ে তাড়াতাড়ি চলে?'",
+"পুরোটা শুনুন। মাথা নাড়ুন। তাঁর একটা কথা লিখে রাখুন।",
+"পিচে তাঁর কথাই ব্যবহার করুন: 'আপনি বললেন অনেক রোগীর খাওয়ার পরে জ্বালা হয় – ঠিক সেখানেই R-Loc Raft কাজে আসে।'",
+"একটা ক্লোজিং প্রশ্নে শেষ করুন: 'শুরুতে ৬ বোতল বুক করে দিই?'"],
+says:'যে গ্রাহক বেশি কথা বলেন, তিনি বেশি কেনেন। আপনার সেরা অস্ত্র একটা ভালো প্রশ্ন।'},
+{icon:'🧱',title:'আপত্তি সামলানো – ৪ ধাপে',sub:'শুনুন, সায় দিন, উত্তর দিন, আবার চান',steps:[
+"ধাপ ১, শুনুন: তাঁকে পুরোটা বলতে দিন। মাঝে বাধা দেবেন না।",
+"ধাপ ২, অনুভূতিতে সায় দিন, তথ্যে নয়: 'বুঝতে পারছি দাদা, দামটা গুরুত্বপূর্ণ।'",
+"ধাপ ৩, একটা তথ্য দিয়ে উত্তর দিন: টাকায় মার্জিন, লিখছেন এমন ডাক্তার, বা স্কিম।",
+"ধাপ ৪, ছোট পদক্ষেপে আবার চান: 'সবচেয়ে ছোট লট দিয়ে শুরু করি?'",
+"সাধারণ আপত্তি: দামি, চাহিদা নেই, প্রতিযোগী বেশি দেয়, স্টক আগেই আছে, মালিক নেই। প্রতিটির কার্ড Situations-এ আছে।"],
+says:'আপত্তি মানে না নয়। এটা একটা প্রশ্ন – আরও ভালো করে বোঝান।'},
+{icon:'💹',title:'মার্জিন আর লাভের কথা',sub:'দেখান তিনি কত আয় করবেন',steps:[
+"রিটেলার MRP-র প্রায় ২০ শতাংশ আয় করেন। হোলসেলার প্রায় ৭ শতাংশ। স্টকিস্ট প্রায় ১০ শতাংশ।",
+"'ভালো মার্জিন' বলবেন না। টাকায় বলুন: 'প্রতি টিউবে আপনি প্রায় ₹৩৩ আয় করবেন।'",
+"ফ্রি মালের স্কিমে লাভ বাড়ে। দেখান: '৫০+১০-এ আপনার লাভ প্রায় ২৮ শতাংশ হয়ে যায়।'",
+"Learn-এ Rates & offers-এর Profit calculator ব্যবহার করুন। প্রোডাক্ট আর গ্রাহক বেছে 'কী বলবেন' লাইনটা পড়ুন।",
+"দাম বলার আগে প্যাকে ছাপা MRP অবশ্যই দেখে নিন।"],
+says:'মানুষ প্রোডাক্ট কেনে না, লাভ কেনে। টাকায় তাঁর লাভ দেখান।'},
+{icon:'🏬',title:'স্টকিস্ট আর হোলসেলারের সঙ্গে কাজ',sub:'যে পাইপলাইন প্রতিটি দোকান ভরায়',steps:[
+"প্রতি সপ্তাহে স্টকিস্টের কাছে যান। স্টক, বাকি অর্ডার আর এক্সপায়ারি দেখুন।",
+"প্রতি মাসে ৭ তারিখের মধ্যে স্টক স্টেটমেন্ট নিন। এতে বোঝা যায় আসলে কী বিক্রি হচ্ছে।",
+"স্ল্যাব আর গিফট বুঝিয়ে বলুন: যেমন Dexona ইনজেকশন, ৬ কেস বা বেশিতে ২ শতাংশ ছাড়।",
+"ফ্ল্যাট রেট শুধু সরাসরি Zydus স্টকিস্টের জন্য, এক ইনভয়েসে একবার। অন্যদের প্রতিশ্রুতি দেবেন না।",
+"হোলসেলাররা বেশি মাল চালান। বড় লট মাসের শুরুতে বুক করুন, শেষ দিনে নয়।"],
+says:'স্টকিস্ট খালি থাকলে দুনিয়ার সেরা ডিটেলিংও বিক্রি আনতে পারবে না।'},
+{icon:'♻️',title:'স্টক, এক্সপায়ারি আর রিটার্ন',sub:'রিটার্ন ৩ শতাংশের নিচে রাখুন',steps:[
+"সেলেবল রিটার্ন ৩ শতাংশ বা কম থাকতে হবে, নইলে ইনসেনটিভ চলে যায়।",
+"যতটা বিক্রি হবে, শুধু ততটাই বুক করুন। জোর করে নেওয়া অর্ডার রিটার্ন হয়ে ফেরে।",
+"প্রতিটি কেমিস্টে মেয়াদ-ঘনিয়ে আসা স্টক দেখুন। মেয়াদ পেরোনোর আগে দ্রুত চলা দোকানে সরান।",
+"স্টক ঘোরান: পুরনো সামনে, নতুন পেছনে।",
+"ধীরে চলা স্টকের কথা রতন রায়কে আগেভাগে জানান। আগে পদক্ষেপ নিলে রিটার্ন বাঁচে।"],
+says:'যে বিক্রি ফেরত আসে, সেটা বিক্রি নয়। বাজার যতটা নিতে পারে, ততটাই বেচুন।'},
+{icon:'🗺️',title:'আপনার ব্রিকের পরিকল্পনা',sub:'শুধু খাটুনি নয়, বুদ্ধি দিয়ে',steps:[
+"আপনার TP ক্যালেন্ডার দেখুন। মাসের প্রতিদিন কোন ব্রিক, জেনে রাখুন।",
+"প্রতিটি ব্রিকের জন্য লিখুন: সেরা ৫ ডাক্তার, সেরা ৫ কেমিস্ট, হোলসেলার আর NPD আউটলেট।",
+"রুট ঠিক করুন: আগে হোলসেলার, দুপুরে ডাক্তার, বিকেলে রিটেলার।",
+"আজ কিছু বাদ গেছে? সেটা ওই ব্রিকের পরের তারিখে চলে যায়। প্রতি সকালে এগিয়ে আসা কাজ দেখুন।",
+"প্রতিটি ব্রিক থেকে মাসের POB-এর ন্যায্য অংশ আসা উচিত। বেরোনোর আগে সংখ্যাটা জানুন।"],
+says:'পরিকল্পনা ছাড়া ব্রিকে গেলে দিনটা খরচ হয়, বিনিয়োগ হয় না।'},
+{icon:'🏕️',title:'ডাক্তার ক্যাম্প কীভাবে করবেন',sub:'শক্তি ক্যাম্প, ধাপে ধাপে',steps:[
+"ভালো রোগী আসেন এমন লিস্ট ডাক্তার বাছুন। এক সপ্তাহ আগে তাঁর সঙ্গে তারিখ ঠিক করুন।",
+"উপকরণ, রেজিস্টার আর ইনপুট নিজের স্টক থেকে গুছিয়ে নিন। কম থাকলে অ্যাপে Request stock করুন।",
+"সেদিন আগে পৌঁছন, পরিচ্ছন্নভাবে সাজান আর ডাক্তারের কর্মীদের সাহায্য করুন।",
+"রোগী আর প্রেসক্রিপশনের সংখ্যা ছবি সহ লিখে রাখুন।",
+"পরদিন কাছের কেমিস্টে গিয়ে নিশ্চিত করুন যে লেখা প্রোডাক্ট স্টকে আছে।"],
+says:'ভালো ক্যাম্প বছরের পর বছর টেকা সম্পর্ক গড়ে। বিয়ের মতো পরিকল্পনা করুন।'},
+{icon:'⏰',title:'সময় আর নিজের প্রেরণা',sub:'নিজের দিনের মালিক হোন',steps:[
+"সময়ে শুরু করুন। সকাল ১০টার আগের প্রথম কলই সারা দিনের সুর বাঁধে।",
+"মাঠে ফোন শুধু কাজের জন্য। সোশ্যাল মিডিয়া সন্ধ্যা পর্যন্ত অপেক্ষা করতে পারে।",
+"দিনের টার্গেট ছোট লক্ষ্যে ভাগ করুন: দুপুরের আগে ₹X, বাকিটা পরে।",
+"খারাপ কলের পরে একটা গভীর শ্বাস নিন, আর হাসিমুখে পরের দোকানে ঢুকুন।",
+"প্রতি সন্ধ্যায় একটা শেখা কথা লিখুন। রোজকার ছোট উন্নতি বড় কেরিয়ার গড়ে।"],
+says:'প্রেরণা শুরু করায়। অভ্যাস এগিয়ে নিয়ে যায়।'},
+{icon:'🏆',title:'আপনার ইনসেনটিভ জিতুন',sub:'নিয়ম জানুন, তারপর ছাপিয়ে যান',steps:[
+"মাসিক ইনসেনটিভ টার্গেটের ৯৭ শতাংশ থেকে শুরু। ১০০ আর ১১০ শতাংশে অনেক বেশি মেলে।",
+"মাইলস্টোন বোনাসের জন্য মাসের ১০০ শতাংশ আর ১৭ তারিখের মধ্যে ৪০ শতাংশ দরকার।",
+"চারটি KPI শর্তই দরকার: গত বছরের চেয়ে বৃদ্ধি, রিটার্ন ৩ শতাংশ বা কম, আউটলেট কভারেজ ৯০ শতাংশ, ডাক্তার কভারেজ ৯৫ শতাংশ।",
+"প্রতি সকালে Progress ট্যাব দেখুন: প্রতিটি স্তরের জন্য আর কত বেচতে হবে, দেখায়।",
+"ইমপ্যাক্ট ব্র্যান্ড (Deca, R-Loc, Skinlite, Dexona) ত্রৈমাসিকেও গোনা হয়। প্রতি সপ্তাহে জোর দিন।"],
+says:'ইনসেনটিভ ভাগ্য নয়, রোজকার শৃঙ্খলার ফল। প্রতিদিন নজর রাখুন।'}];
+window.COACH=window.COACH||{};
+COACH.as.phases=['পৰ্যায় ১ · ভেটি','পৰ্যায় ২ · বিক্ৰীৰ দক্ষতা','পৰ্যায় ৩ · ব্যৱসায় আৰু সংখ্যা','পৰ্যায় ৪ · চেম্পিয়ন'];
+COACH.as.phaseSub=['আপোনাৰ প্ৰথম দুসপ্তাহ','কোৱা, শুনা আৰু বুজোৱা','মাৰ্জিন, ষ্টক আৰু ষ্টকিষ্ট','পৰিকল্পনা, নেতৃত্ব, জয়'];
+COACH.as.modules2=[
+{icon:'💊',title:'আমাৰ প্ৰডাক্ট সহজ কথাত',sub:'কোনটো ব্ৰেণ্ড কিহৰ বাবে',steps:[
+"R-Loc 150 হৈছে ৰেনিটিডিন, এচিডিটি আৰু আলচাৰৰ বিষৰ বাবে। R-Loc D-ত ডমপেৰিডোনো আছে, বমি-ভাব বা পেট ফুলাৰ সৈতে এচিডিটিৰ বাবে।",
+"R-Loc Raft বুকু জ্বলা আৰু ৰিফ্লাক্সৰ (GERD) বাবে। ডাক্তৰক কওক: যিসকল ৰোগীৰ খোৱাৰ পিছত জ্বলে।",
+"Skinlite Cream মুখৰ ক'লা দাগৰ (মেলাজমা) বাবে। ৰাতি লগাব লাগে, কেৱল ডাক্তৰৰ প্ৰেছক্ৰিপচনত। দিনত ছানস্ক্ৰীন লাগে, সেয়েহে Day Care Sunscreen আৰু Bright Facewash লগত চলে।",
+"Deca-Durabolin (ইনজেকচন) আৰু Dexona (টেবলেট আৰু ইনজেকচন) প্ৰেছক্ৰিপচনৰ প্ৰডাক্ট, ডাক্তৰে নিৰ্দিষ্ট অৱস্থাত দিয়ে। কেৱল ডিটেলিং এইডত যি লিখা আছে, সেয়াই কওক।",
+"Oflin, Oflin-O, Ciprobid আৰু Tiniba সংক্ৰমণৰ ঔষধ। Zipcet এলাৰ্জীৰ বাবে। Cadiphylate উশাহৰ কষ্টৰ সৈতে কাহৰ বাবে।",
+"নিজে কেতিয়াও ঔষধৰ পৰামৰ্শ নিদিব। আপোনাৰ কাম: লিফলেটৰ কথা ডাক্তৰক কোৱা, আৰু কেমিষ্টৰ ওচৰত ষ্টক নিশ্চিত কৰা।"],
+says:'আপুনি ডাক্তৰ হ\'ব নালাগে। প্ৰতিটো ব্ৰেণ্ড এশাৰীত জানক, আৰু আত্মবিশ্বাসেৰে কওক।'},
+{icon:'📱',title:'এপ দিনে মাত্ৰ ২ মিনিট',sub:'কম টাইপ, বেছি বিক্ৰী',steps:[
+"ৰাতিপুৱা: Today খোলক। Check-in টিপক, অগ্ৰাধিকাৰ আৰু POB টাৰ্গেট পঢ়ক। এক মিনিটেই যথেষ্ট।",
+"প্ৰতিখন ফৰ্মত আপোনাৰ ব্ৰিক আগৰে পৰা ভৰোৱা আছে। কেৱল ডাক্তৰ বা দোকান বাছি Save টিপক।",
+"আগৰবাৰ বছা ষ্টকিষ্ট আৰু ৰিটেইলাৰ এপে মনত ৰাখে। এপে যি জানে, সেয়া টাইপ নকৰিব।",
+"চেম্পল বা ইনপুট কমি আহিলে Request stock টিপক। ফোন বা হোৱাটছএপ নালাগে।",
+"সন্ধিয়া: Messages-ত ৰতন ৰয়ৰ ৰিভিউ পঢ়ক। 'Explanation required'-ৰ উত্তৰ ৰাতিপুৱা ১১ বজাৰ ভিতৰত দিয়ক।",
+"ক্লিনিকত অপেক্ষাৰ খালী সময়ত আজিৰ ৩ মিনিটৰ পাঠ কৰি লওক।"],
+says:'এপ আপোনাৰ সহায়ক, মালিক নহয়। সময় গ্ৰাহকক দিয়ক, ফোনক নহয়।'},
+{icon:'🛡️',title:'যি নিয়ম কেতিয়াও নাভাঙিব',sub:'নিজকে আৰু কোম্পানীক সুৰক্ষিত ৰাখক',steps:[
+"প্ৰেছক্ৰিপচনৰ প্ৰডাক্ট (Skinlite Cream, Deca, R-Loc, Dexona) কেৱল ডাক্তৰৰ প্ৰেছক্ৰিপচনত বিক্ৰী হয়। কেমিষ্টক প্ৰেছক্ৰিপচন অবিহনে বেচিবলৈ কেতিয়াও হেঁচা নিদিব।",
+"ডাক্তৰৰ গিফট কেৱল লিষ্ট ডাক্তৰক, কোম্পানীৰ নীতি অনুসৰি। কেমিষ্টক ডাক্তৰৰ গিফট কেতিয়াও নহয়।",
+"কেৱল অনুমোদিত ডিটেলিং এইডৰ কথা কওক। আন কোম্পানীৰ বিৰুদ্ধে অন্যায্য তুলনা নকৰিব।",
+"সৎভাৱে ৰিপৰ্ট কৰক। ভুল ৰিপৰ্ট কম সংখ্যাতকৈও বেয়া। কম সংখ্যাত ৰতন ৰয়ে সহায় কৰিব; মিছাত কোনেও নোৱাৰে।",
+"কোনো ৰোগী বা ডাক্তৰে পাৰ্শ্বক্ৰিয়াৰ কথা ক'লে, সেইদিনাই বিতংভাৱে ৰতন ৰয়ক জনাওক।",
+"কোম্পানীয়ে যি স্কীম, ৰেট বা গিফট অনুমোদন কৰা নাই, তাৰ প্ৰতিশ্ৰুতি কেতিয়াও নিদিব।"],
+says:'সংখ্যা পিছৰ সপ্তাহত ঠিক কৰিব পাৰি। বিশ্বাস এবাৰ গ\'লে আৰু উভতি নাহে।'},
+{icon:'❓',title:'যি প্ৰশ্নই দুৱাৰ খোলে',sub:'সোধক, শুনক, তাৰপিছত বেচক',steps:[
+"মুকলি প্ৰশ্ন সোধক যি কি, কোনটো, কেনেকৈৰে আৰম্ভ হয়: 'এচিডিটিৰ কেনেধৰণৰ ৰোগী আটাইতকৈ বেছি আহে?'",
+"নিজৰ প্ৰডাক্ট নহয়, তেওঁৰ ব্যৱসায়ৰ বিষয়ে সোধক: 'ইয়াত কোনবোৰ স্কিন প্ৰডাক্ট আটাইতকৈ সোনকালে চলে?'",
+"সম্পূৰ্ণকৈ শুনক। মূৰ দোঁৱাওক। তেওঁৰ এটা কথা লিখি ৰাখক।",
+"পিচত তেওঁৰ কথাই ব্যৱহাৰ কৰক: 'আপুনি ক\'লে বহুতো ৰোগীৰ খোৱাৰ পিছত জ্বলে – ঠিক তাতেই R-Loc Raft কামত আহে।'",
+"এটা ক্লজিং প্ৰশ্নৰে শেষ কৰক: 'আৰম্ভণিতে ৬ বটল বুক কৰি দিওঁ নে?'"],
+says:'যি গ্ৰাহকে বেছি কথা কয়, তেওঁ বেছি কিনে। আপোনাৰ শ্ৰেষ্ঠ অস্ত্ৰ এটা ভাল প্ৰশ্ন।'},
+{icon:'🧱',title:'আপত্তি সামৰা – ৪ খোজত',sub:'শুনক, সন্মতি, উত্তৰ, আকৌ খুজক',steps:[
+"খোজ ১, শুনক: তেওঁক সম্পূৰ্ণ ক\'বলৈ দিয়ক। মাজতে বাধা নিদিব।",
+"খোজ ২, অনুভূতিত সন্মতি দিয়ক, তথ্যত নহয়: 'বুজি পাইছোঁ দাদা, দামটো গুৰুত্বপূৰ্ণ।'",
+"খোজ ৩, এটা তথ্যৰে উত্তৰ দিয়ক: টকাত মাৰ্জিন, লিখা ডাক্তৰ, বা স্কীম।",
+"খোজ ৪, সৰু খোজৰে আকৌ খুজক: 'আটাইতকৈ সৰু লটেৰে আৰম্ভ কৰোঁ নে?'",
+"সাধাৰণ আপত্তি: দামী, চাহিদা নাই, প্ৰতিযোগীয়ে বেছি দিয়ে, ষ্টক আগতেই আছে, মালিক নাই। প্ৰতিটোৰ কাৰ্ড Situations-ত আছে।"],
+says:'আপত্তি মানে নহয় বুলি নহয়। ই এটা প্ৰশ্ন – আৰু ভালকৈ বুজাওক।'},
+{icon:'💹',title:'মাৰ্জিন আৰু লাভৰ কথা',sub:'দেখুৱাওক তেওঁ কিমান উপাৰ্জন কৰিব',steps:[
+"ৰিটেইলাৰে MRP-ৰ প্ৰায় ২০ শতাংশ উপাৰ্জন কৰে। হোলচেলাৰে প্ৰায় ৭ শতাংশ। ষ্টকিষ্টে প্ৰায় ১০ শতাংশ।",
+"'ভাল মাৰ্জিন' নক\'ব। টকাত কওক: 'প্ৰতি টিউবত আপুনি প্ৰায় ₹৩৩ উপাৰ্জন কৰিব।'",
+"ফ্ৰী মালৰ স্কীমত লাভ বাঢ়ে। দেখুৱাওক: '৫০+১০-ত আপোনাৰ লাভ প্ৰায় ২৮ শতাংশ হয়।'",
+"Learn-ত Rates & offers-ৰ Profit calculator ব্যৱহাৰ কৰক। প্ৰডাক্ট আৰু গ্ৰাহক বাছি 'কি ক\'ব' শাৰীটো পঢ়ক।",
+"দাম কোৱাৰ আগতে পেকত ছপা MRP নিশ্চয় চাই লওক।"],
+says:'মানুহে প্ৰডাক্ট নিকিনে, লাভ কিনে। টকাত তেওঁৰ লাভ দেখুৱাওক।'},
+{icon:'🏬',title:'ষ্টকিষ্ট আৰু হোলচেলাৰৰ সৈতে কাম',sub:'যি পাইপলাইনে প্ৰতিখন দোকান ভৰায়',steps:[
+"প্ৰতি সপ্তাহে ষ্টকিষ্টৰ ওচৰলৈ যাওক। ষ্টক, বাকী অৰ্ডাৰ আৰু এক্সপায়াৰী চাওক।",
+"প্ৰতি মাহৰ ৭ তাৰিখৰ ভিতৰত ষ্টক ষ্টেটমেণ্ট লওক। ইয়াৰ পৰা গম পায় আচলতে কি বিক্ৰী হৈছে।",
+"স্লেব আৰু গিফট বুজাই কওক: যেনে Dexona ইনজেকচন, ৬ কেছ বা বেছিত ২ শতাংশ ৰেহাই।",
+"ফ্লেট ৰেট কেৱল পোনপটীয়া Zydus ষ্টকিষ্টৰ বাবে, এখন ইনভইচত এবাৰ। আনক প্ৰতিশ্ৰুতি নিদিব।",
+"হোলচেলাৰে বেছি মাল চলায়। ডাঙৰ লট মাহৰ আৰম্ভণিতে বুক কৰক, শেষ দিনা নহয়।"],
+says:'ষ্টকিষ্ট খালী হ\'লে পৃথিৱীৰ শ্ৰেষ্ঠ ডিটেলিঙেও বিক্ৰী আনিব নোৱাৰে।'},
+{icon:'♻️',title:'ষ্টক, এক্সপায়াৰী আৰু ৰিটাৰ্ণ',sub:'ৰিটাৰ্ণ ৩ শতাংশৰ তলত ৰাখক',steps:[
+"চেলেবল ৰিটাৰ্ণ ৩ শতাংশ বা কম হ\'ব লাগিব, নহ\'লে ইনচেণ্টিভ হেৰায়।",
+"যিমান বিক্ৰী হ\'ব, কেৱল সিমানেই বুক কৰক। জোৰকৈ লোৱা অৰ্ডাৰ ৰিটাৰ্ণ হৈ উভতি আহে।",
+"প্ৰতিজন কেমিষ্টৰ ওচৰত মিয়াদ ওচৰ চপা ষ্টক চাওক। মিয়াদ উকলাৰ আগতে সোনকালে চলা দোকানলৈ নিয়ক।",
+"ষ্টক ঘূৰাওক: পুৰণি আগত, নতুন পিছত।",
+"লাহে চলা ষ্টকৰ কথা ৰতন ৰয়ক আগতীয়াকৈ জনাওক। আগতে খোজ ল\'লে ৰিটাৰ্ণ ৰক্ষা পৰে।"],
+says:'যি বিক্ৰী উভতি আহে, সেয়া বিক্ৰী নহয়। বজাৰে যিমান ল\'ব পাৰে, সিমানেই বেচক।'},
+{icon:'🗺️',title:'আপোনাৰ ব্ৰিকৰ পৰিকল্পনা',sub:'কেৱল কষ্ট নহয়, বুদ্ধিৰে',steps:[
+"আপোনাৰ TP কেলেণ্ডাৰ চাওক। মাহৰ প্ৰতিদিনে কোনটো ব্ৰিক, জানি ৰাখক।",
+"প্ৰতিটো ব্ৰিকৰ বাবে লিখক: শীৰ্ষ ৫ ডাক্তৰ, শীৰ্ষ ৫ কেমিষ্ট, হোলচেলাৰ আৰু NPD আউটলেট।",
+"ৰুট ঠিক কৰক: প্ৰথমে হোলচেলাৰ, দুপৰীয়া ডাক্তৰ, আবেলি ৰিটেইলাৰ।",
+"আজি কিবা বাদ পৰিল? সেয়া সেই ব্ৰিকৰ পিছৰ তাৰিখলৈ যায়। প্ৰতি ৰাতিপুৱা আগবঢ়া কাম চাওক।",
+"প্ৰতিটো ব্ৰিকৰ পৰা মাহৰ POB-ৰ ন্যায্য অংশ আহিব লাগে। ওলোৱাৰ আগতে সংখ্যাটো জানক।"],
+says:'পৰিকল্পনা নোহোৱাকৈ ব্ৰিকলৈ গ\'লে দিনটো খৰচ হয়, বিনিয়োগ নহয়।'},
+{icon:'🏕️',title:'ডাক্তৰ কেম্প কেনেকৈ কৰিব',sub:'শক্তি কেম্প, খোজে খোজে',steps:[
+"ভাল ৰোগী অহা লিষ্ট ডাক্তৰ বাছক। এসপ্তাহ আগতে তেওঁৰ সৈতে তাৰিখ ঠিক কৰক।",
+"সামগ্ৰী, ৰেজিষ্টাৰ আৰু ইনপুট নিজৰ ষ্টকৰ পৰা সাজু কৰক। কম থাকিলে এপত Request stock কৰক।",
+"সেইদিনা আগতে পাওক, পৰিপাটিকৈ সজাওক আৰু ডাক্তৰৰ কৰ্মচাৰীক সহায় কৰক।",
+"ৰোগী আৰু প্ৰেছক্ৰিপচনৰ সংখ্যা ফটোৰ সৈতে লিখি ৰাখক।",
+"পিছদিনা ওচৰৰ কেমিষ্টলৈ গৈ নিশ্চিত কৰক যে লিখা প্ৰডাক্ট ষ্টকত আছে।"],
+says:'ভাল কেম্পে বছৰ বছৰ টিকি থকা সম্পৰ্ক গঢ়ে। বিয়াৰ দৰে পৰিকল্পনা কৰক।'},
+{icon:'⏰',title:'সময় আৰু নিজৰ প্ৰেৰণা',sub:'নিজৰ দিনৰ মালিক হওক',steps:[
+"সময়মতে আৰম্ভ কৰক। ৰাতিপুৱা ১০ বজাৰ আগৰ প্ৰথম কলেই গোটেই দিনৰ সুৰ বান্ধে।",
+"পথাৰত ফোন কেৱল কামৰ বাবে। ছ\'চিয়েল মিডিয়া সন্ধিয়ালৈ অপেক্ষা কৰিব পাৰে।",
+"দিনৰ টাৰ্গেট সৰু লক্ষ্যত ভাগ কৰক: দুপৰীয়াৰ আগতে ₹X, বাকীখিনি পিছত।",
+"বেয়া কলৰ পিছত এটা দীঘল উশাহ লওক, আৰু হাঁহিমুখে পিছৰ দোকানলৈ যাওক।",
+"প্ৰতি সন্ধিয়া এটা শিকা কথা লিখক। প্ৰতিদিনৰ সৰু উন্নতিয়ে ডাঙৰ কেৰিয়াৰ গঢ়ে।"],
+says:'প্ৰেৰণাই আৰম্ভ কৰায়। অভ্যাসে আগুৱাই লৈ যায়।'},
+{icon:'🏆',title:'আপোনাৰ ইনচেণ্টিভ জিকক',sub:'নিয়ম জানক, তাৰপিছত অতিক্ৰম কৰক',steps:[
+"মাহেকীয়া ইনচেণ্টিভ টাৰ্গেটৰ ৯৭ শতাংশৰ পৰা আৰম্ভ। ১০০ আৰু ১১০ শতাংশত বহুত বেছি পোৱা যায়।",
+"মাইলষ্টোন ব\'নাছৰ বাবে মাহৰ ১০০ শতাংশ আৰু ১৭ তাৰিখৰ ভিতৰত ৪০ শতাংশ লাগে।",
+"চাৰিওটা KPI চৰ্ত লাগে: যোৱা বছৰতকৈ বৃদ্ধি, ৰিটাৰ্ণ ৩ শতাংশ বা কম, আউটলেট কভাৰেজ ৯০ শতাংশ, ডাক্তৰ কভাৰেজ ৯৫ শতাংশ।",
+"প্ৰতি ৰাতিপুৱা Progress টেব চাওক: প্ৰতিটো স্তৰৰ বাবে আৰু কিমান বেচিব লাগিব, দেখুৱায়।",
+"ইম্পেক্ট ব্ৰেণ্ড (Deca, R-Loc, Skinlite, Dexona) ত্ৰৈমাসিকতো গণনা হয়। প্ৰতি সপ্তাহে জোৰ দিয়ক।"],
+says:'ইনচেণ্টিভ ভাগ্য নহয়, প্ৰতিদিনৰ অনুশাসনৰ ফল। প্ৰতিদিনে নজৰ ৰাখক।'}];
 /* Guwahati Field Tracker – premium shell, sounds, coach, progress & incentive. Coach: Ratan Roy. */
 (function(){
 'use strict';
@@ -665,22 +1029,22 @@ input,textarea,select{-webkit-user-select:text;user-select:text}
 img{-webkit-user-drag:none;pointer-events:auto}
 #app{padding-bottom:96px!important;max-width:560px;margin:0 auto}
 #app>header.top{display:none!important}
-.fthead{position:sticky;top:0;z-index:20;margin:-16px -16px 12px;padding:14px 16px 12px;background:linear-gradient(135deg,#0B4F49,#0E6B63 60%,#138A7F);color:#fff;box-shadow:0 6px 18px rgba(8,60,55,.25);border-radius:0 0 18px 18px}
+.fthead{position:sticky;top:0;z-index:20;margin:-16px -16px 12px;padding:14px 16px 12px;background:linear-gradient(135deg,var(--h1),var(--accent) 60%,var(--h3));color:#fff;box-shadow:0 6px 18px var(--accsh);border-radius:0 0 18px 18px}
 .fthead .row{display:flex;align-items:center;gap:10px}
-.fthead .av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#F6D776,#C9A227);color:#3B2C00;display:grid;place-items:center;font-weight:800;font-size:15px;flex:none;box-shadow:0 2px 6px rgba(0,0,0,.2)}
-.fthead .nm{font-weight:700;font-size:16px;line-height:1.2}.fthead .hq{font-size:12px;opacity:.8}
+.fthead .av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--gold2),var(--gold));color:var(--gink);display:grid;place-items:center;font-weight:800;font-size:15px;flex:none;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.fthead .nm{font-weight:700;font-size:16px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fthead .row>div:nth-child(2){min-width:0;flex:1}.fthead .hq{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fthead .ib{flex:none;white-space:nowrap}.fthead .hq{font-size:12px;opacity:.8}
 .fthead .sp{flex:1}
 .fthead .ib{background:rgba(255,255,255,.14);border:0;color:#fff;border-radius:10px;padding:7px 9px;font-size:13px;min-height:auto}
-.langs{display:flex;gap:4px;margin-top:10px}.langs button{flex:1;background:rgba(255,255,255,.12);border:0;color:#fff;border-radius:8px;padding:6px 0;font-size:13px;min-height:auto}.langs button.on{background:#F6D776;color:#3B2C00;font-weight:700}
-.ftick{overflow:hidden;white-space:nowrap;background:#0A2B28;color:#fff;border-radius:12px;margin:0 0 12px;padding:9px 0;font-size:14px;box-shadow:inset 0 0 0 1px rgba(246,215,118,.25)}
-.ftick span{display:inline-block;padding-left:100%;animation:ftick linear infinite}.ftick b{color:#F6D776}.ftick i{font-style:normal;color:#FF9C92}
+.langs{display:flex;gap:4px;margin-top:10px}.langs button{flex:1;background:rgba(255,255,255,.12);border:0;color:#fff;border-radius:8px;padding:6px 0;font-size:13px;min-height:auto}.langs button.on{background:var(--gold2);color:var(--gink);font-weight:700}
+.ftick{overflow:hidden;white-space:nowrap;background:var(--h0);color:#fff;border-radius:12px;margin:0 0 12px;padding:9px 0;font-size:14px;box-shadow:inset 0 0 0 1px rgba(246,215,118,.25)}
+.ftick span{display:inline-block;padding-left:100%;animation:ftick linear infinite}.ftick b{color:var(--gold2)}.ftick i{font-style:normal;color:#FF9C92}
 @keyframes ftick{from{transform:translateX(0)}to{transform:translateX(-100%)}}
 .quote{background:linear-gradient(135deg,#FFF8E1,#FFFDF5);border:1px solid #F1DFA0;border-radius:14px;padding:12px 14px;margin-bottom:12px;animation:pop .5s ease both}
-.quote .who{font-size:12px;font-weight:700;color:#8A6A00;letter-spacing:.3px;text-transform:uppercase}.quote .q{font-size:15px;line-height:1.45;margin-top:4px;color:#3B2C00}
+.quote .who{font-size:12px;font-weight:700;color:#8A6A00;letter-spacing:.3px;text-transform:uppercase}.quote .q{font-size:15px;line-height:1.45;margin-top:4px;color:var(--gink)}
 .subtabs{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;margin:0 -2px 6px;scrollbar-width:none}.subtabs::-webkit-scrollbar{display:none}
 .subtabs button{flex:none;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 14px;font-size:14px;min-height:auto;box-shadow:0 1px 2px rgba(0,0,0,.04)}
-.subtabs button.on{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 4px 10px rgba(14,107,99,.25)}
-.bnav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:6px 4px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -6px 18px rgba(0,0,0,.06)}
+.subtabs button.on{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 4px 10px var(--accsh)}
+.bnav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--navbg);backdrop-filter:blur(8px);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:6px 4px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -6px 18px rgba(0,0,0,.06)}
 .bnav button{background:none;border:0;flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;color:#7A8B89;font-size:11px;min-height:auto;padding:4px 0;position:relative}
 .bnav button .ic{font-size:22px;line-height:1;transition:transform .2s}.bnav button.on{color:var(--accent);font-weight:700}.bnav button.on .ic{transform:translateY(-2px) scale(1.12)}
 .bnav button.on:after{content:'';position:absolute;top:-6px;width:28px;height:3px;border-radius:3px;background:var(--gold)}
@@ -688,7 +1052,7 @@ img{-webkit-user-drag:none;pointer-events:auto}
 .score,.item,.task,.today,.plan>*,.note,.card,.quote,.lcard{animation:rise .35s ease both}
 .score,.item,.card,.note,.lcard{box-shadow:0 2px 10px rgba(16,40,38,.06)!important;border-radius:16px!important}
 .task{border-radius:14px!important}
-.today{background:linear-gradient(135deg,#0E6B63,#13897E)!important;border-radius:18px!important;box-shadow:0 8px 20px rgba(14,107,99,.25)!important}
+.today{background:linear-gradient(135deg,var(--accent),var(--h3))!important;border-radius:18px!important;box-shadow:0 8px 20px var(--accsh)!important}
 .bar i{transform-origin:left;animation:grow 1s cubic-bezier(.2,.8,.2,1) both}
 @keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -696,11 +1060,11 @@ img{-webkit-user-drag:none;pointer-events:auto}
 button{transition:transform .08s}button:active{transform:scale(.97)}
 .lcard{background:var(--panel);border:1px solid var(--line);padding:14px;margin-bottom:12px}
 .lcard h3{margin:0 0 6px;font-size:17px}.lcard .meta{font-size:12px;color:var(--muted)}
-.player{background:linear-gradient(160deg,#0B4F49,#0E6B63);color:#fff;border-radius:20px;padding:18px;min-height:300px;display:flex;flex-direction:column;box-shadow:0 10px 28px rgba(8,60,55,.3)}
+.player{background:linear-gradient(160deg,var(--h1),var(--accent));color:#fff;border-radius:20px;padding:18px;min-height:300px;display:flex;flex-direction:column;box-shadow:0 10px 28px var(--accsh)}
 .player .ttl{font-size:13px;opacity:.85;text-transform:uppercase;letter-spacing:.4px}
 .player .slide{flex:1;display:flex;align-items:center;font-size:19px;line-height:1.5;padding:14px 2px;animation:pop .4s ease both}
-.player .prog{display:flex;gap:4px;margin:6px 0 12px}.player .prog i{flex:1;height:4px;border-radius:4px;background:rgba(255,255,255,.25)}.player .prog i.on{background:#F6D776}
-.player .ctl{display:flex;gap:8px}.player .ctl button{flex:1;border:0;border-radius:12px;padding:12px;font-weight:700;background:rgba(255,255,255,.15);color:#fff}.player .ctl .play{background:#F6D776;color:#3B2C00}
+.player .prog{display:flex;gap:4px;margin:6px 0 12px}.player .prog i{flex:1;height:4px;border-radius:4px;background:rgba(255,255,255,.25)}.player .prog i.on{background:var(--gold2)}
+.player .ctl{display:flex;gap:8px}.player .ctl button{flex:1;border:0;border-radius:12px;padding:12px;font-weight:700;background:rgba(255,255,255,.15);color:#fff}.player .ctl .play{background:var(--gold2);color:var(--gink)}
 .player .coach{font-size:12px;opacity:.85;margin-top:10px}
 .sit{border-left:4px solid var(--gold)}.sit summary{font-weight:700;font-size:15px;list-style:none}.sit .lbl{font-size:12px;font-weight:700;color:var(--accent);margin-top:8px;text-transform:uppercase}
 .qopt{display:block;width:100%;text-align:left;margin:6px 0;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:15px}
@@ -711,7 +1075,7 @@ button{transition:transform .08s}button:active{transform:scale(.97)}
 .cf{position:fixed;top:-10px;width:8px;height:12px;z-index:99;border-radius:2px;animation:fall 1.6s ease-in forwards;pointer-events:none}
 @keyframes fall{to{transform:translateY(105vh) rotate(540deg);opacity:.6}}
 .toast{border-radius:14px!important;box-shadow:0 8px 24px rgba(0,0,0,.2)!important}
-.apponly{position:fixed;inset:0;z-index:999;background:#0B4F49;color:#fff;display:grid;place-items:center;padding:30px;text-align:center;font-size:18px}
+.apponly{position:fixed;inset:0;z-index:999;background:var(--h1);color:#fff;display:grid;place-items:center;padding:30px;text-align:center;font-size:18px}
 `;
 var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
 try{document.documentElement.setAttribute('data-theme','light')}catch(e){}
@@ -788,10 +1152,9 @@ function ticker(){var parts=[];if(S.mgr&&!S.viewAs){D.users.filter(function(u){r
 var WORK=[['raft','Raft'],['deca','Deca'],['rloc','Rloc'],['skin','Skinlite'],['dexona','Dexona'],['stockists','stockists'],['stock','stock'],['beat','beat']];
 function head(){var w=who();var ini=(w.Name||'?').split(' ').map(function(x){return x[0]}).join('').slice(0,2);
   var mute=h('button',{class:'ib',onclick:function(){UI.mute=!UI.mute;lsSet('ft_mute',UI.mute?'1':'0');mute.textContent=UI.mute?'🔇':'🔊';if(!UI.mute)play('ok')}},UI.mute?'🔇':'🔊');
-  return h('div',{class:'fthead'},h('div',{class:'row'},h('div',{class:'av'},ini),h('div',{},h('div',{class:'nm'},w.Name+(S.viewAs?' (viewing)':'')),h('div',{class:'hq'},w.HQ+' · '+new Date(TODAY+'T00:00:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'}))),h('div',{class:'sp'}),mute),
-    h('div',{class:'langs'},LANGS.map(function(l){return h('button',{class:UI.lang===l[0]?'on':'',onclick:function(){UI.lang=l[0];lsSet('ft_lang',l[0]);stopSpeak();render()}},l[1])})))}
+  return h('div',{class:'fthead'},h('div',{class:'row'},h('div',{class:'av'},ini),h('div',{},h('div',{class:'nm'},w.Name+(S.viewAs?' (viewing)':'')),h('div',{class:'hq'},w.HQ+' · '+new Date(TODAY+'T00:00:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'}))),h('button',{class:'ib',onclick:function(){UI.settings&&UI.settings('lang')}},'🌐 '+(LANGS.find(function(l){return l[0]===UI.lang})||LANGS[0])[1]),mute,h('button',{class:'ib',onclick:function(){UI.settings&&UI.settings()}},'⚙️')))}
 function quote(){var qs=(C().quotes)||[];if(!qs.length)return null;var q=qs[dayIdx()%qs.length];return h('div',{class:'quote'},h('div',{class:'who'},'💬 '+t('says')),h('div',{class:'q'},q))}
-function tabOf(r){if(r==='home'||r==='mgr')return'today';if(r==='learn')return'learn';if(r==='perf')return'progress';if(r==='msgs')return'msgs';return'work'}
+function tabOf(r){if(UI.tabOfX&&UI.tabOfX[r])return UI.tabOfX[r];if(r==='home'||r==='mgr')return'today';if(r==='learn')return'learn';if(r==='perf')return'progress';if(r==='msgs')return'msgs';return'work'}
 function nav(r){var cur=tabOf(r);var pend=0;try{if(!S.mgr||S.viewAs)TASKS.forEach(function(k){var l=k.status().level;if(l==='bad'||l==='todo')pend++})}catch(e){}
   var items=[['today','🏠',function(){go('home')}],['work','💼',function(){go(lsGet('ft_work','raft'))}],['learn','🎓',function(){go('learn')}],['progress','📈',function(){go('perf')}],['msgs','💬',function(){go('msgs')}]];
   return h('nav',{class:'bnav'},items.map(function(it){return h('button',{class:cur===it[0]?'on':'',onclick:it[2]},h('span',{class:'ic'},it[1]),t(it[0]),it[0]==='today'&&pend?h('span',{class:'dot'},String(pend)):null)}))}
@@ -844,7 +1207,7 @@ function vProd(app){var R=REF();if(!R){app.append(h('div',{class:'note'},'Rates 
   var lot=h('select',{},[h('option',{value:0},'No scheme')].concat(lots.map(function(l,k){return h('option',{value:k+1},'Scheme '+l)})));lot.value=st.lot;
   var qty=h('input',{type:'number',inputmode:'numeric',value:st.q});var mrp=h('input',{type:'number',inputmode:'decimal',value:st.mrp||(mrpOf(p)?mrpOf(p).toFixed(2):''),placeholder:'MRP on the pack'});
   var out=h('div');
-  function calc(){st.q=+qty.value||0;st.lot=+lot.value;st.mrp=mrp.value;var m=+mrp.value||0,g=1+p.gst/100,ptr=m/g*.8;out.innerHTML='';if(!m){out.append(h('div',{class:'note'},'Type the MRP printed on the pack.'));return}
+  function calc(){lsSet('ft_calc','1');st.q=+qty.value||0;st.lot=+lot.value;st.mrp=mrp.value;var m=+mrp.value||0,g=1+p.gst/100,ptr=m/g*.8;out.innerHTML='';if(!m){out.append(h('div',{class:'note'},'Type the MRP printed on the pack.'));return}
     var buy=st.who==='Retailer'?ptr*g:st.who==='Wholesaler'?ptr*.93*g:ptr*.9*g,sell=st.who==='Retailer'?m:ptr*g,pct=st.who==='Retailer'?20:st.who==='Wholesaler'?7:10;
     var paid=st.q,free=0,L=lots[st.lot-1];if(L){var ab=L.split('+').map(Number);free=Math.floor(paid/ab[0])*ab[1]}
     var cost=paid*buy,rev=(paid+free)*sell,prof=rev-cost,eff=(paid+free)?cost/(paid+free):0,unitP=sell-eff,pp=sell?unitP/sell*100:0;
@@ -863,7 +1226,7 @@ function vProd(app){var R=REF();if(!R){app.append(h('div',{class:'note'},'Rates 
 function mrpOf(p){if(p.mrp)return p.mrp;if(!p.pts)return 0;return Math.round(p.pts*(1+p.gst/100)/.72*100)/100}
 function vQuiz(app){var Q=(C().quiz||[]);if(!Q.length)return;var seed=dayIdx();var pick=[];for(var k=0;k<5&&k<Q.length;k++)pick.push(Q[(seed*7+k*3)%Q.length]);
   var st=S.tab.quizState||(S.tab.quizState={i:0,score:0,ans:null});if(st.day!==TODAY){st.day=TODAY;st.i=0;st.score=0;st.ans=null}
-  if(st.i>=pick.length){app.append(h('div',{class:'lcard',style:'text-align:center'},h('div',{class:'big'},st.score+' / '+pick.length),h('div',{},st.score>=4?'🏆 '+(C().quizWin||'Excellent!'):(C().quizTry||'Keep learning!')),h('button',{style:'margin-top:10px',onclick:function(){st.i=0;st.score=0;st.ans=null;render()}},t('again'))));return}
+  if(st.i>=pick.length){try{var qb=+lsGet('ft_quizbest','0');if(st.score>qb)lsSet('ft_quizbest',String(st.score))}catch(e){}app.append(h('div',{class:'lcard',style:'text-align:center'},h('div',{class:'big'},st.score+' / '+pick.length),h('div',{},st.score>=4?'🏆 '+(C().quizWin||'Excellent!'):(C().quizTry||'Keep learning!')),h('button',{style:'margin-top:10px',onclick:function(){st.i=0;st.score=0;st.ans=null;render()}},t('again'))));return}
   var q=pick[st.i];var card=h('div',{class:'lcard'},h('div',{class:'meta'},(st.i+1)+' / '+pick.length+' · '+t('score')+' '+st.score),h('h3',{},q.q));
   q.o.forEach(function(o,k){var b=h('button',{class:'qopt'+(st.ans!=null?(k===q.a?' ok':k===st.ans?' no':''):''),onclick:function(){if(st.ans!=null)return;st.ans=k;if(k===q.a){st.score++;play('ok')}else play('err');render()}},o);card.append(b)});
   if(st.ans!=null){card.append(h('div',{class:'quote',style:'margin-top:10px'},h('div',{class:'who'},'💬 '+t('says')),h('div',{class:'q'},q.e||'')),h('button',{onclick:function(){st.i++;st.ans=null;render()}},t('next')+' ▶'))}
@@ -883,18 +1246,274 @@ function autofill(app){try{var b=(typeof brickToday==='function')&&brickToday();
 /* ---------- android bridge ---------- */
 function bridge(){try{if(window.AndroidApp&&AndroidApp.setAuth){var a=lsGet('ft_auth','');if(a)AndroidApp.setAuth(a)}}catch(e){}}
 
+Object.assign(UI,{t:t,rs:rs,pc:pc,sub:sub,player:player,speak:speak,stopSpeak:stopSpeak,play:play,confetti:confetti,quote:quote,sitCard:sitCard,dayIdx:dayIdx,lsGet:lsGet,lsSet:lsSet,vLearn:vLearn,vPerf:vPerf,vProd:vProd,vQuiz:vQuiz,REF:REF,money:money,mrpOf:mrpOf,calc:calc,incCard:incCard,kpiCard:kpiCard,q4Card:q4Card,pobCard:pobCard,mgrInc:mgrInc,streak:streak,markLearned:markLearned,C:C,TX:TX,LANGS:LANGS,head:head,ticker:ticker,nav:nav,tabOf:tabOf,routes:{}});
 /* ---------- main render override ---------- */
 var base=render;
 render=function(){var r=S.route,w=who();
   if(!S.ready||!w){base();return}
   if(!S.mgr&&!inApp()){document.body.innerHTML='';document.body.append(h('div',{class:'apponly'},t('appOnly')));return}
   var app=document.getElementById('app');
-  if(r==='learn'||r==='perf'){app.innerHTML='';app.append(head(),ticker());if(r==='learn'){var q0=quote();if(q0&&S.tab.learn!=='quiz'&&S.tab.learn!=='prod')app.append(q0);vLearn(app)}else vPerf(app);app.append(nav(r));bridge();return}
+  if(r==='learn'||r==='perf'||UI.routes[r]){app.innerHTML='';app.append(head(),ticker());if(UI.routes[r])UI.routes[r](app);else if(r==='learn')UI.vLearn(app);else UI.vPerf(app);app.append(nav(r));bridge();UI.after&&UI.after(app,r);return}
   base();
   app.prepend(head(),ticker());var hd=app.querySelector('.fthead'),tk=app.querySelector('.ftick');
-  if(tabOf(r)==='today'){var q=quote();if(q)tk.after(q);if(!S.mgr||S.viewAs){app.querySelectorAll('.score').forEach(function(x){x.remove()})}}
+  if(tabOf(r)==='today'){if(!S.mgr||S.viewAs){app.querySelectorAll('.score').forEach(function(x){x.remove()})}if(UI.today){var rest=[].slice.call(app.children).filter(function(x){return x!==hd&&x!==tk&&x.tagName!=='HEADER'});UI.today(app,tk,rest)}else{var q=quote();if(q)tk.after(q)}}
   if(tabOf(r)==='work'){lsSet('ft_work',r);var lab={stock:t('stock'),beat:t('beat'),stockists:t('stockists')};tk.after(h('div',{class:'subtabs'},WORK.map(function(x){return h('button',{class:x[0]===r?'on':'',onclick:function(){go(x[0])}},lab[x[0]]||x[1])})));autofill(app)}
-  app.append(nav(r));bridge()};
+  app.append(nav(r));bridge();UI.after&&UI.after(app,r)};
 window.addEventListener('hashchange',function(){});
+try{if(S.ready)render()}catch(e){}
+})();
+/* Field Tracker – Today hub, themes, settings, learning path, TP calendar, stock request, check-in, scorecard, badges, leaderboard. Coach: Ratan Roy. */
+(function(){
+'use strict';
+var U=window.FTUI;if(!U||!U.t)return;
+var t=U.t,rs=U.rs,pc=U.pc,lsGet=U.lsGet,lsSet=U.lsSet;
+
+/* ---------- words ---------- */
+var W={
+ en:{gm:'Good morning',ga:'Good afternoon',ge:'Good evening',checkin:'Start my day',checked:'Checked in',locating:'Finding location…',prio:'Do these first',tiles:'Quick actions',plan:'Day plan',lesson:'3-min lesson',calc:'Profit calculator',req:'Request stock',tp:'My TP',share:'Share plan',board:'Leaderboard',all:'All topics',tasks:"Today's full task list",offer:'Offer to talk about today',path:'My path',search:'Search a topic… (e.g. price, Raft, objection)',locked:'Finish the earlier phase to unlock',next:'Next',done:'Done',week:'Week',badges:'Badges',settings:'Settings',lang:'Language',theme:'Colours',size:'Text size',sound:'Sounds',on:'On',off:'Off',close:'Close',targetToday:'POB today',month:'Month',team:'Team today',noplan:'Your 8 AM day plan will appear here.',readplan:"Read Ratan Roy's day plan",doLesson:"Do today's 3-minute lesson",carry:'Carried from last visit',send:'Send request',qty:'Qty',note:'Note (optional)',myreq:'My requests',pending:'Pending',sent:'Sent',points:'points',rank:'Rank',updates:'The leaderboard updates every evening after the review.'},
+ hi:{gm:'सुप्रभात',ga:'नमस्कार',ge:'शुभ संध्या',checkin:'दिन शुरू करें',checked:'चेक-इन हो गया',locating:'लोकेशन ढूँढ रहे हैं…',prio:'पहले ये करें',tiles:'जल्दी के काम',plan:'दिन का प्लान',lesson:'3 मिनट का पाठ',calc:'मुनाफ़ा कैलकुलेटर',req:'स्टॉक माँगें',tp:'मेरा TP',share:'प्लान भेजें',board:'लीडरबोर्ड',all:'सभी विषय',tasks:'आज के सारे काम',offer:'आज इस ऑफ़र की बात करें',path:'मेरा रास्ता',search:'विषय खोजें… (जैसे रेट, Raft, आपत्ति)',locked:'पिछला चरण पूरा करने पर खुलेगा',next:'अगला',done:'पूरा',week:'हफ़्ता',badges:'बैज',settings:'सेटिंग',lang:'भाषा',theme:'रंग',size:'अक्षर का आकार',sound:'आवाज़',on:'चालू',off:'बंद',close:'बंद करें',targetToday:'आज का POB',month:'महीना',team:'आज की टीम',noplan:'सुबह 8 बजे का प्लान यहाँ दिखेगा।',readplan:'रतन रॉय का दिन का प्लान पढ़ें',doLesson:'आज का 3 मिनट का पाठ करें',carry:'पिछली विज़िट से बाक़ी',send:'माँग भेजें',qty:'मात्रा',note:'नोट (ज़रूरी नहीं)',myreq:'मेरी माँगें',pending:'बाक़ी',sent:'भेजा गया',points:'अंक',rank:'रैंक',updates:'लीडरबोर्ड हर शाम रिव्यू के बाद अपडेट होता है।'},
+ bn:{gm:'সুপ্রভাত',ga:'নমস্কার',ge:'শুভ সন্ধ্যা',checkin:'দিন শুরু করুন',checked:'চেক-ইন হয়েছে',locating:'লোকেশন খুঁজছে…',prio:'আগে এগুলো করুন',tiles:'দ্রুত কাজ',plan:'দিনের প্ল্যান',lesson:'৩ মিনিটের পাঠ',calc:'লাভের ক্যালকুলেটর',req:'স্টক চান',tp:'আমার TP',share:'প্ল্যান পাঠান',board:'লিডারবোর্ড',all:'সব বিষয়',tasks:'আজকের সব কাজ',offer:'আজ এই অফারের কথা বলুন',path:'আমার পথ',search:'বিষয় খুঁজুন… (যেমন দাম, Raft, আপত্তি)',locked:'আগের ধাপ শেষ করলে খুলবে',next:'পরের',done:'শেষ',week:'সপ্তাহ',badges:'ব্যাজ',settings:'সেটিংস',lang:'ভাষা',theme:'রং',size:'লেখার মাপ',sound:'শব্দ',on:'চালু',off:'বন্ধ',close:'বন্ধ করুন',targetToday:'আজকের POB',month:'মাস',team:'আজকের টিম',noplan:'সকাল ৮টার প্ল্যান এখানে দেখা যাবে।',readplan:'রতন রায়ের দিনের প্ল্যান পড়ুন',doLesson:'আজকের ৩ মিনিটের পাঠ করুন',carry:'আগের ভিজিট থেকে বাকি',send:'অনুরোধ পাঠান',qty:'পরিমাণ',note:'নোট (ঐচ্ছিক)',myreq:'আমার অনুরোধ',pending:'বাকি',sent:'পাঠানো হয়েছে',points:'পয়েন্ট',rank:'র‍্যাঙ্ক',updates:'লিডারবোর্ড প্রতি সন্ধ্যায় রিভিউয়ের পরে আপডেট হয়।'},
+ as:{gm:'সুপ্ৰভাত',ga:'নমস্কাৰ',ge:'শুভ সন্ধিয়া',checkin:'দিন আৰম্ভ কৰক',checked:'চেক-ইন হ\'ল',locating:'লোকেশ্বন বিচাৰিছে…',prio:'প্ৰথমে এইবোৰ কৰক',tiles:'সোনকালৰ কাম',plan:'দিনৰ প্লেন',lesson:'৩ মিনিটৰ পাঠ',calc:'লাভৰ কেলকুলেটৰ',req:'ষ্টক খুজক',tp:'মোৰ TP',share:'প্লেন পঠাওক',board:'লিডাৰব\'ৰ্ড',all:'সকলো বিষয়',tasks:'আজিৰ সকলো কাম',offer:'আজি এই অফাৰৰ কথা কওক',path:'মোৰ পথ',search:'বিষয় বিচাৰক… (যেনে দাম, Raft, আপত্তি)',locked:'আগৰ পৰ্যায় শেষ কৰিলে খুলিব',next:'পিছৰ',done:'সম্পূৰ্ণ',week:'সপ্তাহ',badges:'বেজ',settings:'ছেটিংছ',lang:'ভাষা',theme:'ৰং',size:'আখৰৰ আকাৰ',sound:'শব্দ',on:'অন',off:'অফ',close:'বন্ধ কৰক',targetToday:'আজিৰ POB',month:'মাহ',team:'আজিৰ দল',noplan:'ৰাতিপুৱা ৮ বজাৰ প্লেন ইয়াত দেখা পাব।',readplan:'ৰতন ৰয়ৰ দিনৰ প্লেন পঢ়ক',doLesson:'আজিৰ ৩ মিনিটৰ পাঠ কৰক',carry:'আগৰ ভিজিটৰ পৰা বাকী',send:'অনুৰোধ পঠাওক',qty:'পৰিমাণ',note:'টোকা (বাধ্যতামূলক নহয়)',myreq:'মোৰ অনুৰোধ',pending:'বাকী',sent:'পঠোৱা হ\'ল',points:'পইণ্ট',rank:'স্থান',updates:'লিডাৰব\'ৰ্ড প্ৰতি সন্ধিয়া ৰিভিউৰ পিছত আপডেট হয়।'}};
+function w(k){return (W[U.lang]||W.en)[k]||W.en[k]||k}
+
+/* ---------- themes & text size ---------- */
+var THEMES={
+ teal:{n:'Teal & Gold',h0:'#0A2B28',h1:'#0B4F49',h3:'#138A7F',acc:'#0E6B63',soft:'#E3F1EF',gold:'#C9A227',gold2:'#F6D776',gink:'#3B2C00',bg:'#EEF2F1'},
+ royal:{n:'Royal Blue & Saffron',h0:'#0D1B45',h1:'#142B6F',h3:'#2F56C9',acc:'#1E3A8A',soft:'#E6ECFA',gold:'#E08A00',gold2:'#FFC857',gink:'#3A2400',bg:'#EEF1F8'},
+ maroon:{n:'Maroon & Gold',h0:'#2E0710',h1:'#5B0F1F',h3:'#9E2343',acc:'#7A1530',soft:'#F7E7EB',gold:'#C9971C',gold2:'#F2D27A',gink:'#3B2A00',bg:'#F6F0F0'},
+ forest:{n:'Forest & Lime',h0:'#12260F',h1:'#1E3D1A',h3:'#3F7F35',acc:'#2E5E27',soft:'#E7F1E4',gold:'#8FB82A',gold2:'#D4EC7A',gink:'#233000',bg:'#EFF4EC'},
+ purple:{n:'Violet & Aqua',h0:'#23123A',h1:'#3B1F5C',h3:'#7B45B5',acc:'#5B2E8C',soft:'#EFE8F8',gold:'#1FA79A',gold2:'#8FE3D9',gink:'#05332E',bg:'#F3F0F8'},
+ night:{n:'Night (dark)',h0:'#05100F',h1:'#0C1F1D',h3:'#1D4F49',acc:'#3FB3AC',soft:'#1B2C2A',gold:'#E0B84A',gold2:'#F6D776',gink:'#2B2000',bg:'#0E1615',dark:1}};
+function applyTheme(){var k=lsGet('ft_theme','teal'),th=THEMES[k]||THEMES.teal;
+  var v='--h0:'+th.h0+'!important;--h1:'+th.h1+'!important;--h3:'+th.h3+'!important;--accent:'+th.acc+'!important;--soft:'+th.soft+'!important;--gold:'+th.gold+'!important;--gold2:'+th.gold2+'!important;--gink:'+th.gink+'!important;--bg:'+th.bg+'!important;--accsh:'+th.acc+'40!important;';
+  v+=th.dark?'--panel:#16211F!important;--ink:#E7EFEE!important;--muted:#9DB0AD!important;--line:#2A3836!important;--navbg:rgba(22,33,31,.97)!important;--ok-bg:#16352A!important;--warn-bg:#3A2E12!important;--bad-bg:#3B1A18!important;color-scheme:dark!important;':'--navbg:rgba(255,255,255,.96)!important;';
+  var css='html:root:not([data-ftx]):not([data-fty]){'+v+'}';
+  if(th.dark)css+='.quote{background:linear-gradient(135deg,#2B2513,#1E1A0F)!important;border-color:#4A3E1A!important}.quote .q{color:#F3E6B5!important}.quote .who{color:#E0B84A!important}input,select,textarea{background:#0F1918!important;color:#E7EFEE!important;border-color:#2A3836!important}';
+  var el=document.getElementById('ft-theme');if(!el){el=document.createElement('style');el.id='ft-theme';document.head.appendChild(el)}el.textContent=css;
+  try{document.documentElement.style.zoom=({s:'1',m:'1.1',l:'1.22'})[lsGet('ft_size','s')]||'1'}catch(e){}}
+applyTheme();
+
+/* ---------- extra styles ---------- */
+var st=document.createElement('style');st.textContent=`
+.hero{background:linear-gradient(140deg,var(--h1),var(--accent) 55%,var(--h3));color:#fff;border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 10px 26px var(--accsh);position:relative;overflow:hidden;animation:rise .35s ease both}
+.hero:after{content:'';position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.07)}
+.hero .gr{font-size:13px;opacity:.85}.hero .br{font-size:21px;font-weight:800;margin:2px 0 10px;letter-spacing:-.3px}
+.hero .row{display:flex;gap:14px;align-items:center}.hero .ring{flex:none}
+.hero .kv{font-size:12px;opacity:.85}.hero .kv b{display:block;font-size:20px;opacity:1;color:#fff}
+.hero .ci{margin-top:12px;width:100%;border:0;border-radius:14px;padding:13px;font-weight:800;font-size:15px;background:var(--gold2);color:var(--gink);box-shadow:0 4px 12px rgba(0,0,0,.18)}
+.hero .ci.ok{background:rgba(255,255,255,.16);color:#fff;box-shadow:none;font-weight:600}
+.sect{display:flex;align-items:center;justify-content:space-between;margin:16px 2px 8px}.sect b{font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
+.prio{display:flex;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:8px;box-shadow:0 2px 8px rgba(16,40,38,.05);animation:rise .35s ease both;cursor:pointer}
+.prio .n{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:14px;flex:none;color:#fff;background:var(--accent)}
+.prio.bad .n{background:var(--bad)}.prio.warn .n{background:var(--warn)}.prio.gold .n{background:var(--gold);color:var(--gink)}
+.prio .tx{flex:1;font-size:15px;line-height:1.35}.prio .tx small{display:block;color:var(--muted);font-size:12.5px}.prio .go{color:var(--muted);font-size:20px}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px 4px 10px;text-align:center;font-size:11.5px;line-height:1.25;color:var(--ink);min-height:auto;box-shadow:0 2px 8px rgba(16,40,38,.05);animation:pop .35s ease both}
+.tile .i{display:grid;place-items:center;width:42px;height:42px;margin:0 auto 6px;border-radius:13px;font-size:21px;background:var(--soft)}
+.ftsheet{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;animation:fade .2s ease both}
+.ftsheet .pn{background:var(--panel);color:var(--ink);width:100%;max-width:560px;margin:0 auto;border-radius:22px 22px 0 0;max-height:88vh;overflow:auto;padding:8px 16px calc(20px + env(safe-area-inset-bottom));animation:up .28s cubic-bezier(.2,.8,.2,1) both}
+.ftsheet .grab{width:44px;height:5px;border-radius:5px;background:var(--line);margin:6px auto 10px}
+.ftsheet .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.ftsheet .hd b{font-size:18px}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}@keyframes fade{from{opacity:0}to{opacity:1}}
+.sw{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.sw button{border:2px solid var(--line);border-radius:14px;padding:8px;background:var(--panel);color:var(--ink);font-size:12px;min-height:auto}
+.sw button.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accsh)}
+.sw .dots{display:flex;gap:3px;justify-content:center;margin-bottom:5px}.sw .dots i{width:16px;height:16px;border-radius:50%;display:block}
+.seg{display:flex;gap:6px}.seg button{flex:1;border:1px solid var(--line);border-radius:12px;padding:10px 0;background:var(--panel);color:var(--ink);min-height:auto}.seg button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.lrow{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line);cursor:pointer}.lrow:last-child{border-bottom:0}
+.lrow .ic{width:38px;height:38px;border-radius:12px;background:var(--soft);display:grid;place-items:center;font-size:19px;flex:none}
+.lrow .tx{flex:1}.lrow .tx small{display:block;color:var(--muted)}.lrow .st{font-size:13px}
+.lrow.lock{opacity:.5}.lrow.nx .ic{background:var(--gold2)}
+.phase{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px 14px;margin-bottom:12px;box-shadow:0 2px 10px rgba(16,40,38,.06);animation:rise .35s ease both}
+.phase .ph{display:flex;justify-content:space-between;align-items:center}.phase .ph b{font-size:16px}.phase .ph small{color:var(--muted)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.cal .dw{font-size:11px;text-align:center;color:var(--muted);padding:2px 0}
+.cal .d{min-height:56px;border-radius:10px;padding:4px;font-size:10px;line-height:1.15;background:var(--panel);border:1px solid var(--line);overflow:hidden;cursor:pointer}
+.cal .d b{display:block;font-size:13px}.cal .d.fw{background:var(--soft)}.cal .d.off{background:transparent;color:var(--muted)}.cal .d.lv{background:var(--bad-bg)}.cal .d.hol{background:var(--warn-bg)}.cal .d.jw{background:var(--ok-bg)}
+.cal .d.td{outline:2px solid var(--gold);outline-offset:-2px}.cal .d.sel{box-shadow:inset 0 0 0 2px var(--accent)}
+.legend{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.legend span{font-size:11px;padding:3px 8px;border-radius:8px;border:1px solid var(--line)}
+.stp{display:flex;align-items:center;gap:6px}.stp button{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--soft);color:var(--ink);font-size:18px;min-height:auto;padding:0}.stp b{min-width:30px;text-align:center}
+.badge{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.badge div{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px 6px;text-align:center;font-size:11.5px}
+.badge div .i{font-size:28px;display:block;margin-bottom:4px}.badge div.no{opacity:.35;filter:grayscale(1)}
+.lb{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line)}.lb .r{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:var(--soft)}
+.lb.me{background:var(--soft);border-radius:12px}.lb .r.g1{background:#F6D776}.lb .r.g2{background:#D9DEE2}.lb .r.g3{background:#E8B98A}
+.srch{width:100%;border-radius:14px;padding:12px 14px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:15px;margin-bottom:10px}
+`;document.head.appendChild(st);
+
+/* ---------- helpers ---------- */
+function me(){return who()||{}}
+function isMgr(){return S.mgr&&!S.viewAs}
+function hour(){return new Date().getHours()}
+function sheet(title,body){var ov=h('div',{class:'ftsheet'});var pn=h('div',{class:'pn'},h('div',{class:'grab'}),h('div',{class:'hd'},h('b',{},title),h('button',{class:'ghost',onclick:function(){close()}},'✕')));
+  function close(){ov.remove();S.dirty=false}ov.addEventListener('click',function(e){if(e.target===ov)close()});pn.append(body);ov.append(pn);document.body.append(ov);U.play('page');return close}
+function ring(p,size,label,sub){p=Math.max(0,Math.min(100,p||0));var r=size/2-7,c=2*Math.PI*r;var NS='http://www.w3.org/2000/svg';
+  var svg=document.createElementNS(NS,'svg');svg.setAttribute('width',size);svg.setAttribute('height',size);svg.setAttribute('class','ring');
+  function circ(col,dash){var e=document.createElementNS(NS,'circle');e.setAttribute('cx',size/2);e.setAttribute('cy',size/2);e.setAttribute('r',r);e.setAttribute('fill','none');e.setAttribute('stroke',col);e.setAttribute('stroke-width','8');e.setAttribute('stroke-linecap','round');if(dash!=null){e.setAttribute('stroke-dasharray',c);e.setAttribute('stroke-dashoffset',c);e.setAttribute('transform','rotate(-90 '+size/2+' '+size/2+')');e.style.transition='stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1)';setTimeout(function(){e.setAttribute('stroke-dashoffset',c*(1-dash/100))},60)}return e}
+  svg.append(circ('rgba(255,255,255,.18)'),circ('var(--gold2)',p));
+  var tx=document.createElementNS(NS,'text');tx.setAttribute('x','50%');tx.setAttribute('y','47%');tx.setAttribute('text-anchor','middle');tx.setAttribute('fill','#fff');tx.setAttribute('font-size','17');tx.setAttribute('font-weight','800');tx.textContent=label;
+  var t2=document.createElementNS(NS,'text');t2.setAttribute('x','50%');t2.setAttribute('y','64%');t2.setAttribute('text-anchor','middle');t2.setAttribute('fill','rgba(255,255,255,.8)');t2.setAttribute('font-size','9.5');t2.textContent=sub;
+  svg.append(tx,t2);return svg}
+function entriesOf(type,email){return (S.entries||[]).filter(function(e){return e.type===type&&(!email||e.email===email)})}
+function myPob(){return S.feeds['pob_'+myHQ()]||null}
+function todayMsg(){var m=(S.msgs||[]).filter(function(x){return x.email===myEmail()&&x.date===TODAY&&x.slot==='8am'})[0];return m||null}
+function carryToday(){var c=S.feeds['carry_'+myHQ()]||{},out=[];Object.keys(c).forEach(function(b){if(c[b]&&c[b].due===TODAY)(c[b].items||[]).forEach(function(i){out.push(i)})});return out}
+function checkinToday(email){return entriesOf('checkin',email||myEmail()).filter(function(e){return e.date===TODAY})[0]}
+function directAdd(type,fields){try{var x=me();return S.db.collection('entries').add(Object.assign({type:type,email:x.Email,hq:x.HQ,name:x.Name,by:'',ts:Date.now(),date:TODAY},fields))}catch(e){return Promise.reject(e)}}
+
+/* ---------- location ---------- */
+function getLoc(cb){var doneF=false;function fin(v){if(doneF)return;doneF=true;cb(v)}
+  try{if(window.AndroidApp&&AndroidApp.requestLocation){AndroidApp.requestLocation();var n=0;var iv=setInterval(function(){var s='';try{s=AndroidApp.getLocation()}catch(e){}if(s){clearInterval(iv);try{fin(JSON.parse(s))}catch(e){fin(null)}}else if(++n>40){clearInterval(iv);fin(null)}},300);return}}catch(e){}
+  if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(p){fin({lat:p.coords.latitude,lng:p.coords.longitude,acc:Math.round(p.coords.accuracy)})},function(){fin(null)},{enableHighAccuracy:true,timeout:9000,maximumAge:60000});setTimeout(function(){fin(null)},10000)}else fin(null)}
+function doCheckin(btn){if(checkinToday()){toast(w('checked'));return}if(isMgr()){toast('Pick a CSO with "View as" first.');return}
+  if(btn){btn.textContent='📍 '+w('locating');btn.disabled=true}
+  getLoc(function(l){var tm=new Date().toTimeString().slice(0,5);var f={time:tm,brick:(typeof brickToday==='function'&&brickToday())||''};if(l){f.lat=l.lat;f.lng=l.lng;f.acc=l.acc}
+    save('checkin',f).then(function(ok){if(ok){U.confetti(30);render()}else if(btn){btn.disabled=false;btn.textContent='📍 '+w('checkin')}})})}
+
+/* ---------- share ---------- */
+function sharePlan(){var m=todayMsg();if(!m){toast(w('noplan'));return}var txt='*'+me().Name+' – '+TODAY+'*\n'+m.text+'\n\n— Ratan Roy, Guwahati Area';
+  if(window.AndroidApp&&AndroidApp.share){AndroidApp.share(txt);return}toast('Update the app to share.')}
+
+/* ---------- settings ---------- */
+U.settings=function(focus){var body=h('div');
+  body.append(h('div',{class:'sect'},h('b',{},'🌐 '+w('lang'))),h('div',{class:'seg'},[['en','English'],['hi','हिंदी'],['bn','বাংলা'],['as','অসমীয়া']].map(function(l){return h('button',{class:U.lang===l[0]?'on':'',onclick:function(){U.lang=l[0];lsSet('ft_lang',l[0]);U.stopSpeak();close();render()}},l[1])})));
+  body.append(h('div',{class:'sect'},h('b',{},'🎨 '+w('theme'))),h('div',{class:'sw'},Object.keys(THEMES).map(function(k){var th=THEMES[k];return h('button',{class:lsGet('ft_theme','teal')===k?'on':'',onclick:function(){lsSet('ft_theme',k);applyTheme();close();render();U.play('ok')}},h('div',{class:'dots'},h('i',{style:'background:'+th.h1}),h('i',{style:'background:'+th.acc}),h('i',{style:'background:'+th.gold2})),th.n)})));
+  body.append(h('div',{class:'sect'},h('b',{},'🔠 '+w('size'))),h('div',{class:'seg'},[['s','A'],['m','A+'],['l','A++']].map(function(z){return h('button',{class:lsGet('ft_size','s')===z[0]?'on':'',onclick:function(){lsSet('ft_size',z[0]);applyTheme();close();render()}},z[1])})));
+  body.append(h('div',{class:'sect'},h('b',{},'🔊 '+w('sound'))),h('div',{class:'seg'},[[false,w('on')],[true,w('off')]].map(function(z){return h('button',{class:U.mute===z[0]?'on':'',onclick:function(){U.mute=z[0];lsSet('ft_mute',z[0]?'1':'0');close();render()}},z[1])})));
+  body.append(h('div',{class:'note',style:'margin-top:14px'},'👤 Coach: Ratan Roy · CSM, Guwahati Area'));
+  var close=sheet('⚙️ '+w('settings'),body)};
+
+/* ---------- learning path ---------- */
+var PATH=[['m11','n0','n1','m0','m1','m2','n2'],['m3','m4','n3','n4','m6','m5'],['m8','n5','m7','m9','n6','n7'],['m10','n8','n9','n10','n11']];
+function allMods(){var c=U.C(),en=COACH.en,o={};(c.modules||en.modules||[]).forEach(function(m,i){o['m'+i]=m});(c.modules2||en.modules2||[]).forEach(function(m,i){o['n'+i]=m});return o}
+function doneSet(){var s={};try{JSON.parse(lsGet('ft_done','[]')).forEach(function(x){s[x]=1})}catch(e){}entriesOf('lesson_done',myEmail()).forEach(function(e){s[e.mod]=1});return s}
+function markDone(id){var d=[];try{d=JSON.parse(lsGet('ft_done','[]'))}catch(e){}if(d.indexOf(id)<0){d.push(id);lsSet('ft_done',JSON.stringify(d));if(!isMgr())directAdd('lesson_done',{mod:id}).catch(function(){})}}
+function phaseDone(i,ds){return PATH[i].filter(function(id){return ds[id]}).length}
+function unlocked(i,ds){if(i===0||S.mgr)return true;return phaseDone(i-1,ds)>=PATH[i-1].length-1&&unlocked(i-1,ds)}
+function nextId(ds){for(var i=0;i<PATH.length;i++){if(!unlocked(i,ds))break;for(var j=0;j<PATH[i].length;j++)if(!ds[PATH[i][j]])return PATH[i][j]}var all=[].concat.apply([],PATH);return all[U.dayIdx()%all.length]}
+function phaseOf(id){for(var i=0;i<PATH.length;i++)if(PATH[i].indexOf(id)>=0)return i;return 0}
+function phName(i){var c=U.C();return ((c.phases||COACH.en.phases)||[])[i]||('Phase '+(i+1))}
+function openMod(id){S.tab.learn='mods';S.tab.learnMod=id;go('learn')}
+function modPlayer(id,after){var M=allMods()[id];if(!M)return h('div');return U.player(M,function(){markDone(id);after&&after()})}
+
+U.vLearn=function(app){var r=U.sub('learn',[['today',t('lesson').replace(/^Today's l/,'L')],['mods',w('path')],['situ',t('situ')],['prod',t('prod')],['quiz',t('quiz')]]);app.append(r[0]);var cur=r[1];var M=allMods(),ds=doneSet();
+  if(!Object.keys(M).length){app.append(h('div',{class:'note'},'Loading lessons…'));return}
+  if(cur==='today'){var q0=U.quote();if(q0)app.append(q0);var id=nextId(ds),m=M[id],pi=phaseOf(id);
+    app.append(h('div',{class:'lcard'},h('div',{class:'meta'},'🔥 '+U.streak()+' '+t('streak')+' · '+phName(pi)),h('h3',{},(m.icon||'📘')+' '+m.title),h('div',{class:'meta'},m.sub||''),bar(pc(phaseDone(pi,ds),PATH[pi].length))));
+    app.append(modPlayer(id,function(){render()}));var sits=U.C().situations||[];var s=sits[U.dayIdx()%Math.max(1,sits.length)];if(s)app.append(U.sitCard(s,true));return}
+  if(cur==='mods'){var open=S.tab.learnMod;if(open&&M[open]){app.append(h('button',{class:'ghost',onclick:function(){S.tab.learnMod=null;render()}},'‹ '+w('path')),h('div',{class:'meta',style:'margin:6px 2px'},phName(phaseOf(open))));app.append(modPlayer(open,function(){S.tab.learnMod=null;render()}));return}
+    var inp=h('input',{class:'srch',placeholder:'🔎 '+w('search'),value:S.tab.q||''});var res=h('div');app.append(inp,res);
+    function draw(){var q=(inp.value||'').trim().toLowerCase();S.tab.q=inp.value;res.innerHTML='';
+      if(q){var hits=Object.keys(M).filter(function(k){var m=M[k];return (m.title+' '+(m.sub||'')+' '+(m.steps||[]).join(' ')+' '+(m.says||'')).toLowerCase().indexOf(q)>=0});
+        var box=h('div',{class:'phase'});hits.forEach(function(k){box.append(row(k))});(U.C().situations||[]).filter(function(s){return (s.q+' '+(s.do||[]).join(' ')+' '+(s.say||'')).toLowerCase().indexOf(q)>=0}).forEach(function(s){res.append(U.sitCard(s))});
+        if(hits.length)res.prepend(box);if(!res.children.length)res.append(h('div',{class:'note'},'—'));return}
+      var nid=nextId(ds);PATH.forEach(function(ids,i){var ul=unlocked(i,ds),dn=phaseDone(i,ds);var box=h('div',{class:'phase'},h('div',{class:'ph'},h('div',{},h('b',{},(ul?'':'🔒 ')+phName(i)),h('small',{style:'display:block'},((U.C().phaseSub||COACH.en.phaseSub)||[])[i]||'')),h('span',{class:'chip '+(dn===ids.length?'ok':'mut')},dn+' / '+ids.length)),bar(pc(dn,ids.length)));
+        ids.forEach(function(k){box.append(row(k,!ul,k===nid))});res.append(box)})}
+    function row(k,lock,nx){var m=M[k];return h('div',{class:'lrow'+(lock?' lock':'')+(nx?' nx':''),onclick:function(){if(lock){toast(w('locked'));return}openMod(k)}},h('div',{class:'ic'},m.icon||'📘'),h('div',{class:'tx'},h('b',{},m.title),h('small',{},m.sub||'')),h('span',{class:'st'},ds[k]?'✅':lock?'🔒':nx?'▶ '+w('next'):''))}
+    inp.oninput=draw;draw();return}
+  if(cur==='situ'){(U.C().situations||[]).forEach(function(s){app.append(U.sitCard(s))});return}
+  if(cur==='prod'){U.vProd(app);return}
+  if(cur==='quiz'){U.vQuiz(app)}};
+
+/* ---------- Today hub ---------- */
+U.today=function(app,tk,rest){var x=me(),hq=x.HQ;
+  if(isMgr()){var tp=teamPanel();tk.after(tp);var q=U.quote();if(q)tp.after(q);return}
+  var p=myPob(),ci=checkinToday(),tpd=tpFor(myEmail(),TODAY),brick=(typeof brickToday==='function'&&brickToday())||(tpd?tpd.Beat:'');
+  var hr=hour(),gr=hr<12?w('gm'):hr<17?w('ga'):w('ge');
+  var need=p?p.dailyNeed:0,today=p?((p.byDate||{})[TODAY]||0):0,mp=p?pc(p.done,p.target60):0;
+  var ciBtn=h('button',{class:'ci'+(ci?' ok':''),onclick:function(){doCheckin(ciBtn)}},ci?'✅ '+w('checked')+' · '+ci.time+(ci.lat?' · 📍':''):'📍 '+w('checkin'));
+  var hero=h('div',{class:'hero'},h('div',{class:'gr'},gr+', '+(x.Name||'').split(' ')[0]+' 👋'),h('div',{class:'br'},brick?('📍 '+brick):(tpd?tpd.DayType:'')),
+    h('div',{class:'row'},ring(mp,92,mp+'%',w('month')),h('div',{style:'display:grid;gap:8px'},h('div',{class:'kv'},w('targetToday'),h('b',{},need?rs(need):'—')),h('div',{class:'kv'},w('month'),h('b',{style:'font-size:15px'},p?rs(p.done)+' / '+rs(p.target60):'—')))),
+    tpd&&tpd.DayType!=='Field work'&&tpd.DayType!=='Joint working'?null:ciBtn);
+  var list=[];
+  if(!ci&&tpd&&/Field|Joint/.test(tpd.DayType))list.push({c:'gold',t:'📍 '+w('checkin'),s:'',f:function(){doCheckin(ciBtn)}});
+  var m=todayMsg();if(m)list.push({c:'',t:'📋 '+w('readplan'),s:(m.text||'').split('\n')[0].slice(0,80),f:function(){go('msgs')}});
+  carryToday().forEach(function(c){list.push({c:'warn',t:'↩️ '+w('carry'),s:c,f:function(){go('msgs')}})});
+  try{TASKS.forEach(function(k){var s=k.status();if(s.level==='bad')list.push({c:'bad',t:k.t,s:s.why,f:function(){go(k.k)}})});TASKS.forEach(function(k){var s=k.status();if(s.level==='todo'&&list.length<6)list.push({c:'',t:k.t,s:s.why,f:function(){go(k.k)}})})}catch(e){}
+  var ds=doneSet();if(!entriesOf('lesson_done',myEmail()).some(function(e){return e.date===TODAY}))list.push({c:'',t:'🎓 '+w('doLesson'),s:(allMods()[nextId(ds)]||{}).title||'',f:function(){S.tab.learn='today';go('learn')}});
+  var prio=h('div');list.slice(0,6).forEach(function(it,i){prio.append(h('div',{class:'prio '+it.c,style:'animation-delay:'+(i*40)+'ms',onclick:it.f},h('div',{class:'n'},String(i+1)),h('div',{class:'tx'},it.t,it.s?h('small',{},it.s):null),h('div',{class:'go'},'›')))});
+  var T=[['📋',w('plan'),function(){go('msgs')}],['🎓',w('lesson'),function(){S.tab.learn='today';go('learn')}],['🧮',w('calc'),function(){S.tab.learn='prod';S.tab.rates='calc';go('learn')}],['📦',w('req'),stockSheet],['🗓️',w('tp'),function(){go('tp')}],['📤',w('share'),sharePlan],['🏆',w('board'),function(){S.tab.perf='board';go('perf')}],['🧭',w('all'),allSheet]];
+  var tiles=h('div',{class:'tiles'},T.map(function(x,i){return h('button',{class:'tile',style:'animation-delay:'+(i*30)+'ms',onclick:x[2]},h('span',{class:'i'},x[0]),x[1])}));
+  var R=U.REF(),off=null;if(R&&R.offers&&R.offers.length){var o=R.offers[U.dayIdx()%R.offers.length];off=h('div',{class:'lcard sit',onclick:function(){S.tab.learn='prod';S.tab.rates='offers';go('learn')},style:'cursor:pointer'},h('div',{class:'meta'},'🎁 '+w('offer')),h('b',{},o.t),h('div',{style:'margin-top:4px'},o.d),h('div',{style:'font-style:italic;margin-top:6px;color:var(--accent)'},'“'+o.say+'”'))}
+  var wrap=h('details',{class:'phase',open:true},h('summary',{style:'font-weight:700'},'✅ '+w('tasks')));rest.forEach(function(n){wrap.append(n)});
+  var frag=[hero,h('div',{class:'sect'},h('b',{},w('prio'))),prio,h('div',{class:'sect'},h('b',{},w('tiles'))),tiles,off,U.quote(),wrap].filter(Boolean);
+  var after=tk;frag.forEach(function(n){after.after(n);after=n})};
+
+/* ---------- manager team panel ---------- */
+function teamPanel(){var box=h('div',{class:'phase'},h('div',{class:'ph'},h('b',{},'👥 '+w('team')),h('small',{},TODAY)));
+  var csos=D.users.filter(function(u){return u.Role==='CSO'&&u.Status==='Active'});
+  csos.forEach(function(u){var c=checkinToday(u.Email),les=entriesOf('lesson_done',u.Email).filter(function(e){return e.date===TODAY}).length,p=S.feeds['pob_'+u.HQ],req=entriesOf('stock_request',u.Email).filter(function(e){return e.status!=='sent'}).length;
+    box.append(h('div',{class:'lrow',onclick:function(){S.viewAs=u;render()}},h('div',{class:'ic'},(u.Name||'?')[0]),h('div',{class:'tx'},h('b',{},u.Name.split(' ')[0]+' · '+u.HQ),h('small',{},(c?'✅ '+c.time+(c.lat?' 📍':''):'⏳ not checked in')+' · 🎓 '+les+' · POB '+(p?pc(p.done,p.target60)+'%':'—')+(req?' · 📦 '+req+' request':''))),h('span',{class:'st'},'›')))});
+  var reqs=(S.entries||[]).filter(function(e){return e.type==='stock_request'&&e.status!=='sent'});
+  if(reqs.length){box.append(h('div',{class:'sect'},h('b',{},'📦 Stock requests')));reqs.forEach(function(r){var items=Object.keys(r.items||{}).map(function(k){return k+' × '+r.items[k]}).join(', ');
+    box.append(h('div',{class:'note'},h('b',{},r.name+' · '+r.date),h('div',{},items),r.note?h('small',{},r.note):null,h('button',{style:'margin-top:6px',onclick:function(){S.db.collection('entries').doc(r._id).update({status:'sent',sentTs:Date.now()}).then(function(){toast('Marked as sent');render()})}},'✅ Mark sent')))})}
+  return box}
+
+/* ---------- stock request ---------- */
+function stockSheet(){if(isMgr()){toast('Pick a CSO with "View as" first.');return}var items=[];(D.stock||[]).forEach(function(r){if(r.Email===myEmail()&&items.indexOf(r.Input)<0)items.push(r.Input)});
+  var q={};var body=h('div');body.append(h('div',{class:'note'},'Tap + for what you need. Ratan Roy gets it at once.'));
+  items.forEach(function(it){var v=h('b',{},'0');q[it]=0;body.append(h('div',{class:'lrow',style:'cursor:default'},h('div',{class:'tx'},it),h('div',{class:'stp'},h('button',{onclick:function(){q[it]=Math.max(0,q[it]-1);v.textContent=q[it]}},'−'),v,h('button',{onclick:function(){q[it]+=it.match(/sample/i)?5:1;v.textContent=q[it]}},'+'))))});
+  var note=h('input',{placeholder:w('note')});body.append(h('label',{},note));
+  body.append(h('button',{style:'width:100%;margin-top:10px',onclick:function(){var o={};Object.keys(q).forEach(function(k){if(q[k]>0)o[k]=q[k]});if(!Object.keys(o).length){toast('Tap + on at least one item.');return}save('stock_request',{items:o,note:note.value,status:'pending'}).then(function(ok){if(ok){close();render()}})}},'📦 '+w('send')));
+  var mine=entriesOf('stock_request',myEmail()).slice(-5).reverse();if(mine.length){body.append(h('div',{class:'sect'},h('b',{},w('myreq'))));mine.forEach(function(r){body.append(h('div',{class:'lrow',style:'cursor:default'},h('div',{class:'tx'},h('b',{},r.date),h('small',{},Object.keys(r.items||{}).map(function(k){return k+' × '+r.items[k]}).join(', '))),h('span',{class:'chip '+(r.status==='sent'?'ok':'warn')},r.status==='sent'?w('sent'):w('pending'))))})}
+  var close=sheet('📦 '+w('req'),body)}
+
+/* ---------- all topics ---------- */
+function allSheet(){var body=h('div');var G=[
+  ['💼 '+t('work'),[['🧪','Rloc Raft',function(){go('raft')}],['💉','Deca',function(){go('deca')}],['💊','R-Loc',function(){go('rloc')}],['✨','Skinlite',function(){go('skin')}],['🧴','Dexona',function(){go('dexona')}],['🏬',t('stockists'),function(){go('stockists')}],['📄',t('stock'),function(){go('stock')}],['🔀',t('beat'),function(){go('beat')}],['📦',w('req'),stockSheet],['🗓️',w('tp'),function(){go('tp')}]]],
+  ['🎓 '+t('learn'),[['▶️',w('lesson'),function(){S.tab.learn='today';go('learn')}],['🧭',w('path'),function(){S.tab.learn='mods';S.tab.learnMod=null;go('learn')}],['⚡',t('situ'),function(){S.tab.learn='situ';go('learn')}],['🎁',t('prod'),function(){S.tab.learn='prod';S.tab.rates='offers';go('learn')}],['🧮',w('calc'),function(){S.tab.learn='prod';S.tab.rates='calc';go('learn')}],['❓',t('quiz'),function(){S.tab.learn='quiz';go('learn')}]]],
+  ['📈 '+t('progress'),[['📅',t('month'),function(){S.tab.perf='month';go('perf')}],['🎯','POB',function(){S.tab.perf='pob';go('perf')}],['💰',t('inc'),function(){S.tab.perf='inc';go('perf')}],['📊',t('q4'),function(){S.tab.perf='q4';go('perf')}],['🗓️',w('week'),function(){S.tab.perf='week';go('perf')}],['🏅',w('badges'),function(){S.tab.perf='badges';go('perf')}],['🏆',w('board'),function(){S.tab.perf='board';go('perf')}]]],
+  ['⚙️ '+w('settings'),[['🌐',w('lang'),function(){U.settings()}],['🎨',w('theme'),function(){U.settings()}],['💬',t('msgs'),function(){go('msgs')}]]]];
+  G.forEach(function(g){body.append(h('div',{class:'sect'},h('b',{},g[0])),h('div',{class:'tiles'},g[1].map(function(x){return h('button',{class:'tile',onclick:function(){close();x[2]()}},h('span',{class:'i'},x[0]),x[1])})))});
+  var close=sheet('🧭 '+w('all'),body)}
+
+/* ---------- TP calendar ---------- */
+U.tabOfX={tp:'work'};
+U.routes.tp=function(app){var who_=me(),email=myEmail();
+  if(isMgr()){var cs=D.users.filter(function(u){return u.Role==='CSO'&&u.Status==='Active'});var pick=S.tab.tpWho||cs[0].Email;email=pick;app.append(h('div',{class:'subtabs'},cs.map(function(u){return h('button',{class:u.Email===pick?'on':'',onclick:function(){S.tab.tpWho=u.Email;render()}},u.Name.split(' ')[0])})))}
+  var ym=TODAY.slice(0,7),rows={};D.tp.filter(function(r){return r.Email===email&&r.Date.slice(0,7)===ym}).forEach(function(r){rows[r.Date]=r});
+  var d0=new Date(ym+'-01T00:00:00'),days=new Date(d0.getFullYear(),d0.getMonth()+1,0).getDate(),lead=(d0.getDay()+6)%7;
+  var selD=S.tab.tpSel||TODAY;var cal=h('div',{class:'cal'},['M','T','W','T','F','S','S'].map(function(x){return h('div',{class:'dw'},x)}));
+  for(var i=0;i<lead;i++)cal.append(h('div'));
+  for(var dd=1;dd<=days;dd++){(function(dd){var ds=ym+'-'+('0'+dd).slice(-2),r=rows[ds],ty=r?r.DayType:'',cls=/Field/.test(ty)?'fw':/Joint/.test(ty)?'jw':/Leave/.test(ty)?'lv':/Holiday/.test(ty)?'hol':'off';
+    var lab=r?(/Field|Joint/.test(ty)?(r.BrickID?r.BrickID.split(' | ')[1]:r.Beat):ty):'';
+    cal.append(h('div',{class:'d '+cls+(ds===TODAY?' td':'')+(ds===selD?' sel':''),onclick:function(){S.tab.tpSel=ds;render()}},h('b',{},String(dd)),(lab||'').slice(0,18)))})(dd)}
+  app.append(h('div',{class:'phase'},h('div',{class:'ph'},h('b',{},'🗓️ '+w('tp')+' · '+d0.toLocaleDateString('en-IN',{month:'long',year:'numeric'})),null),h('div',{class:'legend'},h('span',{style:'background:var(--soft)'},'Field work'),h('span',{style:'background:var(--ok-bg)'},'Joint working'),h('span',{style:'background:var(--bad-bg)'},'Leave'),h('span',{style:'background:var(--warn-bg)'},'Holiday'),h('span',{},'Off')),cal));
+  var r=rows[selD];var det=h('div',{class:'lcard'},h('b',{},new Date(selD+'T00:00:00').toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'short'})));
+  if(r){det.append(h('div',{},r.DayType+(r.Beat?' · '+r.Beat:'')),r.Objective?h('small',{style:'color:var(--muted)'},r.Objective):null);
+    var br=r.BrickID?r.BrickID.split(' | ')[1]:'';if(br){var cnt={D:0,R:0,W:0};D.cust.forEach(function(c){if(c[2]===br&&cnt[c[3]]!=null)cnt[c[3]]++});det.append(h('div',{style:'margin-top:6px'},'👨‍⚕️ '+cnt.D+' doctors · 🏪 '+cnt.R+' retailers · 🏬 '+cnt.W+' wholesalers'));
+      var hqx=(D.users.find(function(u){return u.Email===email})||{}).HQ;var c=(S.feeds['carry_'+hqx]||{})[br];if(c&&c.due===selD)det.append(h('div',{class:'note',style:'margin-top:6px'},'↩️ '+(c.items||[]).join(' · ')))}}
+  else det.append(h('div',{class:'meta'},'No plan for this day.'));app.append(det)};
+
+/* ---------- progress ---------- */
+function weekDays(){var d=new Date(TODAY+'T00:00:00'),k=(d.getDay()+6)%7,out=[];d.setDate(d.getDate()-k);for(var i=0;i<6;i++){out.push(d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2));d.setDate(d.getDate()+1)}return out}
+function badgeList(){var em=myEmail(),ds=doneSet(),ci=entriesOf('checkin',em).length,p=myPob()||{},hit=Object.keys(p.byDate||{}).some(function(k){return p.byDate[k]>=(p.planPerDay||p.dailyNeed||1e12)}),qb=+lsGet('ft_quizbest','0'),sk=U.streak();
+  return [['📍','First check-in',ci>=1],['🌅','5 check-ins',ci>=5],['🔥','3-day learning streak',sk>=3],['⚡','7-day learning streak',sk>=7],['🎯','Day target hit',hit],['💯','Quiz 5 / 5',qb>=5],['🧮','Profit pro',lsGet('ft_calc','')==='1'],
+    ['🥉',phName(0),phaseDone(0,ds)>=PATH[0].length],['🥈',phName(1),phaseDone(1,ds)>=PATH[1].length],['🥇',phName(2),phaseDone(2,ds)>=PATH[2].length],['🏆',phName(3),phaseDone(3,ds)>=PATH[3].length],['📚','10 lessons done',Object.keys(ds).length>=10]]}
+function vWeek(app){var p=myPob()||{},em=myEmail(),wd=weekDays(),plan=p.planPerDay||p.dailyNeed||0,tot=0,tg=0;
+  var rows=wd.map(function(d){var v=(p.byDate||{})[d]||0,work=(p.workingDays||[]).indexOf(d)>=0;if(work){tot+=v;tg+=plan}var c=entriesOf('checkin',em).some(function(e){return e.date===d}),l=entriesOf('lesson_done',em).filter(function(e){return e.date===d}).length;
+    return h('tr',{},h('td',{},new Date(d+'T00:00:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric'})),h('td',{class:'r num'},work?rs(v):'off'),h('td',{class:'r num'},work?(v>=plan?'✅':d<TODAY?'❌':'·'):''),h('td',{class:'r'},c?'📍':''),h('td',{class:'r'},l?'🎓'+l:''))});
+  var pp=pc(tot,tg);app.append(h('div',{class:'score'},h('b',{},'🗓️ '+w('week')+' scorecard'),h('div',{},h('span',{class:'big'},pp+'%'),h('small',{style:'color:var(--muted)'},'  POB '+rs(tot)+' of '+rs(tg))),bar(pp),
+    h('div',{class:'tbl'},h('table',{},h('tr',{},h('th',{},'Day'),h('th',{class:'r'},'POB'),h('th',{class:'r'},'Target'),h('th',{class:'r'},'In'),h('th',{class:'r'},'Learn')),rows))),
+    h('div',{class:'quote'},h('div',{class:'who'},'💬 '+t('says')),h('div',{class:'q'},pp>=100?'Excellent week! Keep the same rhythm next week.':pp>=70?'Good effort. Close the gap by booking before noon every day.':'This week is behind. Tell me where you need help – we will fix it together.')))}
+function vBadges(app){var b=badgeList(),n=b.filter(function(x){return x[2]}).length;app.append(h('div',{class:'score'},h('b',{},'🏅 '+w('badges')+' · '+n+' / '+b.length),bar(pc(n,b.length))),h('div',{class:'badge'},b.map(function(x){return h('div',{class:x[2]?'':'no'},h('span',{class:'i'},x[0]),x[1])})))}
+function vBoard(app){var f=null,k=Object.keys(S.feeds).find(function(x){return x.indexOf('board_')===0});f=k?S.feeds[k]:null;
+  if(!f||!f.rows){app.append(h('div',{class:'note'},'🏆 '+w('updates')));return}
+  var box=h('div',{class:'phase'},h('div',{class:'ph'},h('b',{},'🏆 '+w('board')),h('small',{},f.asOf||'')));
+  f.rows.slice().sort(function(a,b){return b.points-a.points}).forEach(function(r,i){box.append(h('div',{class:'lb'+(r.email===myEmail()?' me':'')},h('div',{class:'r g'+(i+1)},String(i+1)),h('div',{style:'flex:1'},h('b',{},r.name),h('small',{style:'display:block;color:var(--muted)'},'POB '+r.pobPct+'% · 📍'+(r.checkins||0)+' · 🎓'+(r.lessons||0))),h('b',{},r.points+' '+w('points'))))});
+  app.append(box,h('small',{style:'color:var(--muted)'},'Points: POB % of plan-to-date + 2 per check-in day + 3 per lesson.'))}
+U.vPerf=function(app){var x=me();
+  if(isMgr()){var r0=U.sub('perf',[['team','Team'],['board',w('board')]]);app.append(r0[0]);if(r0[1]==='board'){vBoard(app);return}app.append(U.mgrInc());['Agartala','Bongaigaon','Guwahati'].forEach(function(q){var s=scoreCard(q);if(s)app.append(s)});return}
+  var r=U.sub('perf',[['month',t('month')],['pob','POB'],['week',w('week')],['inc',t('inc')],['q4',t('q4')],['badges',w('badges')],['board',w('board')]]);app.append(r[0]);
+  if(r[1]==='month'){var s=scoreCard(x.HQ);if(s)app.append(s)}
+  if(r[1]==='pob')[].concat(U.pobCard(x.HQ)).forEach(function(n){app.append(n)});
+  if(r[1]==='week')vWeek(app);
+  if(r[1]==='inc')app.append(U.incCard(x.HQ));
+  if(r[1]==='q4'){app.append(U.q4Card(x.HQ));app.append(U.kpiCard(x.HQ))}
+  if(r[1]==='badges')vBadges(app);
+  if(r[1]==='board')vBoard(app)};
+
+/* ---------- smart memory: remember last stockist / retailer / wholesaler ---------- */
+var REM=['stockist','retailer','ws'];
+document.addEventListener('change',function(e){var el=e.target;if(el&&el.tagName==='SELECT'&&REM.indexOf(el.name)>=0&&el.value)lsSet('ft_last_'+el.name,el.value)},true);
+U.after=function(app,r){try{app.querySelectorAll('select').forEach(function(sel){if(sel.value||REM.indexOf(sel.name)<0)return;var v=lsGet('ft_last_'+sel.name,'');if(v&&[].some.call(sel.options,function(o){return o.value===v})){sel.value=v}})}catch(e){}};
+
 try{if(S.ready)render()}catch(e){}
 })();

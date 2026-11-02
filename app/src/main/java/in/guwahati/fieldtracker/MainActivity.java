@@ -14,6 +14,10 @@ import android.speech.tts.TextToSpeech;
 import android.webkit.JavascriptInterface;
 import android.widget.Toast;
 import java.util.Locale;
+import android.location.Location;
+import android.location.LocationManager;
+import android.location.LocationListener;
+import android.webkit.GeolocationPermissions;
 import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -27,7 +31,7 @@ import android.widget.FrameLayout;
 public class MainActivity extends Activity {
   static final String APP_URL = "https://script.google.com/macros/s/AKfycbyFp_mIJqqv-vya_y_DFmW7nwzZc83PQY5PnwOdzMPYjFK3EYg-p-ZHz0M7vSgMlV3_/exec";
   static final int PICK = 11, PERM = 12;
-  WebView web; ProgressBar bar; ValueCallback<Uri[]> pending; TextToSpeech tts; boolean ttsReady;
+  WebView web; ProgressBar bar; ValueCallback<Uri[]> pending; TextToSpeech tts; boolean ttsReady; volatile String lastLoc = "";
 
   @Override protected void onCreate(Bundle b) {
     super.onCreate(b);
@@ -72,6 +76,7 @@ public class MainActivity extends Activity {
     });
     web.setWebChromeClient(new WebChromeClient() {
       @Override public void onProgressChanged(WebView v, int p) { bar.setProgress(p); bar.setVisibility(p < 100 ? View.VISIBLE : View.GONE); }
+      @Override public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback cb) { cb.invoke(origin, true, false); }
       @Override public boolean onShowFileChooser(WebView v, ValueCallback<Uri[]> cb, FileChooserParams fp) {
         if (pending != null) pending.onReceiveValue(null);
         pending = cb;
@@ -91,13 +96,15 @@ public class MainActivity extends Activity {
   }
 
   void askPermissions() {
+    java.util.List<String> need = new java.util.ArrayList<>();
     if (Build.VERSION.SDK_INT >= 29) {
       String media = Build.VERSION.SDK_INT >= 33 ? Manifest.permission.READ_MEDIA_IMAGES : Manifest.permission.READ_EXTERNAL_STORAGE;
-      if (checkSelfPermission(Manifest.permission.ACCESS_MEDIA_LOCATION) != PackageManager.PERMISSION_GRANTED || checkSelfPermission(media) != PackageManager.PERMISSION_GRANTED)
-        requestPermissions(new String[]{media, Manifest.permission.ACCESS_MEDIA_LOCATION}, PERM);
+      if (checkSelfPermission(media) != PackageManager.PERMISSION_GRANTED) need.add(media);
+      if (checkSelfPermission(Manifest.permission.ACCESS_MEDIA_LOCATION) != PackageManager.PERMISSION_GRANTED) need.add(Manifest.permission.ACCESS_MEDIA_LOCATION);
     }
-    if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
-      requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, PERM + 1);
+    if (Build.VERSION.SDK_INT >= 23 && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) { need.add(Manifest.permission.ACCESS_FINE_LOCATION); need.add(Manifest.permission.ACCESS_COARSE_LOCATION); }
+    if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) need.add(Manifest.permission.POST_NOTIFICATIONS);
+    if (!need.isEmpty() && Build.VERSION.SDK_INT >= 23) requestPermissions(need.toArray(new String[0]), PERM);
   }
 
   // Keep the photo's GPS location: ask Android for the original file, not the location-stripped copy.
@@ -138,8 +145,40 @@ public class MainActivity extends Activity {
   // Lets the page hand over the sign-in so phone notifications show this CSO's own numbers.
   class AppBridge {
     @JavascriptInterface public void setAuth(String json) { getSharedPreferences("ft", MODE_PRIVATE).edit().putString("auth", json).apply(); Notify.schedule(MainActivity.this); }
-    @JavascriptInterface public String version() { return "2"; }
+    @JavascriptInterface public String version() { return "3"; }
+    // One-tap check-in: the page asks for the location, then reads it.
+    @JavascriptInterface public void requestLocation() {
+      lastLoc = "";
+      runOnUiThread(() -> {
+        try {
+          if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) { lastLoc = "null"; return; }
+          LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
+          Location best = null;
+          for (String pr : lm.getProviders(true)) { Location l = lm.getLastKnownLocation(pr); if (l != null && (best == null || l.getTime() > best.getTime())) best = l; }
+          if (best != null && System.currentTimeMillis() - best.getTime() < 5 * 60 * 1000) { lastLoc = toJson(best); return; }
+          String pr = lm.isProviderEnabled(LocationManager.GPS_PROVIDER) ? LocationManager.GPS_PROVIDER : LocationManager.NETWORK_PROVIDER;
+          final Location fb = best;
+          lm.requestSingleUpdate(pr, new LocationListener() {
+            @Override public void onLocationChanged(Location l) { lastLoc = toJson(l); }
+            @Override public void onStatusChanged(String a, int b, Bundle c) {}
+            @Override public void onProviderEnabled(String a) {}
+            @Override public void onProviderDisabled(String a) { lastLoc = fb != null ? toJson(fb) : "null"; }
+          }, getMainLooper());
+          web.postDelayed(() -> { if (lastLoc.isEmpty()) lastLoc = fb != null ? toJson(fb) : "null"; }, 11000);
+        } catch (Exception e) { lastLoc = "null"; }
+      });
+    }
+    @JavascriptInterface public String getLocation() { return lastLoc; }
+    // Share only the day-plan text (to WhatsApp etc.).
+    @JavascriptInterface public void share(String text) {
+      runOnUiThread(() -> {
+        Intent i = new Intent(Intent.ACTION_SEND); i.setType("text/plain"); i.putExtra(Intent.EXTRA_TEXT, text);
+        try { startActivity(Intent.createChooser(i, "Share day plan")); } catch (Exception e) {}
+      });
+    }
   }
+
+  static String toJson(Location l) { return "{\"lat\":" + l.getLatitude() + ",\"lng\":" + l.getLongitude() + ",\"acc\":" + Math.round(l.getAccuracy()) + "}"; }
 
   @Override protected void onDestroy() { if (tts != null) tts.shutdown(); super.onDestroy(); }
 
