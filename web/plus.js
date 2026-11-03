@@ -240,7 +240,7 @@ function vBoard(app){var f=null,k=Object.keys(S.feeds).find(function(x){return x
   app.append(box,h('small',{style:'color:var(--muted)'},'Points: POB % of plan-to-date + 2 per check-in day + 3 per lesson.'))}
 U.vPerf=function(app){var x=me();
   if(isMgr()){var r0=U.sub('perf',[['team','Team'],['board',w('board')]]);app.append(r0[0]);if(r0[1]==='board'){vBoard(app);return}app.append(U.mgrInc());['Agartala','Bongaigaon','Guwahati'].forEach(function(q){var s=scoreCard(q);if(s)app.append(s)});return}
-  var r=U.sub('perf',[['brands','📊 Brands'],['month',t('month')],['pob','POB'],['week',w('week')],['inc',t('inc')],['q4',t('q4')],['badges',w('badges')],['board',w('board')]]);app.append(r[0]);
+  var r=U.sub('perf',[['brands','📊 Reports'],['month',t('month')],['pob','POB'],['week',w('week')],['inc',t('inc')],['q4',t('q4')],['badges',w('badges')],['board',w('board')]]);app.append(r[0]);
   if(r[1]==='brands'&&U.csoPerf){U.csoPerf(app);return}
   if(r[1]==='month'){var s=scoreCard(x.HQ);if(s)app.append(s)}
   if(r[1]==='pob')[].concat(U.pobCard(x.HQ)).forEach(function(n){app.append(n)});
