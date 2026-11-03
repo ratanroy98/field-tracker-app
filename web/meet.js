@@ -51,7 +51,7 @@ function scheduleSheet(){var cs=D.users.filter(function(u){return u.Role==='CSO'
         Promise.all(f.who.map(function(e){var u=cs.find(function(x){return x.Email===e});return S.db.collection('entries').add({type:'meeting',mid:mid,email:e,hq:u.HQ,name:u.Name,by:'Ratan Roy',ts:Date.now(),date:f.date,time:f.time,at:at,how:f.how,link:f.link,title:f.title||'Team meeting',agenda:f.agenda,prep:f.prep})}))
           .then(function(){close();toast('Meeting sent');render()},function(){toast('Not sent. Check internet.')})}},'📤 Send to CSOs'))}
   draw();var ov=h('div',{class:'ftsheet'},h('div',{class:'pn'},h('div',{class:'grab'}),h('div',{class:'hd'},h('b',{},'📅 Schedule a meeting'),h('button',{class:'ghost',onclick:function(){close()}},'✕')),body));function close(){ov.remove()}document.body.append(ov)}
-U.scheduleMeeting=scheduleSheet;
+U.scheduleMeeting=scheduleSheet;U.meetPanel=function(){return mgrPanel()};U.myMeetings=function(){return mine().filter(function(m){return atOf(m)-Date.now()<36*3600000})};U.meetCard=function(m){return card(m)};
 function mgrPanel(){var L=(S.entries||[]).filter(function(e){return e.type==='meeting'&&atOf(e)>Date.now()-60*60000&&!e.cancelled}),G={};L.forEach(function(e){(G[e.mid]=G[e.mid]||[]).push(e)});
   var box=h('div',{class:'phase'},h('div',{class:'ph'},h('b',{},'📅 Meetings'),h('button',{style:'min-height:auto;padding:8px 12px',onclick:scheduleSheet},'+ Schedule')));
   var ids=Object.keys(G).sort(function(a,b){return atOf(G[a][0])-atOf(G[b][0])});if(!ids.length)box.append(h('small',{style:'color:var(--muted)'},'No meeting scheduled. Tap + Schedule – it appears on the CSOs\' screens with a phone alert, then reminders 15 minutes before and at the time.'));

@@ -1486,7 +1486,7 @@ function phName(i){var c=U.C();return ((c.phases||COACH.en.phases)||[])[i]||('Ph
 function openMod(id){S.tab.learn='mods';S.tab.learnMod=id;go('learn')}
 function modPlayer(id,after){var M=allMods()[id];if(!M)return h('div');return U.player(M,function(){markDone(id);after&&after()})}
 
-U.vLearn=function(app){var r=U.sub('learn',[['today',t('lesson').replace(/^Today's l/,'L')],['mods',w('path')],['situ',t('situ')],['prod',t('prod')],['quiz',t('quiz')]]);app.append(r[0]);var cur=r[1];var M=allMods(),ds=doneSet();
+U.vLearn=function(app){var r=U.sub('learn',[['today',t('lesson').replace(/^Today's l/,'L')],['mods',w('path')],['situ',t('situ')],['quiz',t('quiz')]]);app.append(r[0]);var cur=r[1];var M=allMods(),ds=doneSet();
   if(!Object.keys(M).length){app.append(h('div',{class:'note'},'Loading lessons…'));return}
   if(cur==='today'){var q0=U.quote();if(q0)app.append(q0);var id=nextId(ds),m=M[id],pi=phaseOf(id);
     app.append(h('div',{class:'lcard'},h('div',{class:'meta'},'🔥 '+U.streak()+' '+t('streak')+' · '+phName(pi)),h('h3',{},(m.icon||'📘')+' '+m.title),h('div',{class:'meta'},m.sub||''),bar(pc(phaseDone(pi,ds),PATH[pi].length))));
@@ -1522,9 +1522,9 @@ U.today=function(app,tk,rest){var x=me(),hq=x.HQ;
   try{TASKS.forEach(function(k){var s=k.status();if(s.level==='bad')list.push({c:'bad',t:k.t,s:s.why,f:function(){go(k.k)}})});TASKS.forEach(function(k){var s=k.status();if(s.level==='todo'&&list.length<6)list.push({c:'',t:k.t,s:s.why,f:function(){go(k.k)}})})}catch(e){}
   var ds=doneSet();if(!entriesOf('lesson_done',myEmail()).some(function(e){return e.date===TODAY}))list.push({c:'',t:'🎓 '+w('doLesson'),s:(allMods()[nextId(ds)]||{}).title||'',f:function(){S.tab.learn='today';go('learn')}});
   var prio=h('div');list.slice(0,6).forEach(function(it,i){prio.append(h('div',{class:'prio '+it.c,style:'animation-delay:'+(i*40)+'ms',onclick:it.f},h('div',{class:'n'},String(i+1)),h('div',{class:'tx'},it.t,it.s?h('small',{},it.s):null),h('div',{class:'go'},'›')))});
-  var T=[['📋',w('plan'),function(){go('msgs')}],['🎓',w('lesson'),function(){S.tab.learn='today';go('learn')}],['🧮',w('calc'),function(){S.tab.learn='prod';S.tab.rates='calc';go('learn')}],['📦',w('req'),stockSheet],['🗓️',w('tp'),function(){go('tp')}],['📤',w('share'),sharePlan],['🏆',w('board'),function(){S.tab.perf='board';go('perf')}],['🧭',w('all'),allSheet]];
+  var T=[['📋',w('plan'),function(){go('msgs')}],['🎓',w('lesson'),function(){S.tab.learn='today';go('learn')}],['🧮',w('calc'),function(){S.tab.rates='calc';go('sell')}],['📦',w('req'),stockSheet],['🗓️',w('tp'),function(){go('tp')}],['📤',w('share'),sharePlan],['🏆',w('board'),function(){S.tab.perf='board';go('perf')}],['🧭',w('all'),allSheet]];
   var tiles=h('div',{class:'tiles'},T.map(function(x,i){return h('button',{class:'tile',style:'animation-delay:'+(i*30)+'ms',onclick:x[2]},h('span',{class:'i'},x[0]),x[1])}));
-  var R=U.REF(),off=null;if(R&&R.offers&&R.offers.length){var o=R.offers[U.dayIdx()%R.offers.length];off=h('div',{class:'lcard sit',onclick:function(){S.tab.learn='prod';S.tab.rates='offers';go('learn')},style:'cursor:pointer'},h('div',{class:'meta'},'🎁 '+w('offer')),h('b',{},o.t),h('div',{style:'margin-top:4px'},o.d),h('div',{style:'font-style:italic;margin-top:6px;color:var(--accent)'},'“'+o.say+'”'))}
+  var R=U.REF(),off=null;if(R&&R.offers&&R.offers.length){var o=R.offers[U.dayIdx()%R.offers.length];off=h('div',{class:'lcard sit',onclick:function(){S.tab.rates='offers';go('sell')},style:'cursor:pointer'},h('div',{class:'meta'},'🎁 '+w('offer')),h('b',{},o.t),h('div',{style:'margin-top:4px'},o.d),h('div',{style:'font-style:italic;margin-top:6px;color:var(--accent)'},'“'+o.say+'”'))}
   var wrap=h('details',{class:'phase',open:true},h('summary',{style:'font-weight:700'},'✅ '+w('tasks')));rest.forEach(function(n){wrap.append(n)});
   var frag=[hero,h('div',{class:'sect'},h('b',{},w('prio'))),prio,h('div',{class:'sect'},h('b',{},w('tiles'))),tiles,off,U.quote(),wrap].filter(Boolean);
   var after=tk;frag.forEach(function(n){after.after(n);after=n})};
@@ -1548,10 +1548,11 @@ function stockSheet(){if(isMgr()){toast('Pick a CSO with "View as" first.');retu
   var mine=entriesOf('stock_request',myEmail()).slice(-5).reverse();if(mine.length){body.append(h('div',{class:'sect'},h('b',{},w('myreq'))));mine.forEach(function(r){body.append(h('div',{class:'lrow',style:'cursor:default'},h('div',{class:'tx'},h('b',{},r.date),h('small',{},Object.keys(r.items||{}).map(function(k){return k+' × '+r.items[k]}).join(', '))),h('span',{class:'chip '+(r.status==='sent'?'ok':'warn')},r.status==='sent'?w('sent'):w('pending'))))})}
   var close=sheet('📦 '+w('req'),body)}
 
+U.stockSheet=function(){stockSheet()};U.teamPanel=function(){return teamPanel()};U.checkinToday=function(){return checkinToday()};U.lessonDoneToday=function(){return entriesOf('lesson_done',myEmail()).some(function(e){return e.date===TODAY})||JSON.parse(lsGet('ft_learned','[]')).indexOf(TODAY)>=0};U.nextLesson=function(){return (allMods()[nextId(doneSet())]||{}).title||''};
 /* ---------- all topics ---------- */
 function allSheet(){var body=h('div');var G=[
   ['💼 '+t('work'),[['🧪','Rloc Raft',function(){go('raft')}],['💉','Deca',function(){go('deca')}],['💊','R-Loc',function(){go('rloc')}],['✨','Skinlite',function(){go('skin')}],['🧴','Dexona',function(){go('dexona')}],['🏬',t('stockists'),function(){go('stockists')}],['📄',t('stock'),function(){go('stock')}],['🔀',t('beat'),function(){go('beat')}],['📦',w('req'),stockSheet],['🗓️',w('tp'),function(){go('tp')}]]],
-  ['🎓 '+t('learn'),[['▶️',w('lesson'),function(){S.tab.learn='today';go('learn')}],['🧭',w('path'),function(){S.tab.learn='mods';S.tab.learnMod=null;go('learn')}],['⚡',t('situ'),function(){S.tab.learn='situ';go('learn')}],['🎁',t('prod'),function(){S.tab.learn='prod';S.tab.rates='offers';go('learn')}],['🧮',w('calc'),function(){S.tab.learn='prod';S.tab.rates='calc';go('learn')}],['❓',t('quiz'),function(){S.tab.learn='quiz';go('learn')}]]],
+  ['🎓 '+t('learn'),[['▶️',w('lesson'),function(){S.tab.learn='today';go('learn')}],['🧭',w('path'),function(){S.tab.learn='mods';S.tab.learnMod=null;go('learn')}],['⚡',t('situ'),function(){S.tab.learn='situ';go('learn')}],['🎁',t('prod'),function(){S.tab.rates='offers';go('sell')}],['🧮',w('calc'),function(){S.tab.rates='calc';go('sell')}],['❓',t('quiz'),function(){S.tab.learn='quiz';go('learn')}]]],
   ['📈 '+t('progress'),[['📅',t('month'),function(){S.tab.perf='month';go('perf')}],['🎯','POB',function(){S.tab.perf='pob';go('perf')}],['💰',t('inc'),function(){S.tab.perf='inc';go('perf')}],['📊',t('q4'),function(){S.tab.perf='q4';go('perf')}],['🗓️',w('week'),function(){S.tab.perf='week';go('perf')}],['🏅',w('badges'),function(){S.tab.perf='badges';go('perf')}],['🏆',w('board'),function(){S.tab.perf='board';go('perf')}]]],
   ['⚙️ '+w('settings'),[['🌐',w('lang'),function(){U.settings()}],['🎨',w('theme'),function(){U.settings()}],['💬',t('msgs'),function(){go('msgs')}]]]];
   G.forEach(function(g){body.append(h('div',{class:'sect'},h('b',{},g[0])),h('div',{class:'tiles'},g[1].map(function(x){return h('button',{class:'tile',onclick:function(){close();x[2]()}},h('span',{class:'i'},x[0]),x[1])})))});
@@ -1658,6 +1659,14 @@ var st=document.createElement('style');st.textContent=`
 .hof .pp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .hof .p{text-align:center}.hof .p img,.hof .p .noimg{width:84px;height:84px;border-radius:50%;object-fit:cover;object-position:top;border:3px solid #F6D776;box-shadow:0 0 0 4px rgba(246,215,118,.25);display:block;margin:0 auto;background:rgba(255,255,255,.15)}
 .hof .p b{display:block;margin-top:6px;font-size:14px}.hof .p small{display:block;font-size:11.5px;opacity:.85;line-height:1.3}
+.hof .pp.three{grid-template-columns:1fr 1fr 1fr}.hof .p .empty,.fame .fimg.empty{display:flex!important;align-items:center;justify-content:center;font-size:34px;font-weight:800;color:#F6D776;border-style:dashed!important;background:rgba(255,255,255,.08)!important;animation:youpulse 1.8s ease-in-out infinite}
+@keyframes youpulse{50%{box-shadow:0 0 0 8px rgba(246,215,118,.18)}}
+.hof .enc{margin-top:10px;font-size:13px;line-height:1.4;background:rgba(0,0,0,.18);border-radius:12px;padding:8px 10px;text-align:center}
+.hof.slim{padding:12px}.hof.slim .p img,.hof.slim .p .noimg{width:58px;height:58px}.hof.slim .p b{font-size:12.5px}.hof.slim .enc{font-size:12px;padding:6px 8px;margin-top:8px}.hof.slim .tap{display:none}
+.fame .tog{display:flex;gap:16px;justify-content:center;align-items:flex-end;margin-top:6px}
+.fame .tog .tp{text-align:center;animation:pop2 .6s cubic-bezier(.2,1.4,.4,1) both}.fame .tog .tp b{display:block;margin-top:8px;color:#FFF3C4}
+.fame .tog .fimg{width:min(27vw,120px);height:min(27vw,120px);border-radius:50%;object-fit:cover;object-position:top;border:3px solid #F6D776;box-shadow:0 0 0 6px rgba(246,215,118,.18),0 0 40px rgba(246,215,118,.35);display:block}
+.fame .encb{margin-top:22px;max-width:330px;font-size:16px;line-height:1.45;text-align:center;color:#fff;background:rgba(255,255,255,.1);border:1px solid rgba(246,215,118,.35);border-radius:16px;padding:12px 14px;animation:rise .6s ease .5s both}
 .hof .tap{text-align:center;font-size:11.5px;opacity:.8;margin-top:8px}
 .gifts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .gift{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(16,40,38,.06);animation:pop .4s ease both;cursor:pointer}
@@ -1679,8 +1688,8 @@ var st=document.createElement('style');st.textContent=`
 
 /* ---------- Hall of Fame ---------- */
 var FAME=[
- {id:'bhub',name:'Bhubaneswar Kundu',role:'CSO · Guwahati HQ',items:['🏆 RCL All India Top 10 – July 2026','🏆 RCL All India Top 10 – September 2026','🥇 RCL Quarter Winner – CSO','🛒 RCL Trolley Winner – East Zone'],cheer:'Guwahati is proud of you!'},
- {id:'ratan',name:'Ratan Roy',role:'CSM · Guwahati Area',items:['🛒 RCL Trolley Winner – CSM, Guwahati','🌟 Coach of an All India Top 10 CSO – Jul & Sep 2026','🥇 Coach of an RCL Quarter Winner – CSO'],cheer:'Leading Guwahati to the top!'}];
+ {id:'bhub',mail:'rajibkundu.kundu@gmail.com',name:'Bhubaneswar Kundu',role:'CSO · Guwahati HQ',items:['🏆 RCL All India Top 10 – July 2026','🏆 RCL All India Top 10 – September 2026','🥇 RCL Quarter Winner – CSO','🛒 RCL Trolley Winner – East Zone'],cheer:'Guwahati is proud of you!'},
+ {id:'ratan',mail:'ratanroy98@gmail.com',name:'Ratan Roy',role:'CSM · Guwahati Area',items:['🛒 RCL Trolley Winner – CSM, Guwahati','🌟 Coach of an All India Top 10 CSO – Jul & Sep 2026','🥇 Coach of an RCL Quarter Winner – CSO'],cheer:'Leading Guwahati to the top!'}];
 function fanfare(){if(U.mute)return;try{var A=new(window.AudioContext||window.webkitAudioContext)();[[523,0],[659,.12],[784,.24],[1047,.38],[784,.62],[1047,.74]].forEach(function(n){var o=A.createOscillator(),g=A.createGain(),s=A.currentTime+n[1];o.type='triangle';o.frequency.value=n[0];g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(.13,s+.02);g.gain.exponentialRampToValueAtTime(.0001,s+(n[1]>.6?.6:.28));o.connect(g);g.connect(A.destination);o.start(s);o.stop(s+.7)})}catch(e){}}
 function showFame(list){if(document.querySelector('.fame'))return;var i=0,ov=h('div',{class:'fame'}),timer=null;
   function draw(){var p=list[i];ov.innerHTML='';
@@ -1690,13 +1699,39 @@ function showFame(list){if(document.querySelector('.fame'))return;var i=0,ov=h('
       h('div',{class:'dots'},list.length>1?list.map(function(_,k){return h('i',{class:k===i?'on':''})}):[]),
       h('div',{class:'go'},i<list.length-1?'Tap for next ›':'Tap to continue'));
     fanfare();setTimeout(function(){U.confetti(60)},500);setTimeout(function(){U.confetti(40)},1600);clearTimeout(timer);timer=setTimeout(next,6500)}
-  function next(){if(i<list.length-1){i++;draw()}else{clearTimeout(timer);ov.style.transition='opacity .35s';ov.style.opacity='0';setTimeout(function(){ov.remove()},350)}}
+  function next(){if(i<list.length-1){i++;draw()}else if(i===list.length-1&&list.length>1){i++;together()}else{clearTimeout(timer);land()}}
+  // Last frame: both champions together + an empty seat for the viewer, then the photos fly into their place on the screen.
+  function together(){ov.innerHTML='';var me=who()||{},mine=FAME.some(function(p){return p.mail===String(me.Email||'').toLowerCase()});
+    ov.append(img('rcl','lg','RCL'),h('div',{class:'kick'},'Guwahati Hall of Fame'),
+      h('div',{class:'tog'},list.map(function(p,k){return h('div',{class:'tp',style:'animation-delay:'+(k*.15)+'s'},img(p.id,'fimg',p.name),h('b',{},p.name.split(' ')[0]))}),
+        mine||S.mgr&&!S.viewAs?null:h('div',{class:'tp you',style:'animation-delay:.3s'},h('div',{class:'fimg empty'},'?'),h('b',{},'You next'))),
+      h('div',{class:'encb'},encourage()),h('div',{class:'go'},'Tap to continue'));
+    fanfare();setTimeout(function(){U.confetti(50)},300);clearTimeout(timer);timer=setTimeout(next,7000)}
+  function land(){var hof=document.querySelector('.hof');var src=[].slice.call(ov.querySelectorAll('.tog .fimg:not(.empty)'));
+    if(!hof||!src.length){ov.style.transition='opacity .35s';ov.style.opacity='0';setTimeout(function(){ov.remove()},350);return}
+    try{hof.scrollIntoView({block:'center'})}catch(e){}
+    var tg=[].slice.call(hof.querySelectorAll('.p img, .p .noimg'));ov.style.transition='opacity .45s ease';
+    src.forEach(function(sEl,k){var t=tg[k];if(!t)return;var a=sEl.getBoundingClientRect(),b=t.getBoundingClientRect();var c=sEl.cloneNode(true);
+      c.style.cssText='position:fixed;z-index:700;margin:0;left:'+a.left+'px;top:'+a.top+'px;width:'+a.width+'px;height:'+a.height+'px;border-radius:50%;object-fit:cover;object-position:top;border:3px solid #F6D776;box-shadow:0 0 30px rgba(246,215,118,.7);transition:all 1s cubic-bezier(.6,0,.2,1) '+(k*.12)+'s';
+      document.body.append(c);t.style.visibility='hidden';
+      requestAnimationFrame(function(){requestAnimationFrame(function(){c.style.left=b.left+'px';c.style.top=b.top+'px';c.style.width=b.width+'px';c.style.height=b.height+'px';c.style.boxShadow='0 0 0 4px rgba(246,215,118,.25)'})});
+      setTimeout(function(){t.style.visibility='';c.remove();try{t.animate([{transform:'scale(1.18)'},{transform:'scale(1)'}],{duration:380,easing:'ease-out'})}catch(e){}},1150+k*120)});
+    ov.style.opacity='0';setTimeout(function(){ov.remove()},1000);setTimeout(function(){U.play&&U.play('cash')},1050)}
   ov.addEventListener('click',next);document.body.append(ov);draw()}
 U.showFame=showFame;
 function dailyFame(){if(!S.ready||!who())return;var days=[];try{days=JSON.parse(lsGet('ft_fame_days','[]'))}catch(e){}if(days.indexOf(TODAY)>=0||days.length>=3)return;days.push(TODAY);lsSet('ft_fame_days',JSON.stringify(days));
   withMedia(function(){setTimeout(function(){showFame(FAME)},300)})}
-function hofCard(){return h('div',{class:'hof',onclick:function(){withMedia(function(){showFame(FAME)})}},h('div',{class:'hd'},img('rcl','','RCL'),'Guwahati Hall of Fame · RCL'),
-  h('div',{class:'pp'},FAME.map(function(p){return h('div',{class:'p'},img(p.id,'',p.name),h('b',{},p.name),h('small',{},p.items[0].replace(/^\S+\s/,'')))})),h('div',{class:'tap'},'Tap to celebrate 🎉'))}
+function encourage(){var me=who()||{},em=String(me.Email||'').toLowerCase(),first=(me.Name||'').split(' ')[0];
+  if(S.mgr&&!S.viewAs)return'Coach the team – the next photo on this wall could be Karamjit or Prashun.';
+  if(em==='rajibkundu.kundu@gmail.com')return'Champion, '+first+'! Keep the crown – win RCL again this quarter.';
+  var p=(S.feeds||{})['pob_'+me.HQ],pc_=p&&p.target60?Math.round(100*p.done/p.target60):null;
+  return'Your photo can be here next, '+first+'.'+(pc_!==null?' You are at '+pc_+'% of '+new Date().toLocaleDateString('en-IN',{month:'long'})+' –':'')+' every order brings you closer. Ratan Roy believes in you.'}
+U.encourage=encourage;
+function hofCard(slim){var me=who()||{},mine=FAME.some(function(p){return p.mail===String(me.Email||'').toLowerCase()}),showYou=!mine&&!(S.mgr&&!S.viewAs);
+  return h('div',{class:'hof'+(slim?' slim':''),onclick:function(){withMedia(function(){showFame(FAME)})}},h('div',{class:'hd'},img('rcl','','RCL'),'Guwahati Hall of Fame · RCL'),
+  h('div',{class:'pp'+(showYou?' three':'')},FAME.map(function(p){return h('div',{class:'p'},img(p.id,'',p.name),h('b',{},slim?p.name.split(' ')[0]:p.name),slim?'':h('small',{},p.items[0].replace(/^\S+\s/,'')))}).concat(showYou?[h('div',{class:'p you'},h('div',{class:'noimg empty'},'?'),h('b',{},'You next'),slim?'':h('small',{},'Hit 100% and win RCL'))]:[])),
+  h('div',{class:'enc'},encourage()),h('div',{class:'tap'},'Tap to celebrate 🎉'))}
+U.hofCard=hofCard;
 
 /* ---------- gifts ---------- */
 var GIFTS=[
@@ -1760,8 +1795,8 @@ function quickDocs(app,r){if(S.mgr&&!S.viewAs)return;var brand=BR[r];if(!brand||
   function no(c,ex){ex.innerHTML='';ex.append(h('div',{class:'qdx'},h('small',{},'Why not yet?'),h('div',{class:'chips'},NO.map(function(x){return h('button',{onclick:function(){save('dr_input',{brand:brand,dr:c,input:'As per Ventasys',rx:'Not yet',reason:x,quick:1}).then(function(ok){if(ok)render()})}},x)}))))}}
 
 /* ---------- hooks ---------- */
-var prevToday=U.today;U.today=function(app,tk,rest){ensureMedia();prevToday&&prevToday(app,tk,rest);var hero=app.querySelector('.hero')||tk;var c=hofCard();hero.after(c);dailyFame()};
-var prevPerf=U.vPerf;U.vPerf=function(app){app.append(hofCard());prevPerf(app)};
+var prevToday=U.today;U.today=function(app,tk,rest){ensureMedia();prevToday&&prevToday(app,tk,rest);var hero=app.querySelector('.hero')||tk;var c=hofCard(true);hero.after(c);dailyFame()};
+U.routes.hof=function(app){ensureMedia();app.append(hofCard(false));var w0=h('div',{class:'phase'},h('div',{class:'ph'},h('b',{},'🏆 Their wins')));FAME.forEach(function(p){w0.append(h('div',{class:'lrow',style:'cursor:default'},h('div',{class:'tx'},h('b',{},p.name),h('small',{},p.items.join(' · ')))))});app.append(w0);var q=U.quote();if(q)app.append(q)};
 var prevAfter=U.after;U.after=function(app,r){ensureMedia();prevAfter&&prevAfter(app,r);try{quickDocs(app,r)}catch(e){}};
 try{if(S.ready)render()}catch(e){}
 })();
@@ -1873,6 +1908,7 @@ U.vStockist=vStockist;
 
 /* ---------- hooks ---------- */
 var prevToday=U.today;U.today=function(app,tk,rest){prevToday&&prevToday(app,tk,rest);if(!isMgr()){var hof=app.querySelector('.hof')||app.querySelector('.hero')||tk;hof.after(vbar())}else{var tp=app.querySelector('.phase');if(tp)tp.after(pendingPlans())}};
+U.pendingPlans=function(){return pendingPlans()};U.vbar=function(){return vbar()};
 function pendingPlans(){var L=(S.entries||[]).filter(function(e){return e.type==='brick_plan'&&e.status==='pending'}),B=(S.entries||[]).filter(function(e){return e.type==='beat_change'&&e.status==='pending'&&e.date>=TODAY});var box=h('div');if(!L.length&&!B.length)return box;
   box.className='phase';box.append(h('div',{class:'ph'},h('b',{},'📋 Brick changes to approve'),h('small',{},String(L.length+B.length))));
   B.forEach(function(e){box.append(h('div',{class:'lrow',style:'cursor:default'},h('div',{class:'tx'},h('b',{},e.name+' · today'),h('small',{},(e.planned||'—')+' → '+e.actual+' · '+e.reason)),h('button',{style:'min-height:auto;padding:8px 12px',onclick:function(){S.db.collection('entries').doc(e._id).update({status:'approved',approvedTs:Date.now()}).then(function(){toast('Approved');render()})}},'✅')))});
@@ -1934,7 +1970,7 @@ function scheduleSheet(){var cs=D.users.filter(function(u){return u.Role==='CSO'
         Promise.all(f.who.map(function(e){var u=cs.find(function(x){return x.Email===e});return S.db.collection('entries').add({type:'meeting',mid:mid,email:e,hq:u.HQ,name:u.Name,by:'Ratan Roy',ts:Date.now(),date:f.date,time:f.time,at:at,how:f.how,link:f.link,title:f.title||'Team meeting',agenda:f.agenda,prep:f.prep})}))
           .then(function(){close();toast('Meeting sent');render()},function(){toast('Not sent. Check internet.')})}},'📤 Send to CSOs'))}
   draw();var ov=h('div',{class:'ftsheet'},h('div',{class:'pn'},h('div',{class:'grab'}),h('div',{class:'hd'},h('b',{},'📅 Schedule a meeting'),h('button',{class:'ghost',onclick:function(){close()}},'✕')),body));function close(){ov.remove()}document.body.append(ov)}
-U.scheduleMeeting=scheduleSheet;
+U.scheduleMeeting=scheduleSheet;U.meetPanel=function(){return mgrPanel()};U.myMeetings=function(){return mine().filter(function(m){return atOf(m)-Date.now()<36*3600000})};U.meetCard=function(m){return card(m)};
 function mgrPanel(){var L=(S.entries||[]).filter(function(e){return e.type==='meeting'&&atOf(e)>Date.now()-60*60000&&!e.cancelled}),G={};L.forEach(function(e){(G[e.mid]=G[e.mid]||[]).push(e)});
   var box=h('div',{class:'phase'},h('div',{class:'ph'},h('b',{},'📅 Meetings'),h('button',{style:'min-height:auto;padding:8px 12px',onclick:scheduleSheet},'+ Schedule')));
   var ids=Object.keys(G).sort(function(a,b){return atOf(G[a][0])-atOf(G[b][0])});if(!ids.length)box.append(h('small',{style:'color:var(--muted)'},'No meeting scheduled. Tap + Schedule – it appears on the CSOs\' screens with a phone alert, then reminders 15 minutes before and at the time.'));
@@ -2002,7 +2038,7 @@ function doSync(){if(busy)return;if(navigator.onLine===false){toast('📶 No net
     syncedThisOpen=true;U.lsSet(K,String(Date.now()));U.lsSet(KD,'');try{U.play&&U.play('ok')}catch(e){}
     toast(isMgr()?'✅ Synced – you have the team\'s latest entries.':'✅ Synced – Ratan has all your entries and you have the latest from him.');try{render()}catch(e){btn()}},
   function(){busy=false;btn();toast('Sync did not finish. Check internet and tap Sync again.')})}
-U.sync=doSync;
+U.sync=doSync;U.syncState=function(){return{busy:busy,due:unsynced()||!syncedThisOpen,unsent:unsynced(),opened:syncedThisOpen,ago:ago()}};U.allDone=function(){return allDone()};
 
 /* after each entry: gentle nudge */
 var baseSave=window.save;
@@ -2074,7 +2110,7 @@ function sheet(){if(document.querySelector('.ftsheet.tsheet'))return;
     (function(){var b=h('button',{class:'wabtn',onclick:doShare});b.innerHTML=WA+'<span>Share to WhatsApp – '+GROUP+'</span>';return b})(),
     h('small',{style:'display:block;text-align:center;margin-top:8px;color:var(--muted)'},'WhatsApp opens – pick "'+GROUP+'" and tap Send.')));
   document.body.append(ov)}
-U.taskSheet=sheet;
+U.taskSheet=sheet;U.taskShared=sharedToday;U.taskDue=due;
 
 var prevToday=U.today;U.today=function(app,tk,rest){prevToday&&prevToday(app,tk,rest);if(isMgr()){mgrLine(app);return}
   var c;if(due())c=h('div',{class:'tasknag'},h('div',{class:'k'},'📋 Daily task'),h('h3',{},'Read today\'s task and share it'),h('p',{},'Share it to WhatsApp "'+GROUP+'" to confirm you have gone through the full task for today.'),h('button',{onclick:sheet},'Read & share'));
@@ -2090,5 +2126,116 @@ var popped=false;function autoPop(){if(popped||typeof S==='undefined'||!S.db||!d
   popped=true;sheet()}
 setInterval(autoPop,2000);
 document.addEventListener('visibilitychange',function(){if(!document.hidden)popped=false});
+try{if(S.ready)render()}catch(e){}
+})();
+/* Field Tracker – clean layout: 5 tabs with sub-tabs, one "Next step" card on Today, Sync + Messages in the top bar.
+   Loaded last: it rearranges what the other modules draw, so nothing is lost – it is just placed where it belongs. */
+(function(){
+'use strict';
+var U=window.FTUI;if(!U||!U.t)return;
+function isMgr(){return S.mgr&&!S.viewAs}
+var SYNC='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M3 21v-5h5"/></svg>';
+var APK='https://github.com/ratanroy98/field-tracker-app/releases/download/latest/GuwahatiFieldTracker.apk';
+
+var st=document.createElement('style');st.textContent=`
+.ftick,#ftsync{display:none!important}
+.fthead .ib.lx{display:none}
+.fthead .acts{margin-left:auto;display:flex;gap:6px}
+.fthead .hb{position:relative;width:40px;height:40px;min-height:auto;padding:0;border-radius:12px;border:0;background:rgba(255,255,255,.16);color:#fff;display:inline-flex;align-items:center;justify-content:center}
+.fthead .hb.due{background:#F5C451;color:#2B2000;animation:ftpulse 1.4s ease-in-out infinite}
+.fthead .hb.spin svg{animation:ftspin .9s linear infinite}
+.fthead .hb .dot{position:absolute;top:-3px;right:-3px;width:11px;height:11px;border-radius:50%;background:#E5484D;border:2px solid #fff}
+@keyframes ftspin{to{transform:rotate(360deg)}}@keyframes ftpulse{50%{box-shadow:0 0 0 6px rgba(245,196,81,.35)}}
+.subtabs.l2{margin-top:-4px}.subtabs.l2 button{font-size:13px;padding:7px 12px}
+.next{border-radius:20px;padding:16px;margin:0 0 12px;color:#fff;background:linear-gradient(135deg,var(--h1,#0F5257),var(--h3,#1B7F79));box-shadow:0 10px 26px rgba(0,0,0,.18);animation:rise .35s ease both}
+.next .k{display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:1.3px;text-transform:uppercase;color:var(--gold2,#F6D776);font-weight:700}
+.next .k i{display:inline-flex;gap:4px}.next .k i b{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3)}.next .k i b.on{background:var(--gold2,#F6D776)}
+.next h3{margin:8px 0 4px;font-size:19px;line-height:1.25}.next p{margin:0;font-size:13.5px;opacity:.9;line-height:1.4}
+.next button.go1{margin-top:12px;width:100%;border:0;border-radius:14px;padding:13px;font-weight:800;font-size:15.5px;background:var(--gold2,#F6D776);color:#2B2000;min-height:auto}
+.next .lnk{display:block;text-align:center;margin-top:9px;font-size:12.5px;opacity:.85;text-decoration:underline;cursor:pointer}
+.next.win{background:linear-gradient(135deg,#0B6B4F,#1B9E6E)}.next.wa{background:linear-gradient(135deg,#0B6B4F,#128C7E 60%,#25D366)}.next.wa button.go1{background:#fff;color:#0B6B4F}
+.tline{display:flex;align-items:center;gap:10px;border-radius:14px;padding:12px 14px;margin:0 0 12px;background:var(--card,#fff);border:1px solid var(--line,#e5ece9);cursor:pointer;font-size:14px}
+.tline b{font-size:15px}.tline .go{margin-left:auto;color:var(--muted)}
+.qline{margin:0 0 12px;padding:12px 14px;border-radius:14px;background:var(--soft,#F2F5F4);font-size:14px;line-height:1.45}
+.qline small{display:block;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:4px}
+.upd{display:flex;align-items:center;gap:10px;border-radius:14px;padding:11px 12px;margin:0 0 12px;background:#E8F0FF;color:#1E3A8A;font-size:13.5px;text-decoration:none}
+.upd b{display:block}.upd span.btn{margin-left:auto;background:#1E3A8A;color:#fff;border-radius:10px;padding:8px 12px;font-weight:700;white-space:nowrap}
+`;document.head.appendChild(st);
+
+/* ---------- which tab each screen belongs to ---------- */
+var WORKR=['raft','deca','rloc','skin','dexona','stockists','stock','beat','tp'];
+function tabFor(r){if(isMgr()){if(r==='home'||r==='mgr')return'team';if(r==='approve')return'approve';if(r==='meet')return'meet';if(r==='perf')return'reports';if(r==='msgs'||r==='hof')return'me';if(r==='sell')return'sell';return'team'}
+  if(r==='home')return'today';if(r==='sell')return'sell';if(r==='learn')return'learn';if(r==='perf'||r==='msgs'||r==='hof')return'me';return'work'}
+function NAV(){return isMgr()?[['team','👥','Team',function(){go('home')}],['approve','✅','Approvals',function(){go('approve')}],['meet','📅','Meetings',function(){go('meet')}],['reports','📈','Reports',function(){go('perf')}],['me','👤','Me',function(){go(U.lsGet('ft_me','msgs'))}]]
+  :[['today','🏠','Today',function(){go('home')}],['work','💼','Work',function(){go(U.lsGet('ft_work','raft'))}],['sell','🛒','Sell',function(){go('sell')}],['learn','🎓','Learn',function(){go('learn')}],['me','👤','Me',function(){go(U.lsGet('ft_me','perf'))}]]}
+function nav(r){var cur=tabFor(r),pend=0,appr=0;
+  try{if(!isMgr())TASKS.forEach(function(k){var l=k.status().level;if(l==='bad'||l==='todo')pend++});else appr=(S.entries||[]).filter(function(e){return (e.type==='brick_plan'||e.type==='beat_change'&&e.date>=TODAY)&&e.status==='pending'}).length}catch(e){}
+  return h('nav',{class:'bnav'},NAV().map(function(it){var n=it[0]==='today'?pend:it[0]==='approve'?appr:0;return h('button',{class:cur===it[0]?'on':'',onclick:it[3]},h('span',{class:'ic'},it[1]),it[2],n?h('span',{class:'dot'},String(n)):'')}))}
+
+/* ---------- sub-tab rows ---------- */
+function tabs(list,cur,cls){return h('div',{class:'subtabs'+(cls?' '+cls:'')},list.map(function(x){return h('button',{class:x[0]===cur?'on':'',onclick:x[2]},x[1])}))}
+function workTabs(r){var grp=r==='stockists'?'cust':(r==='tp'||r==='beat')?'tp':'ent';
+  var top=tabs([['ent','Entries',function(){go(U.lsGet('ft_went','raft'))}],['cust','Customers',function(){go('stockists')}],['tp','TP & Brick',function(){go('tp')}],['req','Stock request',function(){U.stockSheet&&U.stockSheet()}]],grp);
+  if(grp==='ent'){U.lsSet('ft_went',r);return[top,tabs([['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['stock','Stock statement']].map(function(x){return[x[0],x[1],function(){go(x[0])}]}),r,'l2')]}
+  if(grp==='tp')return[top,tabs([['tp','TP calendar',function(){go('tp')}],['beat','Change brick',function(){go('beat')}]],r,'l2')];
+  return[top]}
+function meTabs(r){var L=isMgr()?[['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']]:[['perf','Progress'],['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']];
+  return tabs(L.map(function(x){return[x[0],x[1],function(){if(x[0]==='set'){U.settings&&U.settings();return}U.lsSet('ft_me',x[0]);go(x[0])}]}),r)}
+
+/* ---------- top bar: name · Sync · Messages · Settings ---------- */
+function topbar(app,r){var hd=app.querySelector('.fthead .row');if(!hd||hd.querySelector('.acts'))return;
+  hd.querySelectorAll('.ib').forEach(function(b){b.classList.add('lx')});
+  var sb=h('button',{class:'hb',title:'Sync',onclick:function(){U.sync&&U.sync()}});sb.id='ftsynch';paintSync(sb);
+  hd.append(h('div',{class:'acts'},sb,h('button',{class:'hb',title:'Messages',onclick:function(){U.lsSet('ft_me','msgs');go('msgs')}},'💬'),h('button',{class:'hb',title:'Settings',onclick:function(){U.settings&&U.settings()}},'⚙️')))}
+function paintSync(b){b=b||document.getElementById('ftsynch');if(!b||!U.syncState)return;var s=U.syncState();var cls='hb'+(s.busy?' spin':s.due?' due':'');var html=SYNC+(s.unsent&&!s.busy?'<i class="dot"></i>':'');
+  if(b.className!==cls)b.className=cls;if(b._h!==html){b.innerHTML=html;b._h=html}b.title=s.busy?'Syncing…':'Sync · '+s.ago}
+setInterval(function(){paintSync()},1500);
+
+/* ---------- Today: one "Next step" card ---------- */
+function field(){try{var tp=tpFor(myEmail(),TODAY);return !tp||/Field|Joint/.test(tp.DayType||'')}catch(e){return true}}
+function steps(app){var S0=U.syncState?U.syncState():{opened:true,unsent:false},L=[];
+  var ci=!!(U.checkinToday&&U.checkinToday());var pend=[];try{TASKS.forEach(function(k){var s=k.status();if(s.level==='bad'||s.level==='todo')pend.push({k:k,s:s})})}catch(e){}
+  pend.sort(function(a,b){return (a.s.level==='bad'?0:1)-(b.s.level==='bad'?0:1)});
+  L.push({done:S0.opened,cls:'',t:'Sync to get today\'s latest',p:'Your plan, targets, meetings and messages from Ratan Roy.',b:'🔄 Sync now',f:function(){U.sync()}});
+  L.push({done:!U.taskDue||!U.taskDue(),cls:'wa',t:'Read today\'s task and share it',p:'Share it to WhatsApp "Guwahati CSM Team" to confirm you have gone through the full task.',b:'Read & share',f:function(){U.taskSheet()}});
+  if(field())L.push({done:ci,cls:'',t:'Start my day',p:'Confirm today\'s brick and take your selfie – one tap.',b:'📍 Start my day',f:function(){var c=app.querySelector('.hero .ci');if(c)c.click()}});
+  var top=pend[0];L.push({done:!top,cls:'',t:top?top.k.t:'Entries',p:top?(top.s.why||'')+(pend.length>1?' · '+(pend.length-1)+' more after this':'')+'. Report in Ventasys first, then copy here.':'',b:'Open',f:function(){go(top.k.k)},lnk:pend.length>1?['See all '+pend.length+' tasks',function(){go(U.lsGet('ft_went','raft'))}]:null});
+  L.push({done:!U.lessonDoneToday||U.lessonDoneToday(),cls:'',t:'Today\'s 3-minute lesson',p:(U.nextLesson&&U.nextLesson())||'From Ratan Roy',b:'🎓 Start lesson',f:function(){S.tab.learn='today';go('learn')}});
+  return L}
+function nextCard(app){var L=steps(app),i=L.findIndex(function(x){return!x.done}),S0=U.syncState?U.syncState():{};
+  var dots=h('i',{},L.map(function(x,k){return h('b',{class:x.done?'on':''})}));
+  if(i<0){if(S0.unsent)return h('div',{class:'next win'},h('div',{class:'k'},h('span',{},'All done'),dots),h('h3',{},'🎉 All tasks done – sync now'),h('p',{},'So Ratan Roy gets everything you did today.'),h('button',{class:'go1',onclick:function(){U.sync()}},'🔄 Sync now'));
+    return h('div',{class:'next win'},h('div',{class:'k'},h('span',{},'All done'),dots),h('h3',{},'🎉 Great work today!'),h('p',{},'Everything is done and synced. Ratan Roy is proud of you.'))}
+  var s=L[i],done=L.filter(function(x){return x.done}).length;
+  return h('div',{class:'next '+s.cls},h('div',{class:'k'},h('span',{},'Next step · '+(done+1)+' of '+L.length),dots),h('h3',{},s.t),s.p?h('p',{},s.p):'',
+    h('button',{class:'go1',onclick:s.f},s.b),s.lnk?h('a',{class:'lnk',onclick:s.lnk[1]},s.lnk[0]):(S0.unsent&&i>0?h('a',{class:'lnk',onclick:function(){U.sync()}},'You can sync now, or once everything is done'):''))}
+function updBanner(){try{if(!window.AndroidApp||!AndroidApp.version)return'';if(+AndroidApp.version()>=5)return''}catch(e){return''}
+  return h('a',{class:'upd',href:APK},h('div',{},h('b',{},'📲 New app version'),'Meeting alarms, selfie camera and WhatsApp sharing.'),h('span',{class:'btn'},'Update'))}
+function quoteLine(){var qs=(U.C().quotes)||[];if(!qs.length)return'';return h('div',{class:'qline'},h('small',{},'Ratan Roy says'),qs[U.dayIdx()%qs.length])}
+
+function todayCSO(app){var keep=[app.querySelector('.fthead')],hero=app.querySelector('.hero'),meets=[].slice.call(app.querySelectorAll('.meet')),hof=app.querySelector('.hof'),ob=[].slice.call(app.querySelectorAll('.note')).filter(function(n){return /saved on your phone/.test(n.textContent)})[0],nav0=app.querySelector('.bnav');
+  var pend=0;try{TASKS.forEach(function(k){var l=k.status().level;if(l==='bad'||l==='todo')pend++})}catch(e){}
+  [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
+  var u=updBanner(),list=[u,nextCard(app),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
+  [].concat.apply([],list).forEach(function(n){if(n)app.append(n)})}
+function todayMgr(app){var keep=[app.querySelector('.fthead')];var team=U.teamPanel?U.teamPanel():null,share=[].slice.call(app.querySelectorAll('.tdone'))[0],hof=app.querySelector('.hof');
+  [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
+  [team,share,hof,quoteLine()].forEach(function(n){if(n)app.append(n)})}
+
+/* ---------- manager routes ---------- */
+U.routes.approve=function(app){var p=U.pendingPlans?U.pendingPlans():null;if(p&&p.children.length)app.append(p);else app.append(h('div',{class:'note'},'✅ Nothing waiting for your approval.'));
+  try{var reqs=(S.entries||[]).filter(function(e){return e.type==='stock_request'&&e.status!=='sent'});if(reqs.length)app.append(h('div',{class:'note'},'📦 '+reqs.length+' stock request(s) – see Team.'))}catch(e){}};
+U.routes.meet=function(app){if(U.meetPanel)app.append(U.meetPanel())};
+U.routes.sell=function(app){U.vProd(app)};
+
+/* ---------- apply after every screen is drawn ---------- */
+var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(document.getElementById('ftlogin'))return;
+  try{topbar(app,r);var t=tabFor(r),hd=app.querySelector('.fthead');
+    if(r==='home'){if(isMgr())todayMgr(app);else todayCSO(app)}
+    // replace the old sub-tab row on Work screens
+    if(t==='work'){U.lsSet('ft_work',r);var old=app.querySelector('.fthead~.subtabs');if(old&&old.textContent.indexOf('Raft')>=0&&!old.classList.contains('l2'))old.remove();var rows=workTabs(r);var after=hd;rows.forEach(function(x){after.after(x);after=x})}
+    if(t==='me'){var mt=meTabs(r);hd.after(mt);if(r==='perf')app.querySelectorAll('.hof').forEach(function(x){x.remove()})}
+    var nb=app.querySelector('.bnav');if(nb)nb.replaceWith(nav(r));else app.append(nav(r))}catch(e){try{console.log('layout',e)}catch(_){}}};
+var pt=U.tabOfX||{};['sell','approve','meet','hof'].forEach(function(k){pt[k]=k});U.tabOfX=pt;
 try{if(S.ready)render()}catch(e){}
 })();

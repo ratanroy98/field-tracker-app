@@ -40,7 +40,7 @@ function doSync(){if(busy)return;if(navigator.onLine===false){toast('📶 No net
     syncedThisOpen=true;U.lsSet(K,String(Date.now()));U.lsSet(KD,'');try{U.play&&U.play('ok')}catch(e){}
     toast(isMgr()?'✅ Synced – you have the team\'s latest entries.':'✅ Synced – Ratan has all your entries and you have the latest from him.');try{render()}catch(e){btn()}},
   function(){busy=false;btn();toast('Sync did not finish. Check internet and tap Sync again.')})}
-U.sync=doSync;
+U.sync=doSync;U.syncState=function(){return{busy:busy,due:unsynced()||!syncedThisOpen,unsent:unsynced(),opened:syncedThisOpen,ago:ago()}};U.allDone=function(){return allDone()};
 
 /* after each entry: gentle nudge */
 var baseSave=window.save;

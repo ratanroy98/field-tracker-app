@@ -106,6 +106,7 @@ U.vStockist=vStockist;
 
 /* ---------- hooks ---------- */
 var prevToday=U.today;U.today=function(app,tk,rest){prevToday&&prevToday(app,tk,rest);if(!isMgr()){var hof=app.querySelector('.hof')||app.querySelector('.hero')||tk;hof.after(vbar())}else{var tp=app.querySelector('.phase');if(tp)tp.after(pendingPlans())}};
+U.pendingPlans=function(){return pendingPlans()};U.vbar=function(){return vbar()};
 function pendingPlans(){var L=(S.entries||[]).filter(function(e){return e.type==='brick_plan'&&e.status==='pending'}),B=(S.entries||[]).filter(function(e){return e.type==='beat_change'&&e.status==='pending'&&e.date>=TODAY});var box=h('div');if(!L.length&&!B.length)return box;
   box.className='phase';box.append(h('div',{class:'ph'},h('b',{},'📋 Brick changes to approve'),h('small',{},String(L.length+B.length))));
   B.forEach(function(e){box.append(h('div',{class:'lrow',style:'cursor:default'},h('div',{class:'tx'},h('b',{},e.name+' · today'),h('small',{},(e.planned||'—')+' → '+e.actual+' · '+e.reason)),h('button',{style:'min-height:auto;padding:8px 12px',onclick:function(){S.db.collection('entries').doc(e._id).update({status:'approved',approvedTs:Date.now()}).then(function(){toast('Approved');render()})}},'✅')))});

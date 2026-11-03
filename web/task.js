@@ -45,7 +45,7 @@ function sheet(){if(document.querySelector('.ftsheet.tsheet'))return;
     (function(){var b=h('button',{class:'wabtn',onclick:doShare});b.innerHTML=WA+'<span>Share to WhatsApp – '+GROUP+'</span>';return b})(),
     h('small',{style:'display:block;text-align:center;margin-top:8px;color:var(--muted)'},'WhatsApp opens – pick "'+GROUP+'" and tap Send.')));
   document.body.append(ov)}
-U.taskSheet=sheet;
+U.taskSheet=sheet;U.taskShared=sharedToday;U.taskDue=due;
 
 var prevToday=U.today;U.today=function(app,tk,rest){prevToday&&prevToday(app,tk,rest);if(isMgr()){mgrLine(app);return}
   var c;if(due())c=h('div',{class:'tasknag'},h('div',{class:'k'},'📋 Daily task'),h('h3',{},'Read today\'s task and share it'),h('p',{},'Share it to WhatsApp "'+GROUP+'" to confirm you have gone through the full task for today.'),h('button',{onclick:sheet},'Read & share'));

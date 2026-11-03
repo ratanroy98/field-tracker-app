@@ -46,6 +46,14 @@ var st=document.createElement('style');st.textContent=`
 .hof .pp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .hof .p{text-align:center}.hof .p img,.hof .p .noimg{width:84px;height:84px;border-radius:50%;object-fit:cover;object-position:top;border:3px solid #F6D776;box-shadow:0 0 0 4px rgba(246,215,118,.25);display:block;margin:0 auto;background:rgba(255,255,255,.15)}
 .hof .p b{display:block;margin-top:6px;font-size:14px}.hof .p small{display:block;font-size:11.5px;opacity:.85;line-height:1.3}
+.hof .pp.three{grid-template-columns:1fr 1fr 1fr}.hof .p .empty,.fame .fimg.empty{display:flex!important;align-items:center;justify-content:center;font-size:34px;font-weight:800;color:#F6D776;border-style:dashed!important;background:rgba(255,255,255,.08)!important;animation:youpulse 1.8s ease-in-out infinite}
+@keyframes youpulse{50%{box-shadow:0 0 0 8px rgba(246,215,118,.18)}}
+.hof .enc{margin-top:10px;font-size:13px;line-height:1.4;background:rgba(0,0,0,.18);border-radius:12px;padding:8px 10px;text-align:center}
+.hof.slim{padding:12px}.hof.slim .p img,.hof.slim .p .noimg{width:58px;height:58px}.hof.slim .p b{font-size:12.5px}.hof.slim .enc{font-size:12px;padding:6px 8px;margin-top:8px}.hof.slim .tap{display:none}
+.fame .tog{display:flex;gap:16px;justify-content:center;align-items:flex-end;margin-top:6px}
+.fame .tog .tp{text-align:center;animation:pop2 .6s cubic-bezier(.2,1.4,.4,1) both}.fame .tog .tp b{display:block;margin-top:8px;color:#FFF3C4}
+.fame .tog .fimg{width:min(27vw,120px);height:min(27vw,120px);border-radius:50%;object-fit:cover;object-position:top;border:3px solid #F6D776;box-shadow:0 0 0 6px rgba(246,215,118,.18),0 0 40px rgba(246,215,118,.35);display:block}
+.fame .encb{margin-top:22px;max-width:330px;font-size:16px;line-height:1.45;text-align:center;color:#fff;background:rgba(255,255,255,.1);border:1px solid rgba(246,215,118,.35);border-radius:16px;padding:12px 14px;animation:rise .6s ease .5s both}
 .hof .tap{text-align:center;font-size:11.5px;opacity:.8;margin-top:8px}
 .gifts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .gift{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(16,40,38,.06);animation:pop .4s ease both;cursor:pointer}
@@ -67,8 +75,8 @@ var st=document.createElement('style');st.textContent=`
 
 /* ---------- Hall of Fame ---------- */
 var FAME=[
- {id:'bhub',name:'Bhubaneswar Kundu',role:'CSO · Guwahati HQ',items:['🏆 RCL All India Top 10 – July 2026','🏆 RCL All India Top 10 – September 2026','🥇 RCL Quarter Winner – CSO','🛒 RCL Trolley Winner – East Zone'],cheer:'Guwahati is proud of you!'},
- {id:'ratan',name:'Ratan Roy',role:'CSM · Guwahati Area',items:['🛒 RCL Trolley Winner – CSM, Guwahati','🌟 Coach of an All India Top 10 CSO – Jul & Sep 2026','🥇 Coach of an RCL Quarter Winner – CSO'],cheer:'Leading Guwahati to the top!'}];
+ {id:'bhub',mail:'rajibkundu.kundu@gmail.com',name:'Bhubaneswar Kundu',role:'CSO · Guwahati HQ',items:['🏆 RCL All India Top 10 – July 2026','🏆 RCL All India Top 10 – September 2026','🥇 RCL Quarter Winner – CSO','🛒 RCL Trolley Winner – East Zone'],cheer:'Guwahati is proud of you!'},
+ {id:'ratan',mail:'ratanroy98@gmail.com',name:'Ratan Roy',role:'CSM · Guwahati Area',items:['🛒 RCL Trolley Winner – CSM, Guwahati','🌟 Coach of an All India Top 10 CSO – Jul & Sep 2026','🥇 Coach of an RCL Quarter Winner – CSO'],cheer:'Leading Guwahati to the top!'}];
 function fanfare(){if(U.mute)return;try{var A=new(window.AudioContext||window.webkitAudioContext)();[[523,0],[659,.12],[784,.24],[1047,.38],[784,.62],[1047,.74]].forEach(function(n){var o=A.createOscillator(),g=A.createGain(),s=A.currentTime+n[1];o.type='triangle';o.frequency.value=n[0];g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(.13,s+.02);g.gain.exponentialRampToValueAtTime(.0001,s+(n[1]>.6?.6:.28));o.connect(g);g.connect(A.destination);o.start(s);o.stop(s+.7)})}catch(e){}}
 function showFame(list){if(document.querySelector('.fame'))return;var i=0,ov=h('div',{class:'fame'}),timer=null;
   function draw(){var p=list[i];ov.innerHTML='';
@@ -78,13 +86,39 @@ function showFame(list){if(document.querySelector('.fame'))return;var i=0,ov=h('
       h('div',{class:'dots'},list.length>1?list.map(function(_,k){return h('i',{class:k===i?'on':''})}):[]),
       h('div',{class:'go'},i<list.length-1?'Tap for next ›':'Tap to continue'));
     fanfare();setTimeout(function(){U.confetti(60)},500);setTimeout(function(){U.confetti(40)},1600);clearTimeout(timer);timer=setTimeout(next,6500)}
-  function next(){if(i<list.length-1){i++;draw()}else{clearTimeout(timer);ov.style.transition='opacity .35s';ov.style.opacity='0';setTimeout(function(){ov.remove()},350)}}
+  function next(){if(i<list.length-1){i++;draw()}else if(i===list.length-1&&list.length>1){i++;together()}else{clearTimeout(timer);land()}}
+  // Last frame: both champions together + an empty seat for the viewer, then the photos fly into their place on the screen.
+  function together(){ov.innerHTML='';var me=who()||{},mine=FAME.some(function(p){return p.mail===String(me.Email||'').toLowerCase()});
+    ov.append(img('rcl','lg','RCL'),h('div',{class:'kick'},'Guwahati Hall of Fame'),
+      h('div',{class:'tog'},list.map(function(p,k){return h('div',{class:'tp',style:'animation-delay:'+(k*.15)+'s'},img(p.id,'fimg',p.name),h('b',{},p.name.split(' ')[0]))}),
+        mine||S.mgr&&!S.viewAs?null:h('div',{class:'tp you',style:'animation-delay:.3s'},h('div',{class:'fimg empty'},'?'),h('b',{},'You next'))),
+      h('div',{class:'encb'},encourage()),h('div',{class:'go'},'Tap to continue'));
+    fanfare();setTimeout(function(){U.confetti(50)},300);clearTimeout(timer);timer=setTimeout(next,7000)}
+  function land(){var hof=document.querySelector('.hof');var src=[].slice.call(ov.querySelectorAll('.tog .fimg:not(.empty)'));
+    if(!hof||!src.length){ov.style.transition='opacity .35s';ov.style.opacity='0';setTimeout(function(){ov.remove()},350);return}
+    try{hof.scrollIntoView({block:'center'})}catch(e){}
+    var tg=[].slice.call(hof.querySelectorAll('.p img, .p .noimg'));ov.style.transition='opacity .45s ease';
+    src.forEach(function(sEl,k){var t=tg[k];if(!t)return;var a=sEl.getBoundingClientRect(),b=t.getBoundingClientRect();var c=sEl.cloneNode(true);
+      c.style.cssText='position:fixed;z-index:700;margin:0;left:'+a.left+'px;top:'+a.top+'px;width:'+a.width+'px;height:'+a.height+'px;border-radius:50%;object-fit:cover;object-position:top;border:3px solid #F6D776;box-shadow:0 0 30px rgba(246,215,118,.7);transition:all 1s cubic-bezier(.6,0,.2,1) '+(k*.12)+'s';
+      document.body.append(c);t.style.visibility='hidden';
+      requestAnimationFrame(function(){requestAnimationFrame(function(){c.style.left=b.left+'px';c.style.top=b.top+'px';c.style.width=b.width+'px';c.style.height=b.height+'px';c.style.boxShadow='0 0 0 4px rgba(246,215,118,.25)'})});
+      setTimeout(function(){t.style.visibility='';c.remove();try{t.animate([{transform:'scale(1.18)'},{transform:'scale(1)'}],{duration:380,easing:'ease-out'})}catch(e){}},1150+k*120)});
+    ov.style.opacity='0';setTimeout(function(){ov.remove()},1000);setTimeout(function(){U.play&&U.play('cash')},1050)}
   ov.addEventListener('click',next);document.body.append(ov);draw()}
 U.showFame=showFame;
 function dailyFame(){if(!S.ready||!who())return;var days=[];try{days=JSON.parse(lsGet('ft_fame_days','[]'))}catch(e){}if(days.indexOf(TODAY)>=0||days.length>=3)return;days.push(TODAY);lsSet('ft_fame_days',JSON.stringify(days));
   withMedia(function(){setTimeout(function(){showFame(FAME)},300)})}
-function hofCard(){return h('div',{class:'hof',onclick:function(){withMedia(function(){showFame(FAME)})}},h('div',{class:'hd'},img('rcl','','RCL'),'Guwahati Hall of Fame · RCL'),
-  h('div',{class:'pp'},FAME.map(function(p){return h('div',{class:'p'},img(p.id,'',p.name),h('b',{},p.name),h('small',{},p.items[0].replace(/^\S+\s/,'')))})),h('div',{class:'tap'},'Tap to celebrate 🎉'))}
+function encourage(){var me=who()||{},em=String(me.Email||'').toLowerCase(),first=(me.Name||'').split(' ')[0];
+  if(S.mgr&&!S.viewAs)return'Coach the team – the next photo on this wall could be Karamjit or Prashun.';
+  if(em==='rajibkundu.kundu@gmail.com')return'Champion, '+first+'! Keep the crown – win RCL again this quarter.';
+  var p=(S.feeds||{})['pob_'+me.HQ],pc_=p&&p.target60?Math.round(100*p.done/p.target60):null;
+  return'Your photo can be here next, '+first+'.'+(pc_!==null?' You are at '+pc_+'% of '+new Date().toLocaleDateString('en-IN',{month:'long'})+' –':'')+' every order brings you closer. Ratan Roy believes in you.'}
+U.encourage=encourage;
+function hofCard(slim){var me=who()||{},mine=FAME.some(function(p){return p.mail===String(me.Email||'').toLowerCase()}),showYou=!mine&&!(S.mgr&&!S.viewAs);
+  return h('div',{class:'hof'+(slim?' slim':''),onclick:function(){withMedia(function(){showFame(FAME)})}},h('div',{class:'hd'},img('rcl','','RCL'),'Guwahati Hall of Fame · RCL'),
+  h('div',{class:'pp'+(showYou?' three':'')},FAME.map(function(p){return h('div',{class:'p'},img(p.id,'',p.name),h('b',{},slim?p.name.split(' ')[0]:p.name),slim?'':h('small',{},p.items[0].replace(/^\S+\s/,'')))}).concat(showYou?[h('div',{class:'p you'},h('div',{class:'noimg empty'},'?'),h('b',{},'You next'),slim?'':h('small',{},'Hit 100% and win RCL'))]:[])),
+  h('div',{class:'enc'},encourage()),h('div',{class:'tap'},'Tap to celebrate 🎉'))}
+U.hofCard=hofCard;
 
 /* ---------- gifts ---------- */
 var GIFTS=[
@@ -148,8 +182,8 @@ function quickDocs(app,r){if(S.mgr&&!S.viewAs)return;var brand=BR[r];if(!brand||
   function no(c,ex){ex.innerHTML='';ex.append(h('div',{class:'qdx'},h('small',{},'Why not yet?'),h('div',{class:'chips'},NO.map(function(x){return h('button',{onclick:function(){save('dr_input',{brand:brand,dr:c,input:'As per Ventasys',rx:'Not yet',reason:x,quick:1}).then(function(ok){if(ok)render()})}},x)}))))}}
 
 /* ---------- hooks ---------- */
-var prevToday=U.today;U.today=function(app,tk,rest){ensureMedia();prevToday&&prevToday(app,tk,rest);var hero=app.querySelector('.hero')||tk;var c=hofCard();hero.after(c);dailyFame()};
-var prevPerf=U.vPerf;U.vPerf=function(app){app.append(hofCard());prevPerf(app)};
+var prevToday=U.today;U.today=function(app,tk,rest){ensureMedia();prevToday&&prevToday(app,tk,rest);var hero=app.querySelector('.hero')||tk;var c=hofCard(true);hero.after(c);dailyFame()};
+U.routes.hof=function(app){ensureMedia();app.append(hofCard(false));var w0=h('div',{class:'phase'},h('div',{class:'ph'},h('b',{},'🏆 Their wins')));FAME.forEach(function(p){w0.append(h('div',{class:'lrow',style:'cursor:default'},h('div',{class:'tx'},h('b',{},p.name),h('small',{},p.items.join(' · ')))))});app.append(w0);var q=U.quote();if(q)app.append(q)};
 var prevAfter=U.after;U.after=function(app,r){ensureMedia();prevAfter&&prevAfter(app,r);try{quickDocs(app,r)}catch(e){}};
 try{if(S.ready)render()}catch(e){}
 })();
