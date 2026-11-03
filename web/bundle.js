@@ -2270,8 +2270,10 @@ var st=document.createElement('style');st.textContent=`
 function dates(){var d={};(S.msgs||[]).forEach(function(m){if(m.slot==='8pm'&&m.date)d[m.date]=1});return Object.keys(d).sort().reverse().slice(0,10)}
 // Mail must carry only Ventasys / company data – nothing from this app (the app is not mandatory).
 var APPWORDS=/\b(app|apps|check-?ins?|checked in|selfie|lessons?|task shar\w*|shared the task|daily task|sync\w*|stock statement uploaded|uploaded)\b/i;
+function cleanPart(x){if(!APPWORDS.test(x))return x;var sub=x.split(/,\s+/).filter(function(y){return !APPWORDS.test(y)});return sub.length&&sub.join(', ').length>12?sub.join(', '):''}
+function cleanSentence(x){if(!APPWORDS.test(x))return x;return x.split(/;\s*/).map(cleanPart).filter(Boolean).join('; ')}
 function noApp(t){var out=[],n=0;String(t||'').split('\n').forEach(function(line){var l=line;
-    if(APPWORDS.test(l)){var parts=[];l.split(/;\s*/).forEach(function(x){if(!APPWORDS.test(x)){parts.push(x);return}var sub=x.split(/,\s+/).filter(function(y){return !APPWORDS.test(y)});if(sub.length&&sub.join(', ').length>12)parts.push(sub.join(', '))});if(!parts.length||/^\s*\d+[.)]/.test(l)&&APPWORDS.test(l))return;l=parts.join('; ');if(!/[.:)]$/.test(l.trim())&&/\.$/.test(line.trim()))l=l.trim()+'.'}
+    if(APPWORDS.test(l)){if(/^\s*\d+[.)]/.test(l))return;var end=/\.\s*$/.test(l);l=l.split(/\.\s+/).map(function(x){return cleanSentence(x.replace(/\.\s*$/,''))}).filter(function(x){return x&&x.trim()}).join('. ');if(!l.trim())return;if(end)l=l.replace(/\s*$/,'')+'.'}
     var m=l.match(/^(\s*)\d+([.)])\s*(.*)$/);if(m){n++;l=m[1]+n+m[2]+' '+m[3]}else if(/explanation required/i.test(l))n=0;out.push(l)});
   return out.join('\n').replace(/Explanation required by 11 AM:\n(?!\s*\d)/i,'').replace(/\n{3,}/g,'\n\n')}
 function mailMsg(email,date){var m=(S.msgs||[]).filter(function(x){return x.slot==='mail'&&x.for===email&&x.date===date}).sort(function(a,b){return (b.ts||0)-(a.ts||0)})[0];if(m)return m.text;var r=msgFor(email,date);return r&&r.text?noApp(r.text):''}
