@@ -86,7 +86,7 @@ public class Notify extends BroadcastReceiver {
             for (int k = 0; k < ms.length(); k++) {
               JSONObject m = ms.getJSONObject(k);
               String id = m.optString("id"); long at = m.optLong("at");
-              String t = "📅 " + m.optString("title", "Meeting with Ratan Roy"), b = m.optString("how") + " · " + m.optString("when");
+              String t = "📅 " + m.optString("title", "Meeting with Ratan Roy"), b = m.optString("msg", m.optString("how") + " · " + m.optString("when"));
               if (!sp.getBoolean("seen_" + id, false)) { sp.edit().putBoolean("seen_" + id, true).apply(); show(app, "New meeting: " + m.optString("title"), b); }
               meeting(app, id, at, t, b);
             }
