@@ -35,6 +35,10 @@ var st=document.createElement('style');st.textContent=`
 .upd{display:flex;align-items:center;gap:10px;border-radius:14px;padding:11px 12px;margin:0 0 12px;background:#E8F0FF;color:#1E3A8A;font-size:13.5px;text-decoration:none}
 .salestop .tbl{overflow:visible}.salestop table{width:100%}.salestop td,.salestop th,.salestop .num{font-size:11.5px!important;padding:7px 3px!important;letter-spacing:-.2px;white-space:nowrap}.salestop td:first-child{white-space:normal}
 .upd b{display:block}.upd span.btn{margin-left:auto;background:#1E3A8A;color:#fff;border-radius:10px;padding:8px 12px;font-weight:700;white-space:nowrap}
+.coachc{border-radius:16px;padding:13px 15px;margin:0 0 12px;background:linear-gradient(135deg,#FFF4D6,#FDE8B8);border:1px solid #F0D18A;color:#5A4300}
+.coachc .k{font-weight:800;font-size:14.5px;display:flex;align-items:center;gap:7px}
+.coachc p{margin:5px 0 0;font-size:13px;line-height:1.45;color:#6a5320}
+.coachc .big2{font-size:22px;font-weight:800}
 `;document.head.appendChild(st);
 
 /* ---------- which tab each screen belongs to ---------- */
@@ -87,11 +91,24 @@ function nextCard(app){var L=steps(app),i=L.findIndex(function(x){return!x.done}
 function updBanner(){try{if(!window.AndroidApp||!AndroidApp.version)return'';if(+AndroidApp.version()>=5)return''}catch(e){return''}
   return h('a',{class:'upd',href:APK},h('div',{},h('b',{},'📲 New app version'),'Meeting alarms, selfie camera and WhatsApp sharing.'),h('span',{class:'btn'},'Update'))}
 function quoteLine(){var qs=(U.C().quotes)||[];if(!qs.length)return'';return h('div',{class:'qline'},h('small',{},'Ratan Roy says'),qs[U.dayIdx()%qs.length])}
+/* Guide, don't collect: remind the CSO to report in Ventasys, and show what inputs are still lying unreported.
+   The number comes from feed inbal_<HQ> (written by the evening review from the Ventasys Input Usage / Input Tracking file). */
+function inbalCard(brand){try{if(isMgr())return'';
+  var k=Object.keys(S.feeds||{}).filter(function(x){return x.indexOf('inbal_')===0})[0];var f=k?S.feeds[k]:null;
+  if(!f){return h('div',{class:'coachc'},h('div',{class:'k'},'📲 Report in Ventasys as you go'),h('p',{},'When you meet a doctor or chemist today, enter the input, Rx or order in Ventasys the same day. You never have to type it again here.'));}
+  var items=(f.items||[]).filter(function(x){return !brand||x.brand===brand||!x.brand});
+  var tot=brand?items.reduce(function(a,x){return a+(+x.qty||0)},0):(f.total!=null?f.total:items.reduce(function(a,x){return a+(+x.qty||0)},0));
+  if(!tot){return h('div',{class:'coachc',style:'background:linear-gradient(135deg,#E8F6EE,#D6F0E0);border-color:#9FD9B6;color:#13684A'},h('div',{class:'k'},'✅ All inputs reported'),h('p',{style:'color:#1b6b4a'},'Nothing lying unreported. Keep entering each input in Ventasys the day you give it.'));}
+  var top=items.filter(function(x){return (+x.qty||0)>0}).slice(0,6).map(function(x){return x.name+(x.qty?' ×'+x.qty:'')}).join(', ');
+  return h('div',{class:'coachc'},h('div',{class:'k'},'📦 ',h('span',{class:'big2'},String(tot)),' input'+(tot>1?'s':'')+(brand?' of '+brand:'')+' still lying with you — not reported'),
+    h('p',{},(top?top+(items.length>6?', and more':'')+'. ':'')+'When you give one to a doctor or chemist, enter it in Ventasys the same day so it counts. '+(f.asOf?'As of '+f.asOf+'.':'')));
+}catch(e){return''}}
+U.inbalCard=inbalCard;
 
 function todayCSO(app){var keep=[app.querySelector('.fthead')],hero=app.querySelector('.hero'),meets=[].slice.call(app.querySelectorAll('.meet')),hof=app.querySelector('.hof'),ob=[].slice.call(app.querySelectorAll('.note')).filter(function(n){return /saved on your phone/.test(n.textContent)})[0],nav0=app.querySelector('.bnav');
   var pend=U.nagList().length;
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
-  var u=updBanner(),list=[u,nextCard(app),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
+  var u=updBanner(),list=[u,nextCard(app),inbalCard(),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
   [].concat.apply([],list).forEach(function(n){if(n)app.append(n)})}
 function todayMgr(app){var keep=[app.querySelector('.fthead')];var team=U.teamPanel?U.teamPanel():null,share=[].slice.call(app.querySelectorAll('.tdone'))[0],hof=app.querySelector('.hof');
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
@@ -133,7 +150,10 @@ var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(doc
     if(r==='home'){if(isMgr())todayMgr(app);else todayCSO(app)}
     // replace the old sub-tab row on Work screens
     if(t==='work'){U.lsSet('ft_work',r);var old=app.querySelector('.fthead~.subtabs');if(old&&old.textContent.indexOf('Raft')>=0&&!old.classList.contains('l2'))old.remove();var rows=workTabs(r);var after=hd;rows.forEach(function(x){after.after(x);after=x});
-      if(!isMgr()&&WORKR.indexOf(r)>=0&&!app.querySelector('.optnote')){var on=h('div',{class:'qline optnote'},h('small',{},'Optional'),'You don\'t have to fill this. Your calls, POB and inputs are already in Ventasys and reach Ratan from there. The app only needs your check-in, the shared task and today\'s lesson. Use this tab just to see your plan and the ready lists.');after.after(on)}}
+      if(!isMgr()&&WORKR.indexOf(r)>=0&&!app.querySelector('.optnote')){
+        var BM={raft:'Rloc Raft',deca:'Deca Durabolin',rloc:'Rloc Tablets',skin:'Skinlite',dexona:'Dexona'};
+        var cc=inbalCard(BM[r]);if(cc){after.after(cc);after=cc}
+        var on=h('div',{class:'qline optnote'},h('small',{},'The app guides — Ventasys collects'),'When you meet a doctor or chemist, report the input, Rx or order in Ventasys. You don\'t have to fill the lists below — they are only here to show you who to meet and what to carry.');after.after(on)}}
     if(t==='me'){var mt=meTabs(r);hd.after(mt);if(r==='perf')app.querySelectorAll('.hof').forEach(function(x){x.remove()})}
     var nb=app.querySelector('.bnav');if(nb)nb.replaceWith(nav(r));else app.append(nav(r));
     if(isMgr()&&r==='perf'&&!app.querySelector('.salestop')){var s1=app.querySelector('.score'),c1=(U.salesTop||salesTop)();if(s1)s1.before(c1);else app.append(c1)}
