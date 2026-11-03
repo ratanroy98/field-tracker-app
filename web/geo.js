@@ -105,8 +105,8 @@ function heat(p){return p==null?'h0':p>=105?'h5':p>=100?'h4':p>=90?'h3':p>=80?'h
 function tag(b){var m=META[b];return m&&m[0]!=='—'?h('span',{class:'tag '+m[0]},m[0]):''}
 // period: 0..9 months, 'Q1'..'Q4', 'YTD'
 var QM={Q1:[0,1,2],Q2:[3,4,5],Q3:[6,7,8],Q4:[9]};
-function agg(rows,p){if(!rows)return[0,0,0,0,0,null];if(p==='YTD')return rows[10];if(QM[p]){var a=[0,0,0,0,0,null];QM[p].forEach(function(i){for(var k=0;k<5;k++)a[k]+=rows[i][k]});return a}return rows[p]}
-function plab(p){return p==='YTD'?'YTD (Jan–Oct)':QM[p]?p+(p==='Q4'?' (Oct so far)':''):MON[p]}
+function agg(rows,p){if(!rows)return[0,0,0,0,0,null];if(p==='tm')return rows[MON.length-1];if(p==='YTD')return rows[10];if(QM[p]){var a=[0,0,0,0,0,null];QM[p].forEach(function(i){for(var k=0;k<5;k++)a[k]+=rows[i][k]});return a}return rows[p]}
+function plab(p){return p==='tm'?'This month ('+MON[MON.length-1]+')':p==='YTD'?'YTD (Jan–'+MON[MON.length-1]+')':QM[p]?p+(p==='Q4'?' ('+MON[MON.length-1]+' so far)':''):MON[p]}
 function hit(rows){var n=0,t=0;for(var i=0;i<10;i++){if(rows[i][1]>0){t++;if(rows[i][2]>=rows[i][1])n++}}return[n,t]}
 function rowsOf(scope,brand){brand=brand||'ALL';if(scope==='Area')return G.area.Guwahati[brand];if(scope==='Region')return G.region[brand];return (G.hq[scope]||{})[brand]}
 function brands(){return Object.keys(G.area.Guwahati).filter(function(b){return b!=='ALL'})}
@@ -141,7 +141,8 @@ var T=S.tab||(S.tab={});
 function get(k,d){return T['geo_'+k]!=null?T['geo_'+k]:(U.lsGet?U.lsGet('ft_geo_'+k,d):d)}
 function set(k,v){T['geo_'+k]=v;try{U.lsSet&&U.lsSet('ft_geo_'+k,v)}catch(e){}render()}
 function chips(list,cur,k,cls){return h('div',{class:'chips'+(cls?' '+cls:'')},list.map(function(x){var id=x[0];return h('button',{class:String(id)===String(cur)?'on':'',onclick:function(){set(k,id)}},x[1])}))}
-function periodChips(p){return chips([['YTD','YTD']].concat([['Q4','Q4'],['Q3','Q3'],['Q2','Q2'],['Q1','Q1']]).concat(MON.map(function(m,i){return[i,m]}).reverse()),p,'per')}
+function lastMonth(){return MON.length-1}
+function periodChips(p){return chips([['tm','This month ('+MON[lastMonth()]+')'],['YTD','YTD (Jan–'+MON[lastMonth()]+')'],['Q4','Q4'],['Q3','Q3'],['Q2','Q2'],['Q1','Q1']].concat(MON.map(function(m,i){return[i,m]}).reverse()),p,'per')}
 function per(){var p=get('per','YTD');return /^\d+$/.test(String(p))?+p:p}
 
 /* ---------- views ---------- */
@@ -201,6 +202,13 @@ function vMonths(app){var bl=['ALL'].concat(brands()),b=get('mb','ALL');if(bl.in
     t.append(h('tr',{class:q==='Area'?'me':''},h('td',{},q==='Region'?'Region':q==='Area'?'Area':q.slice(0,4)),R.slice(0,10).map(function(r){var p=P(r[2],r[1]);return h('td',{class:heat(p)},p==null?'–':Math.round(p))}),h('td',{},h('b',{},hm[0]+'/'+hm[1]))))});
   app.append(h('div',{class:'card'},h('h3',{},'Target done – month by month',h('small',{},b==='ALL'?'all brands':b)),h('div',{class:'tbl'},t),
     h('div',{class:'leg'},h('span',{style:'--c:#1B8A5A'},'≥105%'),h('span',{style:'--c:#7CC59A'},'100–104%'),h('span',{style:'--c:#F6D776'},'90–99%'),h('span',{style:'--c:#F4A261'},'80–89%'),h('span',{style:'--c:#E5484D'},'<80%'))));
+  // growth vs last year, month by month
+  function gcell(v){var cls=v==null?'h0':v>=15?'h5':v>=0?'h4':v>=-10?'h3':v>=-25?'h2':'h1';return h('td',{class:cls},v==null?'–':(v>0?'+':'')+Math.round(v))}
+  var gt=h('table',{class:'heat'},h('tr',{},h('th',{},''),MON.map(function(m){return h('th',{style:'text-align:center'},m[0]+m[1])}),h('th',{style:'text-align:center'},'YTD')));
+  HQS.concat(['Area','Region']).forEach(function(q){var R=rowsOf(q,b);if(!R)return;var y=R[10],gy=gr(y[2],y[0]);
+    gt.append(h('tr',{class:q==='Area'?'me':''},h('td',{},q==='Region'?'Region':q==='Area'?'Area':q.slice(0,4)),R.slice(0,10).map(function(r){return gcell(gr(r[2],r[0]))}),h('td',{},h('b',{class:gcls(gy)},sg(gy)))))});
+  app.append(h('div',{class:'card'},h('h3',{},'Growth vs last year – month by month',h('small',{},b==='ALL'?'all brands':b)),h('div',{class:'tbl'},gt),
+    h('div',{class:'leg'},h('span',{style:'--c:#1B8A5A'},'+15% & up'),h('span',{style:'--c:#7CC59A'},'0 to +15%'),h('span',{style:'--c:#F6D776'},'0 to −10%'),h('span',{style:'--c:#F4A261'},'−10 to −25%'),h('span',{style:'--c:#E5484D'},'below −25%'))));
   // all brands x HQ months-done grid
   var g=h('table',{},h('tr',{},h('th',{},'Brand'),HQS.map(function(q){return h('th',{},q.slice(0,4))}),h('th',{},'Area')));
   brands().forEach(function(br){var cells=HQS.concat(['Area']).map(function(q){var R=rowsOf(q,br);if(!R)return h('td',{},'—');var hm=hit(R);return h('td',{class:hm[1]?(hm[0]/hm[1]>=.6?'up':hm[0]/hm[1]>=.3?'md':'dn'):''},hm[1]?hm[0]+'/'+hm[1]:'—')});
