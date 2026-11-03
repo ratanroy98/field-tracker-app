@@ -2161,6 +2161,7 @@ var st=document.createElement('style');st.textContent=`
 .qline{margin:0 0 12px;padding:12px 14px;border-radius:14px;background:var(--soft,#F2F5F4);font-size:14px;line-height:1.45}
 .qline small{display:block;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:4px}
 .upd{display:flex;align-items:center;gap:10px;border-radius:14px;padding:11px 12px;margin:0 0 12px;background:#E8F0FF;color:#1E3A8A;font-size:13.5px;text-decoration:none}
+.salestop .tbl{overflow:visible}.salestop table{width:100%}.salestop td,.salestop th,.salestop .num{font-size:11.5px!important;padding:7px 3px!important;letter-spacing:-.2px;white-space:nowrap}.salestop td:first-child{white-space:normal}
 .upd b{display:block}.upd span.btn{margin-left:auto;background:#1E3A8A;color:#fff;border-radius:10px;padding:8px 12px;font-weight:700;white-space:nowrap}
 `;document.head.appendChild(st);
 
@@ -2230,6 +2231,30 @@ U.routes.approve=function(app){var p=U.pendingPlans?U.pendingPlans():null;if(p&&
 U.routes.meet=function(app){if(U.meetPanel)app.append(U.meetPanel())};
 U.routes.sell=function(app){U.vProd(app)};
 
+/* ---------- manager: cumulative company sales at the top of Reports ---------- */
+var HQS=['Agartala','Bongaigaon','Dhubri','Guwahati'];
+function rsx(v){return (v<0?'–':'')+'₹'+Math.abs(Math.round(v||0)).toLocaleString('en-IN')}
+function salesTop(){var T={net:0,tgt:0,gross:0,cl:0},asOf='',hasG=true,rows=[];
+  HQS.forEach(function(q){var f=S.feeds['ach_'+q]||{},tg=(typeof TGT!=='undefined'&&TGT[q]&&TGT[q].Total)||((S.feeds['incq_'+q]||{}).novT)||0;
+    if(f.asOf)asOf=f.asOf;if(f.gross==null)hasG=false;var n=f.total||0;T.net+=n;T.tgt+=tg;T.gross+=f.gross||0;T.cl+=f.claims||0;rows.push({q:q,n:n,tg:tg,g:f.gross||0,c:f.claims||0})});
+  var pc=function(a,b){return b?Math.round(a/b*100):0},p=pc(T.net,T.tgt);
+  function row(x,b){var c=[h('td',{},b?h('b',{},x.q):x.q,h('small',{style:'display:block;color:var(--muted);font-size:11px'},'Tgt '+rsx(x.tg)))];if(hasG)c.push(h('td',{class:'r num'},rsx(x.g)),h('td',{class:'r num'},x.c?rsx(-x.c):'—'));
+    c.push(h('td',{class:'r num'},b?h('b',{},rsx(x.n)):rsx(x.n)),h('td',{class:'r num'},pc(x.n,x.tg)+'%'));return h('tr',b?{style:'border-top:2px solid var(--line)'}:{},c)}
+  var hd=[h('th',{},'HQ')];if(hasG)hd.push(h('th',{class:'r'},'Gross'),h('th',{class:'r'},'Exp/Brk'));hd.push(h('th',{class:'r'},'Net'),h('th',{class:'r'},'%'));
+  return h('div',{class:'score salestop'},h('b',{},'Company sales · November'+(asOf?' (cumulative to '+asOf+')':'')),
+    h('div',{},h('span',{class:'big'},p+'%'),h('small',{style:'color:var(--muted)'},'  Area net '+rsx(T.net)+' of '+rsx(T.tgt))),
+    h('div',{style:'height:8px;border-radius:6px;background:var(--soft,#EEF2F1);overflow:hidden;margin:6px 0 8px'},h('div',{style:'height:100%;width:'+Math.max(0,Math.min(100,p))+'%;background:var(--accent,#0F5257)'})),
+    h('div',{class:'tbl'},h('table',{style:'font-size:12.5px'},h('tr',{},hd),rows.map(function(x){return row(x)}),row({q:'Area total',n:T.net,tg:T.tgt,g:T.gross,c:T.cl},true))),
+    h('small',{style:'color:var(--muted)'},'Net = gross billing minus expiry and breakage claims. Dhubri is vacant.'+(hasG?'':' Gross and claims columns appear from the next evening review.')))}
+
+/* ---------- manager viewing a CSO: always a way back ---------- */
+var vaBar=document.createElement('style');vaBar.textContent='.vabar{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:10px 12px;border-radius:14px;background:#FFF4D6;color:#5A4300;font-size:14px}.vabar button{margin-left:auto;border:0;border-radius:10px;padding:9px 14px;font-weight:800;background:#0F5257;color:#fff;min-height:auto}';document.head.appendChild(vaBar);
+function backToTeam(){S.viewAs=null;try{if(history.state&&history.state.ftva)history.back()}catch(e){}go('home')}
+window.addEventListener('popstate',function(){if(S.viewAs){S.viewAs=null;go('home')}});
+function viewBar(app){if(!S.mgr||!S.viewAs)return;try{if(!history.state||!history.state.ftva)history.pushState({ftva:1},'')}catch(e){}
+  var hd=app.querySelector('.fthead');if(!hd||app.querySelector('.vabar'))return;var nm=((S.viewAs&&S.viewAs.Name)||'CSO').split(' ')[0];
+  hd.after(h('div',{class:'vabar'},'👀',h('div',{},h('b',{},'Viewing '+nm+'\'s app'),h('small',{style:'display:block'},'Nothing you see here is changed for '+nm+'.')),h('button',{onclick:backToTeam},'← Back to Team')))}
+
 /* ---------- apply after every screen is drawn ---------- */
 var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(document.getElementById('ftlogin'))return;
   try{topbar(app,r);var t=tabFor(r),hd=app.querySelector('.fthead');
@@ -2237,7 +2262,9 @@ var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(doc
     // replace the old sub-tab row on Work screens
     if(t==='work'){U.lsSet('ft_work',r);var old=app.querySelector('.fthead~.subtabs');if(old&&old.textContent.indexOf('Raft')>=0&&!old.classList.contains('l2'))old.remove();var rows=workTabs(r);var after=hd;rows.forEach(function(x){after.after(x);after=x})}
     if(t==='me'){var mt=meTabs(r);hd.after(mt);if(r==='perf')app.querySelectorAll('.hof').forEach(function(x){x.remove()})}
-    var nb=app.querySelector('.bnav');if(nb)nb.replaceWith(nav(r));else app.append(nav(r))}catch(e){try{console.log('layout',e)}catch(_){}}};
+    var nb=app.querySelector('.bnav');if(nb)nb.replaceWith(nav(r));else app.append(nav(r));
+    if(isMgr()&&r==='perf'&&!app.querySelector('.salestop')){var s1=app.querySelector('.score'),c1=salesTop();if(s1)s1.before(c1);else app.append(c1)}
+    viewBar(app)}catch(e){try{console.log('layout',e)}catch(_){}}};
 var pt=U.tabOfX||{};['sell','approve','meet','hof'].forEach(function(k){pt[k]=k});U.tabOfX=pt;
 try{if(S.ready)render()}catch(e){}
 })();
