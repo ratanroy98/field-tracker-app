@@ -17,7 +17,7 @@ function b64(s){var b=atob(s.replace(/\s+/g,'')),u=new Uint8Array(b.length);for(
 function load(){if(G||state==='busy')return;if(window.__GEO){G=window.__GEO;return}
   var key=((S.feeds||{}).geokey_mgr||{}).k;if(!key){state='nokey';return}
   if(!(window.crypto&&crypto.subtle)){state='nocrypto';return}
-  state='busy';var day=new Date().toISOString().slice(0,10);
+  state='busy';var day=Date.now();
   (function tryU(i){if(i>=URLS.length){state='fail';rr();return}
     fetch(URLS[i]+'?v='+day,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(t){var d=b64(t);
       return crypto.subtle.importKey('raw',b64(key),'AES-GCM',false,['decrypt']).then(function(k){return crypto.subtle.decrypt({name:'AES-GCM',iv:d.slice(0,12)},k,d.slice(12))})})
@@ -245,5 +245,5 @@ U.routes.geo=function(app){if(!isMgr()){app.append(h('div',{class:'note'},'Perfo
   box.append(h('div',{class:'chips main',style:'margin-top:2px'},VIEWS.map(function(x){return h('button',{class:x[0]===v?'on':'',onclick:function(){set('v',x[0])}},x[1])})));
   box.append(h('p',{class:'note',style:'margin:-4px 0 10px'},'Source: company Geo sales file · '+(G.asOf||'')+' · ₹ in lakh'));
   try{VIEWS.filter(function(x){return x[0]===v})[0][2](box)}catch(e){box.append(h('div',{class:'note'},'Could not draw this view: '+e.message))}};
-U.geoReady=function(){return !!G};
+U.geoReady=function(){return !!G};U.geoReset=function(){if(window.__GEO)return;G=null;state='idle'};
 })();

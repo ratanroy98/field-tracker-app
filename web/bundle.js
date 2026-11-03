@@ -1,3 +1,4 @@
+window.FT_BUILD='20261104022951';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -2031,14 +2032,22 @@ function btn(){var b=document.getElementById('ftsync');if(!b){b=document.createE
   b.style.display=document.getElementById('ftlogin')||typeof S==='undefined'||!S.db?'none':''}
 setInterval(btn,3000);
 
-function doSync(){if(busy)return;if(navigator.onLine===false){toast('📶 No network. Your entries are safe on your phone – tap Sync when network is back.');return}
+// After every Sync: if a newer version of the screens is published, load it straight away (no reinstall, no waiting).
+var EXEC='https://script.google.com/macros/s/AKfycbyFp_mIJqqv-vya_y_DFmW7nwzZc83PQY5PnwOdzMPYjFK3EYg-p-ZHz0M7vSgMlV3_/exec';
+function checkUpdate(){try{var a=JSON.parse(U.lsGet('ft_auth','null'));if(!a||!window.google||!google.script||!window.FT_BUILD)return;
+  google.script.run.withSuccessHandler(function(r){var b=r&&r.b;if(!b||b===window.FT_BUILD)return;
+    if(U.flushOutbox&&U.outboxCount&&U.outboxCount()>0)return;U.lsSet('ft_upd','1');toast('⬇️ New version found – updating…');
+    setTimeout(function(){try{window.top.location.href=EXEC}catch(e){try{window.open(EXEC,'_top')}catch(_){location.reload()}}},900)}).withFailureHandler(function(){}).api(a,'ver',{})}catch(e){}}
+setTimeout(function(){try{if(U.lsGet('ft_upd','')==='1'){U.lsSet('ft_upd','');toast('✅ Updated – you have the latest version with all changes.')}}catch(e){}},2500);
+function doSync(){if(busy)return;try{U.geoReset&&U.geoReset()}catch(e){}if(navigator.onLine===false){toast('📶 No network. Your entries are safe on your phone – tap Sync when network is back.');return}
   busy=true;btn();var t0=Date.now();
   Promise.resolve(U.flushOutbox?U.flushOutbox():0).then(function(left){
     try{document.dispatchEvent(new Event('visibilitychange'))}catch(e){}   // pulls the latest data from the server
     return new Promise(function(r){setTimeout(function(){r(left)},Math.max(0,1800-(Date.now()-t0)))})})
   .then(function(left){busy=false;if(left>0){toast('Some entries are still waiting – tap Sync again in a minute.');btn();return}
     syncedThisOpen=true;U.lsSet(K,String(Date.now()));U.lsSet(KD,'');try{U.play&&U.play('ok')}catch(e){}
-    toast(isMgr()?'✅ Synced – you have the team\'s latest entries.':'✅ Synced – Ratan has all your entries and you have the latest from him.');try{render()}catch(e){btn()}},
+    toast(isMgr()?'✅ Synced – you have the team\'s latest entries.':'✅ Synced – Ratan has all your entries and you have the latest from him.');try{render()}catch(e){btn()}
+    checkUpdate()},
   function(){busy=false;btn();toast('Sync did not finish. Check internet and tap Sync again.')})}
 U.sync=doSync;U.syncState=function(){return{busy:busy,due:unsynced()||!syncedThisOpen,unsent:unsynced(),opened:syncedThisOpen,ago:ago()}};U.allDone=function(){return allDone()};
 
@@ -2356,7 +2365,7 @@ function b64(s){var b=atob(s.replace(/\s+/g,'')),u=new Uint8Array(b.length);for(
 function load(){if(G||state==='busy')return;if(window.__GEO){G=window.__GEO;return}
   var key=((S.feeds||{}).geokey_mgr||{}).k;if(!key){state='nokey';return}
   if(!(window.crypto&&crypto.subtle)){state='nocrypto';return}
-  state='busy';var day=new Date().toISOString().slice(0,10);
+  state='busy';var day=Date.now();
   (function tryU(i){if(i>=URLS.length){state='fail';rr();return}
     fetch(URLS[i]+'?v='+day,{cache:'no-store'}).then(function(r){if(!r.ok)throw 0;return r.text()}).then(function(t){var d=b64(t);
       return crypto.subtle.importKey('raw',b64(key),'AES-GCM',false,['decrypt']).then(function(k){return crypto.subtle.decrypt({name:'AES-GCM',iv:d.slice(0,12)},k,d.slice(12))})})
@@ -2584,7 +2593,7 @@ U.routes.geo=function(app){if(!isMgr()){app.append(h('div',{class:'note'},'Perfo
   box.append(h('div',{class:'chips main',style:'margin-top:2px'},VIEWS.map(function(x){return h('button',{class:x[0]===v?'on':'',onclick:function(){set('v',x[0])}},x[1])})));
   box.append(h('p',{class:'note',style:'margin:-4px 0 10px'},'Source: company Geo sales file · '+(G.asOf||'')+' · ₹ in lakh'));
   try{VIEWS.filter(function(x){return x[0]===v})[0][2](box)}catch(e){box.append(h('div',{class:'note'},'Could not draw this view: '+e.message))}};
-U.geoReady=function(){return !!G};
+U.geoReady=function(){return !!G};U.geoReset=function(){if(window.__GEO)return;G=null;state='idle'};
 })();
 /* Field Tracker – Review mail (manager, best on a laptop): the evening review laid out as an email,
    ready to copy or open in Outlook. Nothing is sent by the app itself. */

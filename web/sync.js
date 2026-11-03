@@ -31,14 +31,22 @@ function btn(){var b=document.getElementById('ftsync');if(!b){b=document.createE
   b.style.display=document.getElementById('ftlogin')||typeof S==='undefined'||!S.db?'none':''}
 setInterval(btn,3000);
 
-function doSync(){if(busy)return;if(navigator.onLine===false){toast('📶 No network. Your entries are safe on your phone – tap Sync when network is back.');return}
+// After every Sync: if a newer version of the screens is published, load it straight away (no reinstall, no waiting).
+var EXEC='https://script.google.com/macros/s/AKfycbyFp_mIJqqv-vya_y_DFmW7nwzZc83PQY5PnwOdzMPYjFK3EYg-p-ZHz0M7vSgMlV3_/exec';
+function checkUpdate(){try{var a=JSON.parse(U.lsGet('ft_auth','null'));if(!a||!window.google||!google.script||!window.FT_BUILD)return;
+  google.script.run.withSuccessHandler(function(r){var b=r&&r.b;if(!b||b===window.FT_BUILD)return;
+    if(U.flushOutbox&&U.outboxCount&&U.outboxCount()>0)return;U.lsSet('ft_upd','1');toast('⬇️ New version found – updating…');
+    setTimeout(function(){try{window.top.location.href=EXEC}catch(e){try{window.open(EXEC,'_top')}catch(_){location.reload()}}},900)}).withFailureHandler(function(){}).api(a,'ver',{})}catch(e){}}
+setTimeout(function(){try{if(U.lsGet('ft_upd','')==='1'){U.lsSet('ft_upd','');toast('✅ Updated – you have the latest version with all changes.')}}catch(e){}},2500);
+function doSync(){if(busy)return;try{U.geoReset&&U.geoReset()}catch(e){}if(navigator.onLine===false){toast('📶 No network. Your entries are safe on your phone – tap Sync when network is back.');return}
   busy=true;btn();var t0=Date.now();
   Promise.resolve(U.flushOutbox?U.flushOutbox():0).then(function(left){
     try{document.dispatchEvent(new Event('visibilitychange'))}catch(e){}   // pulls the latest data from the server
     return new Promise(function(r){setTimeout(function(){r(left)},Math.max(0,1800-(Date.now()-t0)))})})
   .then(function(left){busy=false;if(left>0){toast('Some entries are still waiting – tap Sync again in a minute.');btn();return}
     syncedThisOpen=true;U.lsSet(K,String(Date.now()));U.lsSet(KD,'');try{U.play&&U.play('ok')}catch(e){}
-    toast(isMgr()?'✅ Synced – you have the team\'s latest entries.':'✅ Synced – Ratan has all your entries and you have the latest from him.');try{render()}catch(e){btn()}},
+    toast(isMgr()?'✅ Synced – you have the team\'s latest entries.':'✅ Synced – Ratan has all your entries and you have the latest from him.');try{render()}catch(e){btn()}
+    checkUpdate()},
   function(){busy=false;btn();toast('Sync did not finish. Check internet and tap Sync again.')})}
 U.sync=doSync;U.syncState=function(){return{busy:busy,due:unsynced()||!syncedThisOpen,unsent:unsynced(),opened:syncedThisOpen,ago:ago()}};U.allDone=function(){return allDone()};
 
