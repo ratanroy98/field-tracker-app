@@ -91,24 +91,44 @@ function nextCard(app){var L=steps(app),i=L.findIndex(function(x){return!x.done}
 function updBanner(){try{if(!window.AndroidApp||!AndroidApp.version)return'';if(+AndroidApp.version()>=5)return''}catch(e){return''}
   return h('a',{class:'upd',href:APK},h('div',{},h('b',{},'📲 New app version'),'Meeting alarms, selfie camera and WhatsApp sharing.'),h('span',{class:'btn'},'Update'))}
 function quoteLine(){var qs=(U.C().quotes)||[];if(!qs.length)return'';return h('div',{class:'qline'},h('small',{},'Ratan Roy says'),qs[U.dayIdx()%qs.length])}
-/* Guide, don't collect: remind the CSO to report in Ventasys, and show what inputs are still lying unreported.
-   The number comes from feed inbal_<HQ> (written by the evening review from the Ventasys Input Usage / Input Tracking file). */
-function inbalCard(brand){try{if(isMgr())return'';
-  var k=Object.keys(S.feeds||{}).filter(function(x){return x.indexOf('inbal_')===0})[0];var f=k?S.feeds[k]:null;
-  if(!f){return h('div',{class:'coachc'},h('div',{class:'k'},'📲 Report in Ventasys as you go'),h('p',{},'When you meet a doctor or chemist today, enter the input, Rx or order in Ventasys the same day. You never have to type it again here.'));}
-  var items=(f.items||[]).filter(function(x){return !brand||x.brand===brand||!x.brand});
-  var tot=brand?items.reduce(function(a,x){return a+(+x.qty||0)},0):(f.total!=null?f.total:items.reduce(function(a,x){return a+(+x.qty||0)},0));
-  if(!tot){return h('div',{class:'coachc',style:'background:linear-gradient(135deg,#E8F6EE,#D6F0E0);border-color:#9FD9B6;color:#13684A'},h('div',{class:'k'},'✅ All inputs reported'),h('p',{style:'color:#1b6b4a'},'Nothing lying unreported. Keep entering each input in Ventasys the day you give it.'));}
-  var top=items.filter(function(x){return (+x.qty||0)>0}).slice(0,6).map(function(x){return x.name+(x.qty?' ×'+x.qty:'')}).join(', ');
-  return h('div',{class:'coachc'},h('div',{class:'k'},'📦 ',h('span',{class:'big2'},String(tot)),' input'+(tot>1?'s':'')+(brand?' of '+brand:'')+' still lying with you — not reported'),
-    h('p',{},(top?top+(items.length>6?', and more':'')+'. ':'')+'When you give one to a doctor or chemist, enter it in Ventasys the same day so it counts. '+(f.asOf?'As of '+f.asOf+'.':'')));
+/* Guide, don't collect.
+   FRONT SCREEN: for each doctor / chemist / wholesaler on today's list, tell them what to hand over, then report in Ventasys.
+   BRAND TAB + SAMPLES: show the total inputs / samples of that category the CSO is holding.
+   Counts come from feed inbal_<HQ> {asOf, items:[{name, qty, brand, kind:'input'|'sample'}]} (evening review, from the Ventasys input-tracking / in-hand file). */
+function brickNames(codes,brick){try{if(typeof CUST==='undefined')return[];return (codes||[]).filter(function(c){return CUST[c]&&CUST[c].brick===brick}).map(function(c){return CUST[c].name})}catch(e){return[]}}
+function nameList(a,n){n=n||5;return a.slice(0,n).join(', ')+(a.length>n?' +'+(a.length-n)+' more':'')}
+function handoverCard(){try{if(isMgr())return'';
+  var brick=(typeof brickToday==='function'&&brickToday())||'';
+  var lines=[];
+  [['Rloc Raft','the Raft input'],['Deca Durabolin','the Deca input'],['Rloc Tablets','the R-Loc gift']].forEach(function(x){
+    if(typeof drListFor!=='function')return;var L=drListFor(x[0]);if(!L||L.status!=='approved')return;
+    var docs=brickNames(L.doctors,brick);if(docs.length)lines.push('Hand over '+x[1]+' to '+nameList(docs)+', then report the Rx in Ventasys.')});
+  try{var nk=Object.keys(S.feeds||{}).filter(function(z){return z.indexOf('npd_')===0})[0];var nf=nk?S.feeds[nk]:null;
+    var outs=nf?brickNames(nf.codes,brick):[];if(outs.length)lines.push('Give Skinlite Facewash/Day Care to '+nameList(outs)+', then report the order in Ventasys.')}catch(e){}
+  if(!lines.length){return h('div',{class:'coachc'},h('div',{class:'k'},'📲 Report in Ventasys as you go'),h('p',{},'As you meet each doctor, chemist and wholesaler on today\'s list, hand over your inputs and samples and enter the Rx, input or order in Ventasys the same day. The app will tell you exactly what to give to whom.'));}
+  var box=h('div',{class:'coachc'},h('div',{class:'k'},'📋 Today'+(brick?' · '+brick:'')+' — hand over, then report in Ventasys'));
+  lines.forEach(function(t){box.append(h('p',{},'• '+t))});
+  box.append(h('p',{style:'margin-top:7px;font-weight:700;color:#5A4300'},'Then visit your chemists and wholesalers on the list, hand over their inputs and report each order in Ventasys.'));
+  return box;
 }catch(e){return''}}
-U.inbalCard=inbalCard;
+/* Count of inputs/samples of one brand still with the CSO – shown on that brand's Work tab and in Samples. */
+function brandInputs(brand){try{if(isMgr())return'';
+  var k=Object.keys(S.feeds||{}).filter(function(x){return x.indexOf('inbal_')===0})[0];var f=k?S.feeds[k]:null;
+  if(!f){return h('div',{class:'coachc'},h('div',{class:'k'},'📲 Hand over & report in Ventasys'),h('p',{},'Give your '+brand+' inputs and samples to today\'s doctors and chemists on the list, and report each in Ventasys the same day.'));}
+  var items=(f.items||[]).filter(function(x){return x.brand===brand});
+  var inp=items.filter(function(x){return (x.kind||'input')!=='sample'}).reduce(function(a,x){return a+(+x.qty||0)},0);
+  var smp=items.filter(function(x){return x.kind==='sample'}).reduce(function(a,x){return a+(+x.qty||0)},0);
+  if(!inp&&!smp){return h('div',{class:'coachc',style:'background:linear-gradient(135deg,#E8F6EE,#D6F0E0);border-color:#9FD9B6;color:#13684A'},h('div',{class:'k'},'✅ '+brand+' — all handed over'),h('p',{style:'color:#1b6b4a'},'No '+brand+' inputs or samples lying with you.'));}
+  var names=items.filter(function(x){return (+x.qty||0)>0}).slice(0,6).map(function(x){return x.name+' ×'+x.qty}).join(', ');
+  return h('div',{class:'coachc'},h('div',{class:'k'},'📦 You hold ',h('span',{class:'big2'},String(inp)),' '+brand+' input'+(inp===1?'':'s')+(smp?' · '+smp+' sample'+(smp===1?'':'s'):'')),
+    h('p',{},(names?names+'. ':'')+'Hand these over to today\'s '+brand+' doctors and chemists on the list, and report each in Ventasys the same day.'+(f.asOf?' As of '+f.asOf+'.':'')));
+}catch(e){return''}}
+U.handoverCard=handoverCard;U.brandInputs=brandInputs;
 
 function todayCSO(app){var keep=[app.querySelector('.fthead')],hero=app.querySelector('.hero'),meets=[].slice.call(app.querySelectorAll('.meet')),hof=app.querySelector('.hof'),ob=[].slice.call(app.querySelectorAll('.note')).filter(function(n){return /saved on your phone/.test(n.textContent)})[0],nav0=app.querySelector('.bnav');
   var pend=U.nagList().length;
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
-  var u=updBanner(),list=[u,nextCard(app),inbalCard(),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
+  var u=updBanner(),list=[u,nextCard(app),handoverCard(),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
   [].concat.apply([],list).forEach(function(n){if(n)app.append(n)})}
 function todayMgr(app){var keep=[app.querySelector('.fthead')];var team=U.teamPanel?U.teamPanel():null,share=[].slice.call(app.querySelectorAll('.tdone'))[0],hof=app.querySelector('.hof');
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
@@ -152,7 +172,7 @@ var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(doc
     if(t==='work'){U.lsSet('ft_work',r);var old=app.querySelector('.fthead~.subtabs');if(old&&old.textContent.indexOf('Raft')>=0&&!old.classList.contains('l2'))old.remove();var rows=workTabs(r);var after=hd;rows.forEach(function(x){after.after(x);after=x});
       if(!isMgr()&&WORKR.indexOf(r)>=0&&!app.querySelector('.optnote')){
         var BM={raft:'Rloc Raft',deca:'Deca Durabolin',rloc:'Rloc Tablets',skin:'Skinlite',dexona:'Dexona'};
-        var cc=inbalCard(BM[r]);if(cc){after.after(cc);after=cc}
+        var cc=brandInputs(BM[r]);if(cc){after.after(cc);after=cc}
         var on=h('div',{class:'qline optnote'},h('small',{},'The app guides — Ventasys collects'),'When you meet a doctor or chemist, report the input, Rx or order in Ventasys. You don\'t have to fill the lists below — they are only here to show you who to meet and what to carry.');after.after(on)}}
     if(t==='me'){var mt=meTabs(r);hd.after(mt);if(r==='perf')app.querySelectorAll('.hof').forEach(function(x){x.remove()})}
     var nb=app.querySelector('.bnav');if(nb)nb.replaceWith(nav(r));else app.append(nav(r));
