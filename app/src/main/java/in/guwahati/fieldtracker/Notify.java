@@ -91,6 +91,9 @@ public class Notify extends BroadcastReceiver {
               meeting(app, id, at, t, b);
             }
           }
+          // Daily task not yet shared to the WhatsApp group: keep reminding (same notification, re-alerts each time).
+          JSONObject ng = j.optJSONObject("nag");
+          if (ng != null) show(app, ng.optString("title"), ng.optString("body"), 777);
           if (j.optBoolean("skip") || "poll".equals(slot)) { done(app, pr); return; }
           title = j.optString("title", title); body = j.optString("body", body);
         }
@@ -111,13 +114,14 @@ public class Notify extends BroadcastReceiver {
     return "Check your pending tasks and today's POB.";
   }
 
-  static void show(Context c, String title, String body) {
+  static void show(Context c, String title, String body) { show(c, title, body, (int) (System.currentTimeMillis() % 100000)); }
+  static void show(Context c, String title, String body, int id) {
     NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
     if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(new NotificationChannel(CH, "Daily reminders", NotificationManager.IMPORTANCE_DEFAULT));
     PendingIntent open = PendingIntent.getActivity(c, 0, new Intent(c, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), PendingIntent.FLAG_IMMUTABLE);
     Notification.Builder b = Build.VERSION.SDK_INT >= 26 ? new Notification.Builder(c, CH) : new Notification.Builder(c);
     b.setSmallIcon(R.mipmap.ic_launcher).setContentTitle(title).setContentText(body)
       .setStyle(new Notification.BigTextStyle().bigText(body)).setAutoCancel(true).setContentIntent(open);
-    nm.notify((int) (System.currentTimeMillis() % 100000), b.build());
+    nm.notify(id, b.build());
   }
 }

@@ -198,6 +198,15 @@ public class MainActivity extends Activity {
     }
     @JavascriptInterface public String getLocation() { return lastLoc; }
     // Share only the day-plan text (to WhatsApp etc.).
+    // Share straight into WhatsApp (the CSO picks the "Guwahati CSM Team" group). Falls back to WhatsApp Business, then the share sheet.
+    @JavascriptInterface public void shareWhatsApp(String text) {
+      runOnUiThread(() -> {
+        for (String pkg : new String[]{"com.whatsapp", "com.whatsapp.w4b"}) {
+          try { Intent i = new Intent(Intent.ACTION_SEND); i.setType("text/plain"); i.putExtra(Intent.EXTRA_TEXT, text); i.setPackage(pkg); startActivity(i); return; } catch (Exception e) {}
+        }
+        try { Intent i = new Intent(Intent.ACTION_SEND); i.setType("text/plain"); i.putExtra(Intent.EXTRA_TEXT, text); startActivity(Intent.createChooser(i, "Share to Guwahati CSM Team")); } catch (Exception e) {}
+      });
+    }
     @JavascriptInterface public void share(String text) {
       runOnUiThread(() -> {
         Intent i = new Intent(Intent.ACTION_SEND); i.setType("text/plain"); i.putExtra(Intent.EXTRA_TEXT, text);
