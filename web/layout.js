@@ -131,7 +131,7 @@ var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(doc
     if(t==='work'){U.lsSet('ft_work',r);var old=app.querySelector('.fthead~.subtabs');if(old&&old.textContent.indexOf('Raft')>=0&&!old.classList.contains('l2'))old.remove();var rows=workTabs(r);var after=hd;rows.forEach(function(x){after.after(x);after=x})}
     if(t==='me'){var mt=meTabs(r);hd.after(mt);if(r==='perf')app.querySelectorAll('.hof').forEach(function(x){x.remove()})}
     var nb=app.querySelector('.bnav');if(nb)nb.replaceWith(nav(r));else app.append(nav(r));
-    if(isMgr()&&r==='perf'&&!app.querySelector('.salestop')){var s1=app.querySelector('.score'),c1=salesTop();if(s1)s1.before(c1);else app.append(c1)}
+    if(isMgr()&&r==='perf'&&!app.querySelector('.salestop')){var s1=app.querySelector('.score'),c1=(U.salesTop||salesTop)();if(s1)s1.before(c1);else app.append(c1)}
     viewBar(app)}catch(e){try{console.log('layout',e)}catch(_){}}};
 var pt=U.tabOfX||{};['sell','approve','meet','hof'].forEach(function(k){pt[k]=k});U.tabOfX=pt;
 try{if(S.ready)render()}catch(e){}
