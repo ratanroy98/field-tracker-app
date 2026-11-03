@@ -73,7 +73,25 @@ var st=document.createElement('style');st.textContent=`
 .geo .note{font-size:12px;color:var(--muted);margin:6px 0 0}
 .geo svg text{font-family:inherit}
 .geo .leg{display:flex;gap:12px;font-size:11px;color:var(--muted);margin-top:4px;flex-wrap:wrap}.geo .leg span:before{content:'';display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px;background:var(--c)}
+.geo .tbl{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sharebar{display:flex;gap:8px;margin:0 0 10px}
+.sharebar button{flex:1;border:0;border-radius:12px;padding:11px;font-weight:800;font-size:14px;background:#128C7E;color:#fff;min-height:auto;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.sharebar button.alt{background:var(--card,#fff);color:var(--g1,#0F5257);border:1px solid var(--line,#dfe7e4)}
+.printhdr{display:none}
+@media print{
+  html,body{background:#fff!important}
+  .bnav,.fthead .acts,.fthead .ib,.fthead .hb,.subtabs,.geo .chips,.sharebar,.sales2 .seg,.geo .note{display:none!important}
+  .geo .card,.sales2,.geo .hero,.score{box-shadow:none!important;break-inside:avoid;page-break-inside:avoid}
+  .geo .hero{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .printhdr{display:block;margin:0 0 10px;font:700 15px/1.3 var(--display,sans-serif);color:#0F5257}
+  .printhdr small{display:block;font-weight:600;color:#5B716E;font-size:12px}
+}
 `;document.head.appendChild(st);
+function shareView(title){try{var old=document.querySelector('.printhdr');if(old)old.remove();
+  var hd=document.createElement('div');hd.className='printhdr';hd.innerHTML='Guwahati Area · '+(title||'Performance')+'<small>Zydus GEO · Ratan Roy · '+new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})+'</small>';
+  var box=document.querySelector('.geo,.sales2');if(box)box.insertBefore(hd,box.firstChild);
+  setTimeout(function(){window.print()},60)}catch(e){try{window.print()}catch(_){}}}
+U.shareView=shareView;
 
 /* ---------- number helpers (all values in ₹ lakh) ---------- */
 function L(v){v=+v||0;return (v<0?'–':'')+'₹'+Math.abs(v).toFixed(2)+' L'}
@@ -243,7 +261,9 @@ U.routes.geo=function(app){if(!isMgr()){app.append(h('div',{class:'note'},'Perfo
   if(!G){box.append(h('div',{class:'card'},h('h3',{},'Performance'),h('p',{},state==='busy'||state==='idle'?'Loading the latest company sales file…':state==='nokey'?'Tap Sync once – the secure key for performance data arrives with it.':state==='nocrypto'?'This phone browser cannot open the secure file. Please update Chrome / the app.':'Could not load the performance file. Check the internet and tap Sync.')));return}
   var v=get('v','ov');if(!VIEWS.some(function(x){return x[0]===v}))v='ov';
   box.append(h('div',{class:'chips main',style:'margin-top:2px'},VIEWS.map(function(x){return h('button',{class:x[0]===v?'on':'',onclick:function(){set('v',x[0])}},x[1])})));
-  box.append(h('p',{class:'note',style:'margin:-4px 0 10px'},'Source: company Geo sales file · '+(G.asOf||'')+' · ₹ in lakh'));
+  var vname=(VIEWS.filter(function(x){return x[0]===v})[0]||[])[1]||'Performance';
+  box.append(h('div',{class:'sharebar'},h('button',{onclick:function(){shareView(vname)}},'📸 Save / Share for WhatsApp'),h('button',{class:'alt',onclick:function(){shareView(vname)}},'⬇️ Download')));
+  box.append(h('p',{class:'note',style:'margin:-4px 0 10px'},'Source: company Geo sales file · '+(G.asOf||'')+' · ₹ in lakh · only you can see this'));
   try{VIEWS.filter(function(x){return x[0]===v})[0][2](box)}catch(e){box.append(h('div',{class:'note'},'Could not draw this view: '+e.message))}};
 U.geoReady=function(){return !!G};U.geoReset=function(){if(window.__GEO)return;G=null;state='idle'};
 })();

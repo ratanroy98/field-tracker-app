@@ -47,6 +47,7 @@ function draw(box){box.innerHTML='';
     seg([['Area','Overall area']].concat(HQS.map(function(q){return[q,q]})),sel.h,function(v){sel.h=v;U.lsSet&&U.lsSet('ft_sh',v);draw(box)}));
   if(!d){box.append(h('small',{style:'display:block;margin-top:8px;color:var(--muted)'},sel.p==='ytd'?'YTD figures appear after the YTD sales file is uploaded and the evening review runs.':'Figures appear after the next evening review.'));return}
   var T=d.T,ach=pct(T.n,T.t),g=gr(T.n,T.ly),cl=(T.exp||0)+(T.brk||0);
+  if(U.shareView)box.append(h('div',{class:'sharebar'},h('button',{onclick:function(){U.shareView('This month sales')}},'📸 Save / Share for WhatsApp'),h('button',{class:'alt',onclick:function(){U.shareView('This month sales')}},'⬇️ Download')));
   box.append(h('small',{style:'display:block;color:var(--muted);margin-top:6px'},(sel.h==='Area'?'Overall area (4 HQs)':sel.h)+' · '+(d.period||'')+(d.asOf?' · cumulative to '+d.asOf:'')));
   box.append(h('div',{class:'kp'},
     h('div',{class:'hi'},h('small',{},'Achievement (net)'),h('b',{},rsx(T.n))),
