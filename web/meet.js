@@ -65,14 +65,15 @@ var baseSave=window.save;
 if(typeof baseSave==='function'){window.save=save=function(type,fields){if(navigator.onLine===false&&!(fields&&fields.photos&&fields.photos.length)){var w=who();if(!w||isMgr())return baseSave(type,fields);
     var doc=Object.assign({type:type,email:w.Email,hq:w.HQ,name:w.Name,by:'',ts:Date.now(),date:TODAY,offline:1},fields);var a=q();a.push(doc);setQ(a);S.dirty=false;toast('📶 No network – saved on your phone. It will send itself.');U.play('ok');
     try{S.entries=(S.entries||[]).concat([doc])}catch(e){}return Promise.resolve(true)}return baseSave(type,fields)}}
-function flush(){var a=q();if(!a.length||!S.db||navigator.onLine===false)return;var doc=a[0];S.db.collection('entries').add(doc).then(function(){var b=q();b.shift();setQ(b);if(b.length)flush();else{toast('📶 Back online – '+a.length+' saved entr'+(a.length>1?'ies':'y')+' sent');}},function(){})}
-window.addEventListener('online',function(){setTimeout(flush,1500)});setInterval(flush,60000);
+function flush(quiet){var a=q();if(!a.length||!S.db||navigator.onLine===false)return Promise.resolve(a.length);var doc=a[0];return S.db.collection('entries').add(doc).then(function(){var b=q();b.shift();setQ(b);if(b.length)return flush(quiet);if(!quiet)toast('📶 Back online – '+a.length+' saved entr'+(a.length>1?'ies':'y')+' sent');return 0},function(){return q().length})}
+U.flushOutbox=function(){return flush(true)};U.outboxCount=function(){return q().length};
+window.addEventListener('online',function(){setTimeout(function(){flush()},1500)});setInterval(function(){flush()},60000);
 function outboxNote(){var n=q().length;return n?h('div',{class:'note',style:'margin-bottom:10px'},'📶 '+n+' entr'+(n>1?'ies':'y')+' saved on your phone, waiting for network.'):''}
 
 /* ---------- hooks ---------- */
 var prevToday=U.today;U.today=function(app,tk,rest){prevToday&&prevToday(app,tk,rest);
   if(isMgr()){var tp=app.querySelector('.phase');var p=mgrPanel();if(tp)tp.before(p);else tk.after(p);return}
   var ms=mine().filter(function(m){return atOf(m)-Date.now()<36*3600000});var after=tk;ms.forEach(function(m){var c=card(m);after.after(c);after=c});var ob=outboxNote();if(ob)after.after(ob);alarms()};
-setTimeout(flush,4000);
+setTimeout(function(){flush()},4000);
 try{if(S.ready)render()}catch(e){}
 })();
