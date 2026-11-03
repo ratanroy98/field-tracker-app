@@ -25,6 +25,13 @@ var st=document.createElement('style');st.textContent=`
 `;document.head.appendChild(st);
 
 function dates(){var d={};(S.msgs||[]).forEach(function(m){if(m.slot==='8pm'&&m.date)d[m.date]=1});return Object.keys(d).sort().reverse().slice(0,10)}
+// Mail must carry only Ventasys / company data – nothing from this app (the app is not mandatory).
+var APPWORDS=/\b(app|apps|check-?ins?|checked in|selfie|lessons?|task shar\w*|shared the task|daily task|sync\w*|stock statement uploaded|uploaded)\b/i;
+function noApp(t){var out=[],n=0;String(t||'').split('\n').forEach(function(line){var l=line;
+    if(APPWORDS.test(l)){var parts=[];l.split(/;\s*/).forEach(function(x){if(!APPWORDS.test(x)){parts.push(x);return}var sub=x.split(/,\s+/).filter(function(y){return !APPWORDS.test(y)});if(sub.length&&sub.join(', ').length>12)parts.push(sub.join(', '))});if(!parts.length||/^\s*\d+[.)]/.test(l)&&APPWORDS.test(l))return;l=parts.join('; ');if(!/[.:)]$/.test(l.trim())&&/\.$/.test(line.trim()))l=l.trim()+'.'}
+    var m=l.match(/^(\s*)\d+([.)])\s*(.*)$/);if(m){n++;l=m[1]+n+m[2]+' '+m[3]}else if(/explanation required/i.test(l))n=0;out.push(l)});
+  return out.join('\n').replace(/Explanation required by 11 AM:\n(?!\s*\d)/i,'').replace(/\n{3,}/g,'\n\n')}
+function mailMsg(email,date){var m=(S.msgs||[]).filter(function(x){return x.slot==='mail'&&x.for===email&&x.date===date}).sort(function(a,b){return (b.ts||0)-(a.ts||0)})[0];if(m)return m.text;var r=msgFor(email,date);return r&&r.text?noApp(r.text):''}
 function msgFor(email,date){return (S.msgs||[]).filter(function(m){return m.email===email&&m.date===date&&m.slot==='8pm'}).sort(function(a,b){return (b.ts||0)-(a.ts||0)})[0]}
 function nice(date){return new Date(date+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}
 function dayName(date){return new Date(date+'T00:00:00').toLocaleDateString('en-GB',{weekday:'short'})}
@@ -35,13 +42,13 @@ var SIGN=['Regards,','Ratan Roy','CSM – Guwahati Area','Zydus GEO','Mob: 88110
 // Each CSO gets his own review mail (To: the CSO, Cc: Sudipta). "Team" is an optional summary mail.
 function mailFor(who,date,o){var L=[],subj,to='';
   if(who==='team'){subj='Daily Field Review – Guwahati Area – '+nice(date)+' ('+dayName(date)+')';
-    L.push('Dear Sir,','','Please find below the daily field review of Guwahati Area for '+nice(date)+'.','');var b=msgFor(MGR,date);if(b&&b.text)L.push(o.verify?b.text:dropVerify(b.text),'');
-    CSO.forEach(function(c,i){var m=msgFor(c[0],date);L.push((i+1)+'. '+c[1]+' – '+c[2]+' HQ',m&&m.text?m.text:'Review not available.','')});L.push('Dhubri HQ – vacant.','');to=CC_DEF}
-  else{var c=CSO.filter(function(x){return x[0]===who})[0],m=msgFor(who,date),first=c[1].split(' ')[0],t=m&&m.text?m.text:'Review not available.',leave=/on leave/i.test(t);to=c[0];
+    L.push('Dear Sir,','','Please find below the daily field review of Guwahati Area for '+nice(date)+'.','');var b=mailMsg(MGR,date);if(b)L.push(o.verify?b:dropVerify(b),'');
+    CSO.forEach(function(c,i){L.push((i+1)+'. '+c[1]+' – '+c[2]+' HQ',mailMsg(c[0],date)||'Review not available.','')});L.push('Dhubri HQ – vacant.','');to=CC_DEF}
+  else{var c=CSO.filter(function(x){return x[0]===who})[0],first=c[1].split(' ')[0],t=mailMsg(who,date)||'Review not available.',leave=/on leave/i.test(t);to=c[0];
     subj='Day Review – '+c[1]+' – '+c[2]+' HQ – '+nice(date)+' ('+dayName(date)+')';
     L.push('Dear '+first+',','','Please find your day review for '+nice(date)+'.','',t,'');
     if(!leave&&/explanation/i.test(t))L.push('Please reply to this mail with your explanation for each point by 11 AM tomorrow.','');
-    L.push('Keep entering everything in Ventasys and sync the app every day.','')}
+    L.push('Please keep all reporting in Ventasys up to date every day.','')}
   var body=L.concat(SIGN).join('\n');return{to:to,subject:subj,body:o.emoji?body:noEmoji(body)}}
 function copy(text,ta){var ok=false;try{if(ta){ta.focus();ta.select();ok=document.execCommand('copy')}}catch(e){}
   if(!ok)try{navigator.clipboard.writeText(text).then(function(){toast('Copied')},function(){toast('Select the text and press Ctrl+C')});return}catch(e){}
