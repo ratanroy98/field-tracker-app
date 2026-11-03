@@ -167,7 +167,13 @@ public class MainActivity extends Activity {
   // Lets the page hand over the sign-in so phone notifications show this CSO's own numbers.
   class AppBridge {
     @JavascriptInterface public void setAuth(String json) { getSharedPreferences("ft", MODE_PRIVATE).edit().putString("auth", json).apply(); Notify.schedule(MainActivity.this); }
-    @JavascriptInterface public String version() { return "3"; }
+    @JavascriptInterface public String version() { return "4"; }
+    // Join buttons: phone call, WhatsApp, meeting links open in their own apps.
+    @JavascriptInterface public void open(String url) {
+      runOnUiThread(() -> { try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); } catch (Exception e) { Toast.makeText(MainActivity.this, "No app to open this", Toast.LENGTH_SHORT).show(); } });
+    }
+    // Meeting reminders: 15 minutes before and at the start time.
+    @JavascriptInterface public void meeting(String id, double at, String title, String body) { Notify.meeting(MainActivity.this, id, (long) at, title, body); }
     // One-tap check-in: the page asks for the location, then reads it.
     @JavascriptInterface public void requestLocation() {
       lastLoc = "";
