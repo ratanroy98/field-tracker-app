@@ -1,4 +1,4 @@
-window.FT_BUILD='20261104042353';
+window.FT_BUILD='20261104050635';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -2292,7 +2292,7 @@ U.handoverCard=handoverCard;U.brandInputs=brandInputs;
 function todayCSO(app){var keep=[app.querySelector('.fthead')],hero=app.querySelector('.hero'),meets=[].slice.call(app.querySelectorAll('.meet')),hof=app.querySelector('.hof'),ob=[].slice.call(app.querySelectorAll('.note')).filter(function(n){return /saved on your phone/.test(n.textContent)})[0],nav0=app.querySelector('.bnav');
   var pend=U.nagList().length;
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
-  var u=updBanner(),list=[u,(U.highlightCard&&U.highlightCard())||"",nextCard(app),handoverCard(),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
+  var u=updBanner(),list=[u,(U.highlightCard&&U.highlightCard())||"",(U.earnCard&&U.earnCard())||"",nextCard(app),handoverCard(),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
   [].concat.apply([],list).forEach(function(n){if(n)app.append(n)})}
 function todayMgr(app){var keep=[app.querySelector('.fthead')];var team=U.teamPanel?U.teamPanel():null,share=[].slice.call(app.querySelectorAll('.tdone'))[0],hof=app.querySelector('.hof');
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
@@ -2562,207 +2562,267 @@ function lastMonth(){return MON.length-1}
 function periodChips(p){return chips([['tm','This month ('+MON[lastMonth()]+')'],['YTD','YTD (Jan–'+MON[lastMonth()]+')'],['Q4','Q4'],['Q3','Q3'],['Q2','Q2'],['Q1','Q1']].concat(MON.map(function(m,i){return[i,m]}).reverse()),p,'per')}
 function per(){var p=get('per','YTD');return /^\d+$/.test(String(p))?+p:p}
 
-/* ---------- views ---------- */
-function kpis(a,extra){var p=P(a[2],a[1]),g=gr(a[2],a[0]),cl=(a[3]||0)+(a[4]||0);
-  var k=h('div',{class:'kp'},
-    h('div',{},h('small',{},'Sale (net)'),h('b',{},L(a[2]))),h('div',{},h('small',{},'Target'),h('b',{},L(a[1]))),
-    h('div',{},h('small',{},'Performance'),h('b',{class:pcls(p)},pf(p))),h('div',{},h('small',{},'Growth vs LY'),h('b',{class:gcls(g)},sg(g))),
-    h('div',{},h('small',{},'Last year'),h('b',{},L(a[0]))),h('div',{},h('small',{},'Gap to target'),h('b',{class:a[2]>=a[1]?'up':'dn'},a[2]>=a[1]?'+'+L(a[2]-a[1]):L(a[2]-a[1]))),
-    h('div',{},h('small',{},'Sales return'),h('b',{},L(-(a[3]||0)))),h('div',{},h('small',{},'Expiry return'),h('b',{},L(-(a[4]||0)))));
-  (extra||[]).forEach(function(x){k.append(h('div',{},h('small',{},x[0]),h('b',{class:x[2]||''},x[1])))});return k}
-function heroCard(title,sub,a,right){var p=P(a[2],a[1]),g=gr(a[2],a[0]);
-  return h('div',{class:'hero'},h('div',{class:'k'},sub),h('h2',{},title),h('div',{class:'hrow'},ring(p,76),h('div',{},h('div',{class:'big'},L(a[2])),h('small',{},'of '+L(a[1])+' target · LY '+L(a[0])),h('small',{},'Growth '+sg(g)+(right?' · '+right:'')))))}
+/* ========================================================================
+   Reports — unified for manager (full Geo, all HQs) and CSO (own HQ feed).
+   Tabs: Performance · Impact Brands · Incentive · NPDs.
+   Performance: Normal | Incentive-basis (SAG), each Monthly / Quarterly / YTD.
+   Incentive: the money tab — earnings, milestones, where it is lacking.
+   Kept deliberately uncrowded: one headline, a small KPI grid, one table/chart per view.
+   ======================================================================== */
+var IMPACT=['Deca Durabolin','R-Loc','Dexona','Skinlite'];
+var CSO={Agartala:'Karamjit',Bongaigaon:'Prashun',Dhubri:'Vacant',Guwahati:'Bhubaneswar'};
 
-function vOverview(app){var p=per(),A=rowsOf('Area'),a=agg(A,p),hh=hit(A),rk=rankOf('Area Guwahati');
-  app.append(periodChips(p),heroCard('Guwahati Area · '+plab(p),'Performance · 4 HQs',a,'target done '+hh[0]+' of '+hh[1]+' months'));
-  app.append(h('div',{class:'card'},h('h3',{},'Key numbers',h('small',{},plab(p))),kpis(a,[['Months target done',hh[0]+' / '+hh[1],hh[0]>=hh[1]/2?'up':'dn'],['Rank in region (YTD)',rk]])));
-  app.append(chart(A,'Area · target vs sale'));
-  var g=h('div',{class:'hqg'});HQS.forEach(function(q){var R=rowsOf(q),x=agg(R,p),pp=P(x[2],x[1]),hq=hit(R),bk=(G.bucket[q]||[]);
-    g.append(h('div',{class:'hqc',onclick:function(){T.geo_hq=q;set('v','hq')}},h('div',{class:'rg'},miniRing(pp)),h('b',{},q),h('small',{},CSO[q]+(bk[5]?' · '+bk[5]:'')),
-      h('div',{class:'row'},h('span',{},L(x[2])),h('span',{style:'color:var(--muted)'},'/ '+L(x[1]))),
-      h('div',{class:'row'},h('span',{class:gcls(gr(x[2],x[0]))},'Gr '+sg(gr(x[2],x[0]))),h('span',{},'✓ '+hq[0]+'/'+hq[1]+' mo'))))});
-  app.append(h('div',{class:'card'},h('h3',{},'HQs',h('small',{},'tap for detail')),g));
-  var ins=insights().slice(0,3);if(ins.length){var c=h('div',{class:'card'},h('h3',{},'What needs you now',h('small',{},'top 3')));ins.forEach(function(x){c.append(insCard(x))});
-    c.append(h('button',{class:'btn',style:'width:100%;margin-top:4px',onclick:function(){set('v','ins')}},'See all insights →'));app.append(c)}}
+/* extra styles for the new layout */
+var st2=document.createElement('style');st2.textContent=`
+.geo .tabbar{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:2px 0 10px;padding-bottom:2px}.geo .tabbar::-webkit-scrollbar{display:none}
+.geo .tabbar button{flex:0 0 auto;border:0;background:var(--soft2);color:var(--muted);border-radius:999px;padding:9px 15px;font-size:13.5px;font-weight:800;min-height:auto;display:flex;align-items:center;gap:6px}
+.geo .tabbar button.on{background:linear-gradient(120deg,var(--g2),var(--g1));color:#fff;box-shadow:0 5px 14px rgba(15,82,87,.28)}
+.geo .seg2{display:flex;gap:4px;background:var(--soft2);border-radius:12px;padding:4px;margin:0 0 10px}
+.geo .seg2 button{flex:1;border:0;background:transparent;color:var(--muted);border-radius:9px;padding:8px 6px;font-size:12.5px;font-weight:800;min-height:auto}
+.geo .seg2 button.on{background:var(--card,#fff);color:var(--g1);box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.geo .mile{margin:0 0 10px}
+.geo .mile .track{position:relative;height:30px;border-radius:8px;background:var(--soft2);overflow:hidden}
+.geo .mile .fill{position:absolute;left:0;top:0;bottom:0;border-radius:8px;background:linear-gradient(90deg,#1B8A5A,#4ADE80)}
+.geo .mile .mk{position:absolute;top:0;bottom:0;width:2px;background:rgba(0,0,0,.22)}
+.geo .mile .lbl{position:absolute;top:50%;transform:translateY(-50%);font-size:10px;font-weight:800;color:#0B3A25;padding-left:3px}
+.geo .money{border-radius:22px;padding:18px 16px;color:#fff;background:radial-gradient(130% 150% at 100% 0,#F6B73C 0%,#E98A1E 42%,#B45309 100%);box-shadow:0 14px 34px rgba(180,83,9,.32);margin:0 0 12px;position:relative;overflow:hidden}
+.geo .money:after{content:'';position:absolute;right:-30px;bottom:-40px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.1)}
+.geo .money .k{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;color:#FFF3D6}
+.geo .money h2{margin:3px 0 2px;font-size:30px;color:#fff!important;line-height:1;font-variant-numeric:tabular-nums;position:relative;z-index:1}
+.geo .money p{margin:6px 0 0;font-size:13.5px;opacity:.95;position:relative;z-index:1}
+.geo .earn{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:0 0 12px}
+.geo .earn>div{background:var(--card,#fff);border:1px solid var(--line,#e5ece9);border-radius:16px;padding:12px;min-width:0}
+.geo .earn .hd{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.geo .earn b{display:block;font-size:19px;margin:5px 0 1px;font-variant-numeric:tabular-nums}
+.geo .earn small{display:block;font-size:11.5px;color:var(--muted)}
+.geo .push{border-left:4px solid var(--g2);background:var(--soft2);border-radius:12px;padding:11px 13px;margin:0 0 9px;font-size:13.5px;line-height:1.45}
+.geo .push b{display:block;color:var(--g1);font-size:13.5px;margin-bottom:2px}
+.geo .push.hot{border-color:#E98A1E}.geo .push.hot b{color:#B45309}
+.geo .impc{background:var(--card,#fff);border:1px solid var(--line,#e5ece9);border-radius:16px;padding:12px;margin:0 0 10px;display:flex;gap:12px;align-items:center}
+.geo .impc .meta{flex:1;min-width:0}
+.geo .impc .meta b{font-size:15px}.geo .impc .meta small{display:block;color:var(--muted);font-size:11.5px;margin-top:1px}
+.geo .pill{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:2px 9px}
+.geo .pill.up{background:#E8F6EE;color:#13684A}.geo .pill.dn{background:#FBE4DC;color:#9A3412}.geo .pill.md{background:#FDF3D6;color:#8A5A00}
+`;document.head.appendChild(st2);
 
-function vHQ(app){var q=get('hq','Guwahati'),p=per(),R=rowsOf(q),a=agg(R,p),hh=hit(R),bk=G.bucket[q]||[],sag=(G.sag[q]||{}).YTD||[];
-  app.append(chips(HQS.map(function(x){return[x,x]}),q,'hq','main'),periodChips(p));
-  app.append(heroCard(q+' · '+plab(p),'HQ · '+CSO[q]+(bk[4]?' · Category '+bk[4]:''),a,'target done '+hh[0]+'/'+hh[1]+' months'));
-  app.append(h('div',{class:'card'},h('h3',{},'Key numbers',h('small',{},plab(p))),kpis(a,[['Flat-rate billing',a[5]==null?'—':a[5]+'%'],['Growth bucket',bk[5]||'—']])));
-  app.append(chart(R,q+' · target vs sale'));
-  // brand table
-  var B=brands().map(function(b){var r=G.hq[q][b];return[b,r,agg(r,p)]}).filter(function(x){return x[2][1]||x[2][2]||x[2][0]}).sort(function(x,y){return y[2][1]-x[2][1]});
-  var t=h('table',{},h('tr',{},h('th',{},'Brand'),h('th',{},'Target'),h('th',{},'Sale'),h('th',{},'Perf'),h('th',{},'Gr'),h('th',{},'✓ Mo')));
-  B.forEach(function(x){var pp=P(x[2][2],x[2][1]),g=gr(x[2][2],x[2][0]),hm=hit(x[1]),cl=(x[2][3]||0)+(x[2][4]||0);
-    var tr=h('tr',{style:'cursor:pointer',onclick:function(){var n=tr.nextSibling;if(n&&n.classList&&n.classList.contains('xp')){n.remove();return}
-      var d=h('tr',{class:'xp'},h('td',{colspan:'6',style:'text-align:left;white-space:normal;background:var(--soft2)'},h('div',{style:'display:flex;gap:10px;align-items:center'},spark(x[1]),h('small',{style:'font-size:11px'},'Perf by month, Jan–Oct (dashed = 100%). '+(META[x[0]]?'Channels: '+META[x[0]][1]+'.':'')+(cl?' Returns '+L(-cl)+'.':'')))));tr.after(d)}},
-      h('td',{},h('b',{},x[0]),tag(x[0]),h('small',{},'LY '+L(x[2][0]))),h('td',{},L(x[2][1]).replace(' L','')),h('td',{},L(x[2][2]).replace(' L','')),h('td',{class:pcls(pp)},pf(pp)),h('td',{class:gcls(g)},sg(g)),h('td',{},hm[0]+'/'+hm[1]));t.append(tr)});
-  t.append(h('tr',{class:'tot'},h('td',{},'All brands'),h('td',{},L(a[1]).replace(' L','')),h('td',{},L(a[2]).replace(' L','')),h('td',{class:pcls(P(a[2],a[1]))},pf(P(a[2],a[1]))),h('td',{class:gcls(gr(a[2],a[0]))},sg(gr(a[2],a[0]))),h('td',{},hh[0]+'/'+hh[1])));
-  app.append(h('div',{class:'card'},h('h3',{},'Brand-wise',h('small',{},'₹ lakh · tap a brand')),h('div',{class:'tbl'},t),h('p',{class:'note'},'✓ Mo = months in Jan–Oct where the target was achieved.')));
-  if(sag.length)app.append(h('div',{class:'card'},h('h3',{},'Incentive basis (SAG) · YTD'),h('div',{class:'kp'},h('div',{},h('small',{},'SAG target'),h('b',{},L(sag[2]))),h('div',{},h('small',{},'SAG sale'),h('b',{},L(sag[3]))),h('div',{},h('small',{},'SAG perf'),h('b',{class:pcls(P(sag[3],sag[2]))},pf(P(sag[3],sag[2])))),h('div',{},h('small',{},'SAG growth'),h('b',{class:gcls(gr(sag[3],sag[1]))},sg(gr(sag[3],sag[1]))))),h('p',{class:'note'},'SAG counts only the months on the incentive sheet; see the Incentive tab for month and quarter detail.')))}
-
-function vBrand(app){var bl=brands(),b=get('br',bl[0]);if(bl.indexOf(b)<0)b=bl[0];var p=per(),A=rowsOf('Area',b),a=agg(A,p),all=agg(rowsOf('Area'),p),reg=agg(rowsOf('Region',b),p),hh=hit(A);
-  app.append(chips(bl.map(function(x){return[x,x]}),b,'br','main'),periodChips(p));
-  var m=META[b]||['',''];
-  app.append(heroCard(b+' · '+plab(p),'Brand · '+(m[0]||'')+' · Area',a,'share '+Math.round(P(a[2],all[2])||0)+'% of area'));
-  app.append(h('div',{class:'card'},h('h3',{},'Key numbers',tag(b),h('small',{},plab(p))),kpis(a,[['Months target done',hh[0]+' / '+hh[1],hh[0]>=hh[1]/2?'up':'dn'],['Region perf',pf(P(reg[2],reg[1])),pcls(P(reg[2],reg[1]))]]),h('p',{class:'note'},'Moves through: '+m[1]+'.')));
-  app.append(chart(A,b+' · area target vs sale'));
-  var l=h('div',{class:'lst'});HQS.forEach(function(q){var r=(G.hq[q]||{})[b];if(!r)return;var x=agg(r,p),pp=P(x[2],x[1]),hm=hit(r);
-    l.append(h('div',{},h('div',{class:'t'},h('b',{},q+' · '+CSO[q]),h('span',{class:pcls(pp)},pf(pp))),pbar(pp),h('div',{class:'t',style:'font-size:11.5px;color:var(--muted);margin-top:4px'},h('span',{},L(x[2])+' / '+L(x[1])),h('span',{},'Gr '+sg(gr(x[2],x[0]))+' · ✓ '+hm[0]+'/'+hm[1]))))});
-  app.append(h('div',{class:'card'},h('h3',{},'By HQ',h('small',{},'line = 100%')),l));
-  var dv=(G.div||{})[{'Deca Durabolin':'Deca'}[b]||b];if(dv&&dv.OCT){var o=dv.OCT;app.append(h('div',{class:'card'},h('h3',{},'Region diversity · Oct'),h('div',{class:'kp'},h('div',{},h('small',{},'HQs ≥105%'),h('b',{class:'up'},o[2]+' of '+o[7])),h('div',{},h('small',{},'HQs <80%'),h('b',{class:'dn'},o[6]+' of '+o[7]))),h('p',{class:'note'},'How many of the region\'s 13 HQs hit the brand target in October.')))}}
-
-function vMonths(app){var bl=['ALL'].concat(brands()),b=get('mb','ALL');if(bl.indexOf(b)<0)b='ALL';
-  app.append(chips(bl.map(function(x){return[x,x==='ALL'?'All brands':x]}),b,'mb','main'));
-  var t=h('table',{class:'heat'},h('tr',{},h('th',{},''),MON.map(function(m){return h('th',{style:'text-align:center'},m[0]+m[1])}),h('th',{style:'text-align:center'},'✓')));
-  HQS.concat(['Area','Region']).forEach(function(q){var R=rowsOf(q,b);if(!R)return;var hm=hit(R);
-    t.append(h('tr',{class:q==='Area'?'me':''},h('td',{},q==='Region'?'Region':q==='Area'?'Area':q.slice(0,4)),R.slice(0,10).map(function(r){var p=P(r[2],r[1]);return h('td',{class:heat(p)},p==null?'–':Math.round(p))}),h('td',{},h('b',{},hm[0]+'/'+hm[1]))))});
-  app.append(h('div',{class:'card'},h('h3',{},'Target done – month by month',h('small',{},b==='ALL'?'all brands':b)),h('div',{class:'tbl'},t),
-    h('div',{class:'leg'},h('span',{style:'--c:#1B8A5A'},'≥105%'),h('span',{style:'--c:#7CC59A'},'100–104%'),h('span',{style:'--c:#F6D776'},'90–99%'),h('span',{style:'--c:#F4A261'},'80–89%'),h('span',{style:'--c:#E5484D'},'<80%'))));
-  // growth vs last year, month by month
-  function gcell(v){var cls=v==null?'h0':v>=15?'h5':v>=0?'h4':v>=-10?'h3':v>=-25?'h2':'h1';return h('td',{class:cls},v==null?'–':(v>0?'+':'')+Math.round(v))}
-  var gt=h('table',{class:'heat'},h('tr',{},h('th',{},''),MON.map(function(m){return h('th',{style:'text-align:center'},m[0]+m[1])}),h('th',{style:'text-align:center'},'YTD')));
-  HQS.concat(['Area','Region']).forEach(function(q){var R=rowsOf(q,b);if(!R)return;var y=R[10],gy=gr(y[2],y[0]);
-    gt.append(h('tr',{class:q==='Area'?'me':''},h('td',{},q==='Region'?'Region':q==='Area'?'Area':q.slice(0,4)),R.slice(0,10).map(function(r){return gcell(gr(r[2],r[0]))}),h('td',{},h('b',{class:gcls(gy)},sg(gy)))))});
-  app.append(h('div',{class:'card'},h('h3',{},'Growth vs last year – month by month',h('small',{},b==='ALL'?'all brands':b)),h('div',{class:'tbl'},gt),
-    h('div',{class:'leg'},h('span',{style:'--c:#1B8A5A'},'+15% & up'),h('span',{style:'--c:#7CC59A'},'0 to +15%'),h('span',{style:'--c:#F6D776'},'0 to −10%'),h('span',{style:'--c:#F4A261'},'−10 to −25%'),h('span',{style:'--c:#E5484D'},'below −25%'))));
-  // all brands x HQ months-done grid
-  var g=h('table',{},h('tr',{},h('th',{},'Brand'),HQS.map(function(q){return h('th',{},q.slice(0,4))}),h('th',{},'Area')));
-  brands().forEach(function(br){var cells=HQS.concat(['Area']).map(function(q){var R=rowsOf(q,br);if(!R)return h('td',{},'—');var hm=hit(R);return h('td',{class:hm[1]?(hm[0]/hm[1]>=.6?'up':hm[0]/hm[1]>=.3?'md':'dn'):''},hm[1]?hm[0]+'/'+hm[1]:'—')});
-    g.append(h('tr',{},h('td',{},h('b',{},br),tag(br)),cells))});
-  app.append(h('div',{class:'card'},h('h3',{},'Months target done · every brand',h('small',{},'Jan–Oct')),h('div',{class:'tbl'},g)))}
-
-function vSAG(app){var keys=HQS.concat(['Area Guwahati','Region Guwahati']),q=get('sq','Area Guwahati');if(keys.indexOf(q)<0)q='Area Guwahati';var S2=G.sag[q]||{};
-  app.append(chips(keys.map(function(x){return[x,x.replace('Area Guwahati','Area').replace('Region Guwahati','Region')]}),q,'sq','main'));
-  var y=S2.YTD||[0,0,0,0,0,0,0];
-  app.append(heroCard((q.indexOf(' ')>0?q:q+' HQ')+' · SAG','Performance & incentive basis · YTD',[y[1],y[2],y[3]],'gross '+L(y[4])));
-  var t=h('table',{},h('tr',{},h('th',{},'Period'),h('th',{},'Target'),h('th',{},'Sale'),h('th',{},'Perf'),h('th',{},'Gr'),h('th',{},'Return')));
-  ['JAN','FEB','MAR','Q1','APR','MAY','JUN','Q2','JUL','AUG','SEP','Q3','OCT','NOV','DEC','Q4','YTD'].forEach(function(k){var r=S2[k];if(!r)return;var qq=/Q|YTD/.test(k),p=P(r[3],r[2]),g=gr(r[3],r[1]);
-    if(!r[2]&&!r[3]&&!r[1]&&!qq)return t.append(h('tr',{},h('td',{},k.charAt(0)+k.slice(1).toLowerCase()),h('td',{colspan:'5',style:'text-align:left;color:var(--muted)'},k==='NOV'||k==='DEC'?'Target not on this sheet yet':'Not on incentive sheet')));
-    t.append(h('tr',{class:qq?'tot':''},h('td',{},qq?k:k.charAt(0)+k.slice(1).toLowerCase(),r[6]?h('small',{},'BO on target '+r[6]+'/'+r[0]):''),h('td',{},r[2].toFixed(2)),h('td',{},r[3].toFixed(2)),h('td',{class:pcls(p)},pf(p)),h('td',{class:gcls(g)},sg(g)),h('td',{},r[5]?'–'+r[5].toFixed(2):'0')))});
-  app.append(h('div',{class:'card'},h('h3',{},'Month & quarter',h('small',{},'₹ lakh')),h('div',{class:'tbl'},t),h('p',{class:'note'},'Figures exactly as the company SAG sheet (incentive basis). Months not on the sheet are blank. The incentive slab file is awaited – once shared, earned and next-slab amounts will show here.')))}
-
-function rankList(){var L2=[];Object.keys(G.hq).forEach(function(q){var r=G.hq[q].ALL;if(!r)return;var a=r[10];L2.push({q:q,p:P(a[2],a[1]),g:gr(a[2],a[0]),s:a[2],t:a[1]})});return L2.sort(function(a,b){return (b.p||0)-(a.p||0)})}
-function rankOf(k){if(k==='Area Guwahati'){var A=['Guwahati','Jorhat','Siliguri'].map(function(x){var r=(G.area[x]||{}).ALL;return{x:x,p:r?P(r[10][2],r[10][1]):0}}).sort(function(a,b){return b.p-a.p});return (A.findIndex(function(z){return z.x==='Guwahati'})+1)+' of 3 areas'}
-  var r=rankList();return (r.findIndex(function(z){return z.q===k})+1)+' of '+r.length}
-function vRank(app){var r=rankList(),l=h('div',{class:'lst'});
-  r.forEach(function(x,i){var me=HQS.indexOf(x.q)>=0;l.append(h('div',{class:me?'me':''},h('div',{class:'t'},h('b',{},(i+1)+'. '+x.q+(me?' ★':'')),h('span',{class:pcls(x.p)},pf(x.p)+' · Gr '+sg(x.g))),pbar(x.p),h('div',{class:'t',style:'font-size:11.5px;color:var(--muted);margin-top:3px'},h('span',{},L(x.s)+' / '+L(x.t)),h('span',{},(G.bucket[x.q]||[])[5]||''))))});
-  app.append(h('div',{class:'card'},h('h3',{},'Region ranking · YTD perf',h('small',{},'★ = your HQs')),l));
-  var ar=h('div',{class:'lst'});['Guwahati','Jorhat','Siliguri'].forEach(function(x){var R=(G.area[x]||{}).ALL;if(!R)return;var a=R[10],p=P(a[2],a[1]);ar.append(h('div',{class:x==='Guwahati'?'me':''},h('div',{class:'t'},h('b',{},x+' area'),h('span',{class:pcls(p)},pf(p)+' · Gr '+sg(gr(a[2],a[0])))),pbar(p)))});
-  app.append(h('div',{class:'card'},h('h3',{},'Areas in the region'),ar));
-  var t=h('table',{},h('tr',{},h('th',{},'HQ'),h('th',{},"Gr '24"),h('th',{},"Gr '25"),h('th',{},"Gr '26"),h('th',{},'Cat'),h('th',{},'Bucket')));
-  HQS.concat(['Area Guwahati','Region Guwahati']).forEach(function(k){var b=G.bucket[k];if(!b)return;t.append(h('tr',{class:k.indexOf(' ')>0?'tot':''},h('td',{},k.replace(' Guwahati','')),h('td',{class:gcls(b[0])},sg(b[0])),h('td',{class:gcls(b[1])},sg(b[1])),h('td',{class:gcls(b[2])},sg(b[2])),h('td',{},(b[3]||'')+'→'+(b[4]||'')),h('td',{},b[5]||'')))});
-  app.append(h('div',{class:'card'},h('h3',{},'Growth bucket',h('small',{},'company classification')),h('div',{class:'tbl'},t)))}
-
-function vNPD(app){var ps=Object.keys(G.npd||{}),pr=get('np',ps[0]);if(ps.indexOf(pr)<0)pr=ps[0];var D=G.npd[pr]||{};
-  app.append(chips(ps.map(function(x){return[x,x]}),pr,'np','main'));
-  var ms=Object.keys(D.Guwahati||D[Object.keys(D)[0]]||{}).filter(function(m){return m!=='YTD'});
-  var t=h('table',{},h('tr',{},h('th',{},'HQ'),h('th',{},'YTD tgt'),h('th',{},'YTD sale'),h('th',{},'Perf'),h('th',{},'Oct qty')));
-  HQS.concat(['Area Guwahati','Region Guwahati']).forEach(function(k){var r=D[k];if(!r)return;var y=r.YTD||[0,0],p=P(y[1],y[0]);t.append(h('tr',{class:k.indexOf(' ')>0?'tot':''},h('td',{},k.replace(' Guwahati','')),h('td',{},y[0].toFixed(2)),h('td',{},y[1].toFixed(2)),h('td',{class:pcls(p)},pf(p)),h('td',{},(r.OCT||[0,0,0])[2]||0)))});
-  app.append(h('div',{class:'card'},h('h3',{},pr+' · NPD billing',h('small',{},'₹ lakh')),h('div',{class:'tbl'},t)));
-  var hm=h('table',{class:'heat'},h('tr',{},h('th',{},''),ms.map(function(m){return h('th',{style:'text-align:center'},m.charAt(0)+m.slice(1,3).toLowerCase())})));
-  HQS.forEach(function(q){var r=D[q];if(!r)return;hm.append(h('tr',{},h('td',{},q.slice(0,4)),ms.map(function(m){var x=r[m]||[0,0,0],p=P(x[1],x[0]);return h('td',{class:heat(p)},p==null?(x[1]?'✓':'–'):Math.round(p))})))});
-  app.append(h('div',{class:'card'},h('h3',{},'Month by month · perf %'),h('div',{class:'tbl'},hm),h('p',{class:'note'},'NPD = new products: book them at every retailer and stockist; doctors drive repeat.')))}
-
-/* ---------- insights: what is going wrong, and what to do ---------- */
-function insights(){var out=[];
-  HQS.forEach(function(q){var R=G.hq[q].ALL,y=R[10],o=R[9],py=P(y[2],y[1]),po=P(o[2],o[1]),who=CSO[q]==='Vacant'?'Dhubri is vacant – cover through the stockist and your own visits.':'Call '+CSO[q]+'.';
-    var streak=0;for(var i=9;i>=0;i--){if(R[i][1]>0&&R[i][2]<R[i][1])streak++;else break}
-    if(po!=null&&po<90)out.push({s:'bad',w:100-po,t:q+': October at '+pf(po)+' ('+L(o[2]-o[1])+' vs target)',d:(streak>1?streak+' months in a row below target. ':'')+'YTD '+pf(py)+', growth '+sg(gr(y[2],y[0]))+'.',a:who+' Agree a brand-by-brand plan for November with outlet names.'});
-    var B=brands().map(function(b){var r=G.hq[q][b];return{b:b,y:r[10],o:r[9]}}).filter(function(x){return x.y[1]>0.3});
-    B.sort(function(a,b){return (a.y[2]-a.y[1])-(b.y[2]-b.y[1])});
-    B.slice(0,2).forEach(function(x){if(x.y[2]>=x.y[1])return;var p=P(x.y[2],x.y[1]),m=META[x.b]||['',''];out.push({s:p<80?'bad':'mid',w:(x.y[1]-x.y[2]),t:q+' · '+x.b+': YTD '+pf(p)+', short by '+L(x.y[1]-x.y[2]),d:'October '+pf(P(x.o[2],x.o[1]))+'; growth '+sg(gr(x.y[2],x.y[0]))+'.',a:'Push through '+m[1]+'.'})});
-    var cl=(y[3]||0)+(y[4]||0);if(y[2]>0&&cl/y[2]>0.02)out.push({s:'mid',w:cl*5,t:q+': returns '+L(-cl)+' YTD ('+(cl/y[2]*100).toFixed(1)+'% of sale)',d:'Sales return '+L(-(y[3]||0))+', expiry '+L(-(y[4]||0))+'.',a:'Check near-expiry stock at stockists monthly; liquidate before it comes back.'});
-    if(po!=null&&po>=105)out.push({s:'ok',w:1,t:q+': October '+pf(po)+' – target done',d:'Growth vs LY '+sg(gr(o[2],o[0]))+'.',a:'Praise '+(CSO[q]==='Vacant'?'the stockist team':CSO[q])+' in the group; keep the same outlet rhythm in November.'})});
-  var raft=(G.npd||{}).Raft||{};HQS.forEach(function(q){var r=(raft[q]||{}).OCT;if(r&&r[0]>0&&r[1]<r[0])out.push({s:'mid',w:2,t:q+' · Raft (NPD): October '+pf(P(r[1],r[0])),d:r[2]+' bottles billed.',a:'Book Raft at every retailer called; detail to GERD doctors.'})});
-  return out.sort(function(a,b){var o={bad:0,mid:1,ok:2};return o[a.s]-o[b.s]||b.w-a.w})}
-function insCard(x){return h('div',{class:'ins '+x.s},h('b',{},x.t),x.d,h('i',{},'→ '+x.a))}
-function vIns(app){var L2=insights();app.append(h('div',{class:'card'},h('h3',{},'Insights & actions',h('small',{},L2.length+' items · from Oct data')),L2.map(insCard),h('p',{class:'note'},'Red = act today · Amber = watch this week · Green = celebrate. Built from the latest Geo sales file.')))}
-
-/* ---------- route ---------- */
-var VIEWS=[['ov','Overview',vOverview],['hq','HQs',vHQ],['br','Brands',vBrand],['mo','Target months',vMonths],['ins','Insights',vIns],['sag','Incentive (SAG)',vSAG],['rk','Rankings',vRank],['npd','NPD',vNPD]];
-U.routes.geo=function(app){if(!isMgr()){app.append(h('div',{class:'note'},'Performance is for the manager.'));return}
-  load();var box=h('div',{class:'geo'});app.append(box);
-  if(!G){box.append(h('div',{class:'card'},h('h3',{},'Performance'),h('p',{},state==='busy'||state==='idle'?'Loading the latest company sales file…':state==='nokey'?'Tap Sync once – the secure key for performance data arrives with it.':state==='nocrypto'?'This phone browser cannot open the secure file. Please update Chrome / the app.':'Could not load the performance file. Check the internet and tap Sync.')));return}
-  var v=get('v','ov');if(!VIEWS.some(function(x){return x[0]===v}))v='ov';
-  box.append(h('div',{class:'chips main',style:'margin-top:2px'},VIEWS.map(function(x){return h('button',{class:x[0]===v?'on':'',onclick:function(){set('v',x[0])}},x[1])})));
-  var vname=(VIEWS.filter(function(x){return x[0]===v})[0]||[])[1]||'Performance';
-  box.append(h('div',{class:'sharebar'},h('button',{onclick:function(){shareView(vname)}},'📸 Save / Share for WhatsApp'),h('button',{class:'alt',onclick:function(){shareView(vname)}},'⬇️ Download')));
-  box.append(h('p',{class:'note',style:'margin:-4px 0 10px'},'Source: company Geo sales file · '+(G.asOf||'')+' · ₹ in lakh · only you can see this'));
-  try{VIEWS.filter(function(x){return x[0]===v})[0][2](box)}catch(e){box.append(h('div',{class:'note'},'Could not draw this view: '+e.message))}};
-U.geoReady=function(){return !!G};U.geoReset=function(){if(window.__GEO)return;G=null;state='idle'};
-
-/* ============================================================
-   CSO-facing in-depth analysis (own HQ only).
-   Data comes from the per-HQ feed perf_<HQ> in admin.json, which the
-   server delivers ONLY to that HQ's CSO (never other HQs, area or region,
-   and never the encrypted full file / key). Anchored to the incentive (SAG)
-   basis so a CSO's achievement matches what they are paid on, plus the
-   impact brands and every brand for guidance.
-   ============================================================ */
+/* ---------- CSO feed access (own HQ only) ---------- */
 function csoHQ(){try{if(S.viewAs&&S.viewAs.HQ)return S.viewAs.HQ;var ks=Object.keys(S.feeds||{}).filter(function(k){return k.indexOf('perf_')===0});if(ks.length)return (S.feeds[ks[0]]||{}).hq||ks[0].slice(5);}catch(e){}return null}
 function CF(){var hq=csoHQ();if(!hq)return null;var f=(S.feeds||{})['perf_'+hq];return (f&&f.b)?f:null}
-function sagKey(p){if(p==='tm')return MK[MON.length-1];if(p==='YTD')return'YTD';if(QM[p])return p;return MK[p]}
-function impactList(f){var imp=f.impact||['Deca Durabolin','R-Loc','Dexona','Skinlite'];var all=Object.keys(f.b);return imp.filter(function(b){return all.indexOf(b)>=0})}
-function brandOrder(f){var imp=impactList(f),rest=Object.keys(f.b).filter(function(b){return b!=='ALL'&&imp.indexOf(b)<0});return imp.concat(rest)}
-// SAG row = [bo, ly, tgt, sale, gross, ret, boOnTgt]
-function sagHero(hq,p,sag){var perf=sag?P(sag[3],sag[2]):null,g=sag?gr(sag[3],sag[1]):null;
-  return h('div',{class:'hero'},h('div',{class:'k'},'Your incentive basis · SAG'),h('h2',{},hq+' · '+plab(p)),
-    h('div',{class:'hrow'},ring(perf,78),h('div',{},h('div',{class:'big'},sag?L(sag[3]):'—'),h('small',{},'of '+(sag?L(sag[2]):'—')+' target · LY '+(sag?L(sag[1]):'—')),h('small',{},'Growth '+sg(g)+(sag&&sag[4]?' · gross '+L(sag[4]):'')))))}
-function sagKpi(sag){var perf=P(sag[3],sag[2]),g=gr(sag[3],sag[1]);
-  return h('div',{class:'kp'},
-    h('div',{},h('small',{},'Net sale'),h('b',{},L(sag[3]))),h('div',{},h('small',{},'Target'),h('b',{},L(sag[2]))),
-    h('div',{},h('small',{},'Performance'),h('b',{class:pcls(perf)},pf(perf))),h('div',{},h('small',{},'Growth vs LY'),h('b',{class:gcls(g)},sg(g))),
-    h('div',{},h('small',{},'Gross sale'),h('b',{},L(sag[4]||0))),h('div',{},h('small',{},'Gap to target'),h('b',{class:sag[3]>=sag[2]?'up':'dn'},(sag[3]>=sag[2]?'+':'')+L(sag[3]-sag[2]))),
-    h('div',{},h('small',{},'Last year'),h('b',{},L(sag[1]))),h('div',{},h('small',{},'Sales return'),h('b',{},L(-(sag[5]||0)))))}
-function cImpact(f,p){var l=h('div',{class:'lst'});impactList(f).forEach(function(b){var a=agg(f.b[b],p),pp=P(a[2],a[1]),g=gr(a[2],a[0]),hm=hit(f.b[b]),m=META[b]||['',''];
-  l.append(h('div',{},h('div',{class:'t'},h('b',{},b,tag(b)),h('span',{class:pcls(pp)},pf(pp))),pbar(pp),
-    h('div',{class:'t',style:'font-size:11.5px;color:var(--muted);margin-top:4px'},h('span',{},L(a[2])+' / '+L(a[1])),h('span',{},'Gr '+sg(g)+' · ✓ '+hm[0]+'/'+hm[1]+' mo')),
-    m[1]?h('div',{style:'font-size:11px;color:var(--muted);margin-top:2px'},'Push through '+m[1]):''))});
-  return h('div',{class:'card'},h('h3',{},'Impact brands',h('small',{},plab(p))),l,h('p',{class:'note'},'These four brands carry your incentive along with the HQ total above. Line marks 100% of target.'))}
-function cBrandTable(f,p){var order=brandOrder(f),imp=impactList(f),a=agg(f.b.ALL,p),hh=hit(f.b.ALL);
-  var t=h('table',{},h('tr',{},h('th',{},'Brand'),h('th',{},'Target'),h('th',{},'Sale'),h('th',{},'Perf'),h('th',{},'Gr'),h('th',{},'✓ Mo')));
-  order.forEach(function(b){var rows=f.b[b];if(!rows)return;var x=agg(rows,p);if(!(x[1]||x[2]||x[0]))return;var pp=P(x[2],x[1]),g=gr(x[2],x[0]),hm=hit(rows),isI=imp.indexOf(b)>=0,cl=(x[3]||0)+(x[4]||0);
-    var tr=h('tr',{class:isI?'me':'',style:'cursor:pointer',onclick:function(){var n=tr.nextSibling;if(n&&n.classList&&n.classList.contains('xp')){n.remove();return}
-      var d=h('tr',{class:'xp'},h('td',{colspan:'6',style:'text-align:left;white-space:normal;background:var(--soft2)'},h('div',{style:'display:flex;gap:10px;align-items:center'},spark(rows),h('small',{style:'font-size:11px'},'Perf by month, Jan–Oct (dashed = 100%). '+(META[b]?'Channels: '+META[b][1]+'.':'')+(cl?' Returns '+L(-cl)+'.':'')))));tr.after(d)}},
-      h('td',{},h('b',{},(isI?'★ ':'')+b),tag(b),h('small',{},'LY '+L(x[0]))),h('td',{},L(x[1]).replace(' L','')),h('td',{},L(x[2]).replace(' L','')),h('td',{class:pcls(pp)},pf(pp)),h('td',{class:gcls(g)},sg(g)),h('td',{},hm[0]+'/'+hm[1]));t.append(tr)});
-  t.append(h('tr',{class:'tot'},h('td',{},'All brands'),h('td',{},L(a[1]).replace(' L','')),h('td',{},L(a[2]).replace(' L','')),h('td',{class:pcls(P(a[2],a[1]))},pf(P(a[2],a[1]))),h('td',{class:gcls(gr(a[2],a[0]))},sg(gr(a[2],a[0]))),h('td',{},hh[0]+'/'+hh[1])));
-  return h('div',{class:'card'},h('h3',{},'Every brand',h('small',{},'★ impact · ₹ lakh · tap a brand')),h('div',{class:'tbl'},t),h('p',{class:'note'},'✓ Mo = months in Jan–Oct where you hit the brand target. This is product-wise sale; your incentive total is the SAG figure at the top.'))}
-function cMonths(f){var order=brandOrder(f),imp=impactList(f);
-  var t=h('table',{class:'heat'},h('tr',{},h('th',{},''),MON.map(function(m){return h('th',{style:'text-align:center'},m[0]+m[1])}),h('th',{style:'text-align:center'},'✓')));
-  ['ALL'].concat(order).forEach(function(b){var R=f.b[b];if(!R)return;var hm=hit(R),isA=b==='ALL';
-    t.append(h('tr',{class:isA?'me':''},h('td',{},isA?'All':(imp.indexOf(b)>=0?'★ ':'')+b.slice(0,8)),R.slice(0,10).map(function(r){var p=P(r[2],r[1]);return h('td',{class:heat(p)},p==null?'–':Math.round(p))}),h('td',{},h('b',{},hm[0]+'/'+hm[1]))))});
-  var c=h('div',{class:'card'},h('h3',{},'Target done – month by month',h('small',{},'perf %')),h('div',{class:'tbl'},t),
-    h('div',{class:'leg'},h('span',{style:'--c:#1B8A5A'},'≥105%'),h('span',{style:'--c:#7CC59A'},'100–104%'),h('span',{style:'--c:#F6D776'},'90–99%'),h('span',{style:'--c:#F4A261'},'80–89%'),h('span',{style:'--c:#E5484D'},'<80%')));
-  // growth heatmap
-  function gcell(v){var cls=v==null?'h0':v>=15?'h5':v>=0?'h4':v>=-10?'h3':v>=-25?'h2':'h1';return h('td',{class:cls},v==null?'–':(v>0?'+':'')+Math.round(v))}
-  var gt=h('table',{class:'heat'},h('tr',{},h('th',{},''),MON.map(function(m){return h('th',{style:'text-align:center'},m[0]+m[1])}),h('th',{style:'text-align:center'},'YTD')));
-  ['ALL'].concat(order).forEach(function(b){var R=f.b[b];if(!R)return;var y=R[10],gy=gr(y[2],y[0]),isA=b==='ALL';
-    gt.append(h('tr',{class:isA?'me':''},h('td',{},isA?'All':(imp.indexOf(b)>=0?'★ ':'')+b.slice(0,8)),R.slice(0,10).map(function(r){return gcell(gr(r[2],r[0]))}),h('td',{},h('b',{class:gcls(gy)},sg(gy)))))});
-  var c2=h('div',{class:'card'},h('h3',{},'Growth vs last year – month by month',h('small',{},'%')),h('div',{class:'tbl'},gt),
-    h('div',{class:'leg'},h('span',{style:'--c:#1B8A5A'},'+15% & up'),h('span',{style:'--c:#7CC59A'},'0 to +15%'),h('span',{style:'--c:#F6D776'},'0 to −10%'),h('span',{style:'--c:#F4A261'},'−10 to −25%'),h('span',{style:'--c:#E5484D'},'below −25%')));
-  return [c,c2]}
-function cSAGtable(f){var S2=f.sag||{};
-  var t=h('table',{},h('tr',{},h('th',{},'Period'),h('th',{},'Target'),h('th',{},'Sale'),h('th',{},'Perf'),h('th',{},'Gr'),h('th',{},'Return')));
-  ['JAN','FEB','MAR','Q1','APR','MAY','JUN','Q2','JUL','AUG','SEP','Q3','OCT','NOV','DEC','Q4','YTD'].forEach(function(k){var r=S2[k];if(!r)return;var qq=/Q|YTD/.test(k),p=P(r[3],r[2]),g=gr(r[3],r[1]);
-    if(!r[2]&&!r[3]&&!r[1]&&!qq)return t.append(h('tr',{},h('td',{},k.charAt(0)+k.slice(1).toLowerCase()),h('td',{colspan:'5',style:'text-align:left;color:var(--muted)'},k==='NOV'||k==='DEC'?'Target not on this sheet yet':'Not on incentive sheet')));
-    t.append(h('tr',{class:qq?'tot':''},h('td',{},qq?k:k.charAt(0)+k.slice(1).toLowerCase()),h('td',{},(r[2]||0).toFixed(2)),h('td',{},(r[3]||0).toFixed(2)),h('td',{class:pcls(p)},pf(p)),h('td',{class:gcls(g)},sg(g)),h('td',{},r[5]?'–'+r[5].toFixed(2):'0')))});
-  return h('div',{class:'card'},h('h3',{},'Incentive sheet · month & quarter',h('small',{},'₹ lakh')),h('div',{class:'tbl'},t),h('p',{class:'note'},'Exactly as the company SAG sheet your incentive is calculated on. Blank months are not on the sheet. The slab (₹ earned) shows here once Ratan shares it.'))}
-var CVIEWS=[['ov','Overview'],['br','Brands'],['mo','Months'],['sag','Incentive']];
-U.csoPerf=function(app){var box=h('div',{class:'geo cso'});app.append(box);var f=CF();
-  if(!f){box.append(h('div',{class:'card'},h('h3',{},'My brand analysis'),h('p',{class:'note'},'Your brand-wise figures appear right after a Sync. Tap Sync once and open this again.')));return}
-  var hq=f.hq||csoHQ(),p=per(),cv=get('cv','ov');if(!CVIEWS.some(function(x){return x[0]===cv}))cv='ov';
-  box.append(h('div',{class:'chips main',style:'margin-top:2px'},CVIEWS.map(function(x){return h('button',{class:x[0]===cv?'on':'',onclick:function(){set('cv',x[0])}},x[1])})));
-  box.append(h('p',{class:'note',style:'margin:-4px 0 10px'},hq+' HQ · from the company incentive (SAG) sheet · '+(f.asOf||'')+' · ₹ in lakh'));
-  var sk=sagKey(p),sag=(f.sag||{})[sk]||null;
-  if(cv==='ov'){box.append(periodChips(p),sagHero(hq,p,sag));
-    box.append(h('div',{class:'card'},h('h3',{},'Your incentive numbers',h('small',{},plab(p))),sag?sagKpi(sag):h('p',{class:'note'},'Not on the incentive sheet for this period.')));
-    box.append(cImpact(f,p));
-    box.append(chart(f.b.ALL,hq+' · target vs sale (all brands)'));}
-  else if(cv==='br'){box.append(periodChips(p),cBrandTable(f,p));}
-  else if(cv==='mo'){cMonths(f).forEach(function(c){box.append(c)});}
-  else if(cv==='sag'){box.append(cSAGtable(f));
-    box.append(h('div',{class:'card'},h('h3',{},'How your incentive is read'),h('p',{class:'note',style:'margin:0'},'Incentive = your HQ total (SAG) performance and growth, plus the four impact brands (Deca, R-Loc, Skinlite, Dexona) against their targets. Everything on this screen is from the same incentive sheet, so what you see is what you are measured and paid on.')));}}
+
+/* ---------- period model ---------- */
+function defQ(){return 'Q'+Math.ceil((lastMonth()+1)/3)}
+function curP(){var pt=get('pt','ytd');if(pt==='ytd')return'YTD';if(pt==='qt')return get('qq',defQ());var m=get('mm',lastMonth());return /^\d+$/.test(String(m))?+m:lastMonth()}
+function sagKeyOf(p){if(p==='YTD')return'YTD';if(/^Q/.test(String(p)))return p;return MK[p]}
+function periodTabs(){var pt=get('pt','ytd');
+  var box=h('div',{},h('div',{class:'seg2'},[['mo','Monthly'],['qt','Quarterly'],['ytd','YTD']].map(function(x){return h('button',{class:x[0]===pt?'on':'',onclick:function(){set('pt',x[0])}},x[1])})));
+  if(pt==='mo'){var mm=get('mm',lastMonth());box.append(chips(MON.map(function(m,i){return[i,m]}).reverse(),mm,'mm'))}
+  if(pt==='qt'){var qq=get('qq',defQ());box.append(chips([['Q4','Q4'],['Q3','Q3'],['Q2','Q2'],['Q1','Q1']],qq,'qq'))}
+  return box}
+
+/* ---------- data adapter: one shape for manager and CSO ---------- */
+function mkDA(forceCSO){
+  if(!forceCSO&&G){var sc=get('sc','Area');
+    return {isMgr:true,asOf:G.asOf,scope:sc,
+      scopes:[['Area','Area']].concat(['Agartala','Bongaigaon','Dhubri','Guwahati'].map(function(q){return[q,q]})),
+      title:sc==='Area'?'Guwahati Area':sc,sub:sc==='Area'?'4 HQs':(CSO[sc]||''),
+      HQS:['Agartala','Bongaigaon','Dhubri','Guwahati'],
+      allBrands:function(){return brands()},
+      impact:IMPACT.filter(function(b){return (G.hq.Guwahati||{})[b]||rowsOf(sc,b)}),
+      rows:function(brand){return rowsOf(sc,brand)},
+      hqRows:function(q,brand){return (G.hq[q]||{})[brand]},
+      sag:function(){return G.sag[sc==='Area'?'Area Guwahati':sc]||{}},
+      bucket:function(){return G.bucket[sc==='Area'?'Area Guwahati':sc]||[]},
+      onhold:function(q){return ((S.feeds||{})['perf_'+(q||sc)]||{}).onhold||null},
+      npdProducts:function(){return Object.keys(G.npd||{})},
+      npd:function(prod){return (G.npd[prod]||{})[sc==='Area'?'Area Guwahati':sc]||{}}};
+  }
+  var f=CF();if(!f)return null;var hq=f.hq;
+  return {isMgr:false,asOf:f.asOf,scope:hq,scopes:[[hq,hq]],title:hq,sub:CSO[hq]||'',HQS:[hq],
+    allBrands:function(){return Object.keys(f.b).filter(function(b){return b!=='ALL'})},
+    impact:(f.impact||IMPACT).filter(function(b){return f.b[b]}),
+    rows:function(brand){return f.b[brand||'ALL']},
+    hqRows:function(q,brand){return q===hq?f.b[brand]:null},
+    sag:function(){return f.sag||{}},
+    bucket:function(){return f.bucket||[]},
+    onhold:function(){return f.onhold||null},
+    npdProducts:function(){return Object.keys(f.npd||{})},
+    npd:function(prod){return (f.npd||{})[prod]||{}}};
+}
+
+/* ---------- small building blocks ---------- */
+function kgrid(pairs){return h('div',{class:'kp'},pairs.map(function(x){return h('div',{},h('small',{},x[0]),h('b',{class:x[2]||''},x[1]))}))}
+function hero(k,title,a,note){var p=P(a[2],a[1]),g=gr(a[2],a[0]);
+  return h('div',{class:'hero'},h('div',{class:'k'},k),h('h2',{},title),h('div',{class:'hrow'},ring(p,76),h('div',{},h('div',{class:'big'},L(a[2])),h('small',{},'of '+L(a[1])+' target · LY '+L(a[0])),h('small',{},'Growth '+sg(g)+(note?' · '+note:'')))))}
+function scopeChips(DA){return DA.scopes.length>1?chips(DA.scopes,DA.scope,'sc','main'):''}
+
+/* ---------- Performance ---------- */
+function vPerf(app,DA){
+  app.append(scopeChips(DA));
+  var md=get('md','nm');
+  app.append(h('div',{class:'seg2'},[['nm','Normal'],['ip','Incentive basis']].map(function(x){return h('button',{class:x[0]===md?'on':'',onclick:function(){set('md',x[0])}},x[1])})));
+  app.append(periodTabs());
+  var p=curP();
+  if(md==='nm')perfNormal(app,DA,p);else perfInc(app,DA,p);
+}
+function perfNormal(app,DA,p){var R=DA.rows('ALL'),a=agg(R,p),hh=hit(R),bk=DA.bucket();
+  app.append(hero('Performance · '+plab(p),DA.title+(DA.sub?' · '+DA.sub:''),a,'target done '+hh[0]+'/'+hh[1]+' mo'));
+  app.append(h('div',{class:'card'},h('h3',{},'Key numbers',h('small',{},plab(p))),kgrid([
+    ['Sale (net)',L(a[2])],['Target',L(a[1])],
+    ['Performance',pf(P(a[2],a[1])),pcls(P(a[2],a[1]))],['Growth vs LY',sg(gr(a[2],a[0])),gcls(gr(a[2],a[0]))],
+    ['Gap to target',(a[2]>=a[1]?'+':'')+L(a[2]-a[1]),a[2]>=a[1]?'up':'dn'],['Returns',L(-((a[3]||0)+(a[4]||0)))]])));
+  // brand table (compact, by target)
+  var B=DA.allBrands().map(function(b){var r=DA.rows(b);return[b,r,agg(r,p)]}).filter(function(x){return x[2]&&(x[2][1]||x[2][2])}).sort(function(x,y){return y[2][1]-x[2][1]});
+  var t=h('table',{},h('tr',{},h('th',{},'Brand'),h('th',{},'Target'),h('th',{},'Sale'),h('th',{},'Perf'),h('th',{},'Gr')));
+  B.forEach(function(x){var pp=P(x[2][2],x[2][1]),gg=gr(x[2][2],x[2][0]);t.append(h('tr',{},h('td',{},h('b',{},x[0]),tag(x[0])),h('td',{},L(x[2][1]).replace(' L','')),h('td',{},L(x[2][2]).replace(' L','')),h('td',{class:pcls(pp)},pf(pp)),h('td',{class:gcls(gg)},sg(gg))))});
+  t.append(h('tr',{class:'tot'},h('td',{},'All brands'),h('td',{},L(a[1]).replace(' L','')),h('td',{},L(a[2]).replace(' L','')),h('td',{class:pcls(P(a[2],a[1]))},pf(P(a[2],a[1]))),h('td',{class:gcls(gr(a[2],a[0]))},sg(gr(a[2],a[0])))));
+  app.append(h('div',{class:'card'},h('h3',{},'Brand-wise',h('small',{},'₹ lakh')),h('div',{class:'tbl'},t)));
+  app.append(chart(R,DA.title+' · month by month'));
+  // insights folded in (compact)
+  var ins=focusLines(DA).slice(0,3);if(ins.length)app.append(h('div',{class:'card'},h('h3',{},'What needs attention',h('small',{},'now')),ins.map(function(x){return h('div',{class:'push'+(x.hot?' hot':'')},h('b',{},x.t),x.d)})));
+}
+function perfInc(app,DA,p){var R=DA.rows('ALL'),a=agg(R,p),net=a[2],tgt=a[1],ly=a[0],sret=a[3]||0,gross=net+sret+(a[4]||0),
+  ach=P(net,tgt),g=gr(net,ly),isQ=/Q/.test(String(p)),pcpm=isQ?net/3:(p==='YTD'?net/10:net),retpc=gross?sret/gross*100:0,bi=band(ach),si=slabIdx(pcpm),
+  rate=bi<0?null:(isQ?RATE_Q:RATE_M)[si][bi];
+  app.append(h('div',{class:'hero'},h('div',{class:'k'},'Incentive basis · '+plab(p)),h('h2',{},DA.title+(DA.sub?' · '+DA.sub:'')),h('div',{class:'hrow'},ring(ach,76),h('div',{},h('div',{class:'big'},L(net)),h('small',{},'of '+L(tgt)+' target · LY '+L(ly)),h('small',{},'Growth '+sg(g)+' · '+(isQ?'quarterly':'monthly')+' rate '+(rate==null?'—':rate+'%'))))));
+  app.append(h('div',{class:'card'},h('h3',{},'What decides your incentive',h('small',{},plab(p))),kgrid([
+    ['Net sale',L(net)],['Target',L(tgt)],
+    ['Achievement',pf(ach),pcls(ach)],['Growth',sg(g),gcls(g)],
+    ['PCPM',L(pcpm),pcpm>=10?'up':''],['Rate band',rate==null?'—':rate+'%',rate==null?'dn':'up'],
+    ['Saleable returns',retpc.toFixed(1)+'%',retpc<=3?'up':'dn'],['Status',bi<0?'Below 97%':(g<=0?'Growth −':'Eligible'),bi<0||g<=0?'dn':'up']]),
+    h('p',{class:'note'},'Incentive needs ≥97% achievement, positive growth and saleable returns ≤3%. Higher achievement and the right PCPM slab lift the rate.')));
+  // product-wise period ladder (the Sales-at-a-Glance basis the circular uses)
+  var t=h('table',{},h('tr',{},h('th',{},'Period'),h('th',{},'Target'),h('th',{},'Net'),h('th',{},'Ach'),h('th',{},'Gr')));
+  [['Q1','Q1'],['Q2','Q2'],['Q3','Q3'],['Q4','Q4 (Oct)'],['YTD','YTD']].forEach(function(kk){var x=agg(R,kk[0]);if(!x||(!x[1]&&!x[2]))return;var pp=P(x[2],x[1]),gg=gr(x[2],x[0]);
+    t.append(h('tr',{class:'tot'},h('td',{},kk[1]),h('td',{},L(x[1]).replace(' L','')),h('td',{},L(x[2]).replace(' L','')),h('td',{class:pcls(pp)},pf(pp)),h('td',{class:gcls(gg)},sg(gg))))});
+  app.append(h('div',{class:'card'},h('h3',{},'Quarter & YTD',h('small',{},'₹ lakh · Sales at a Glance')),h('div',{class:'tbl'},t)));
+}
+
+/* ---------- Impact Brands ---------- */
+function vImpact(app,DA){app.append(scopeChips(DA),periodTabs());var p=curP();
+  var head=agg(DA.impact.map(function(b){return DA.rows(b)}).reduce(function(acc,r){if(!r)return acc;for(var i=0;i<11;i++){acc[i]=acc[i]||[0,0,0,0,0,0];for(var k=0;k<5;k++)acc[i][k]+=r[i][k]}return acc},[]),p);
+  app.append(h('div',{class:'hero'},h('div',{class:'k'},'Impact brands · '+plab(p)),h('h2',{},DA.title+' · 4 brands'),h('div',{class:'hrow'},ring(P(head[2],head[1]),76),h('div',{},h('div',{class:'big'},L(head[2])),h('small',{},'of '+L(head[1])+' target · LY '+L(head[0])),h('small',{},'Growth '+sg(gr(head[2],head[0]))+' · these carry your incentive')))));
+  DA.impact.forEach(function(b){var R=DA.rows(b);if(!R)return;var a=agg(R,p),pp=P(a[2],a[1]),gg=gr(a[2],a[0]),m=META[b]||['',''],hm=hit(R);
+    var card=h('div',{class:'impc'},miniRing(pp),h('div',{class:'meta'},h('b',{},b,tag(b)),h('div',{style:'margin:5px 0 4px'},pbar(pp)),h('div',{style:'display:flex;justify-content:space-between;font-size:12px;font-variant-numeric:tabular-nums'},h('span',{},L(a[2])+' / '+L(a[1])),h('span',{class:gcls(gg)},'Gr '+sg(gg))),h('small',{},'✓ '+hm[0]+'/'+hm[1]+' mo · '+(m[1]||''))));
+    app.append(card);
+    if(DA.isMgr){var l=h('div',{class:'card',style:'margin-top:-4px'},h('h3',{style:'font-size:13px'},b+' · by HQ',h('small',{},plab(p))));DA.HQS.forEach(function(q){var r=DA.hqRows(q,b);if(!r)return;var x=agg(r,p),qp=P(x[2],x[1]);l.append(h('div',{style:'display:flex;align-items:center;gap:8px;margin:5px 0'},h('span',{style:'width:66px;font-size:12px;font-weight:700'},q.slice(0,8)),h('div',{style:'flex:1'},pbar(qp)),h('span',{class:pcls(qp),style:'width:42px;text-align:right;font-size:12px'},pf(qp))))});app.append(l)}
+  });
+}
+
+/* ---------- Incentive scheme engine (Rise & Shine 2026) ----------
+   Incentive is read from the Productwise "Sales at a Glance" numbers.
+   Net = gross − claims. Achievement = net ÷ target. Growth = net ÷ LY − 1.
+   PCPM = net ÷ months ÷ 1 BO. Needs ≥97% + positive growth + saleable returns ≤3%. */
+var RATE_M=[[.5,.7,.9],[.45,.65,.85],[.4,.6,.8],[.35,.55,.75],[.3,.5,.7]];
+var RATE_Q=[[.3,1.0,1.4],[.25,.9,1.3],[.2,.8,1.2],[.15,.7,1.1],[.1,.6,1.0]];
+function slabIdx(p){return p<5?0:p<10?1:p<20?2:p<30?3:4}
+function band(a){return a==null?-1:a>=110?2:a>=100?1:a>=97?0:-1}
+function R(v){v=Math.round(v||0);return '₹'+v.toLocaleString('en-IN')}
+function earnOf(a,kind){ // a=[ly,tgt,net,...]; kind 'm'|'q'; returns {amt,rate,ach,g,pcpm,locked,why}
+  var net=a[2],tgt=a[1],ly=a[0],ach=P(net,tgt),g=gr(net,ly),pcpm=kind==='q'?net/3:net,bi=band(ach),si=slabIdx(pcpm);
+  if(bi<0)return{amt:0,rate:0,ach:ach,g:g,pcpm:pcpm,locked:true,why:'below 97%'};
+  if(g<=0)return{amt:0,rate:0,ach:ach,g:g,pcpm:pcpm,locked:true,why:'growth not positive'};
+  var rate=(kind==='q'?RATE_Q:RATE_M)[si][bi];return{amt:net*1e5*rate/100,rate:rate,ach:ach,g:g,pcpm:pcpm,locked:false};}
+function nextBand(a,kind){ // what net lifts to the next achievement band, and the extra ₹
+  var net=a[2],tgt=a[1],ach=P(net,tgt),tgt2=ach<97?tgt*0.97:ach<100?tgt:ach<110?tgt*1.1:null;
+  if(tgt2==null)return null;var need=Math.max(0,tgt2-net);return{need:need,at:ach<97?97:ach<100?100:110}}
+function impactGate(DA,p){var ct=0,cs=0,weak=[];DA.impact.forEach(function(b){var a=agg(DA.rows(b),p);if(!a)return;ct+=a[1];cs+=a[2];var ap=P(a[2],a[1]);if(ap==null||ap<90)weak.push({b:b,p:ap,gap:Math.max(0,a[1]*0.9-a[2])})});
+  var comb=P(cs,ct);return{comb:comb,weak:weak,ok:weak.length===0&&comb>=97}}
+
+/* ---------- Incentive (the money tab) ---------- */
+function vInc(app,DA){
+  if(DA.isMgr&&DA.scope==='Area'){app.append(scopeChips(DA));
+    app.append(h('p',{class:'note',style:'margin:0 0 8px'},'Earned so far (paid only when that HQ closes October at 100%). Tap an HQ for the full breakdown. Zone total is deliberately not shown.'));
+    DA.HQS.forEach(function(q){if(q==='Dhubri')return;var oh=DA.onhold(q)||{q3:0,sept:0},tot=(oh.q3||0)+(oh.sept||0);var R2=(G.hq[q]||{}).ALL,o=R2?R2[9]:null,oa=o?P(o[2],o[1]):null,open=oa!=null&&oa>=100;
+      app.append(h('div',{class:'impc',onclick:(function(qq){return function(){set('sc',qq)}})(q),style:'cursor:pointer'},
+        h('div',{class:'meta'},h('b',{},q+' · '+(CSO[q]||'')),h('div',{style:'display:flex;justify-content:space-between;font-size:12.5px;margin-top:4px'},h('span',{},'Earned '+R(tot)),h('span',{class:'pill '+(open?'up':'dn')},'Oct '+pf(oa)+(open?' ✓':''))),h('small',{style:'display:block;margin-top:3px;color:var(--muted)'},open?'October target met — earned amount is payable':tot>0?'Needs October 100% to release':'No held amount this cycle')),h('span',{class:'st',style:'align-self:center'},'›')))});
+    return;}
+  app.append(scopeChips(DA));var hq=DA.scope,oh=DA.onhold(hq)||{q3:0,sept:0},tot=(oh.q3||0)+(oh.sept||0);
+  var R2=DA.rows('ALL'),o=agg(R2,9),oa=P(o[2],o[1]),octOpen=oa!=null&&oa>=100,gapOct=Math.max(0,o[1]-o[2]);
+  // MONEY HERO — their own earned
+  app.append(h('div',{class:'money'},h('div',{class:'k'},'💰 Earned so far · Q3 + September'),h('h2',{},R(tot)),
+    h('p',{},tot>0?(octOpen?'October target met ('+pf(oa)+') — this is now payable. Keep it rolling!':'This is yours the moment October closes at 100%.'):'Cross your targets this cycle and real money starts stacking here.')));
+  // October gate
+  app.append(h('div',{class:'push'+(octOpen?'':' hot')},h('b',{},octOpen?'✓ October secured — '+pf(oa):'October decides your earned money'),
+    octOpen?('You closed October at '+pf(oa)+'. '+(tot>0?R(tot)+' is released.':'Momentum is on your side — push the next slab.')):('October is at '+pf(oa)+'. Reaching 100% releases '+R(tot)+'. Balance '+L(gapOct)+' — every order counts.')));
+  // live earning estimates
+  var me=earnOf(o,'m'),q4=earnOf(agg(R2,'Q4'),'q'),q3=earnOf(agg(R2,'Q3'),'q');
+  app.append(h('div',{class:'earn'},
+    eCard('🗓️','October (est.)',me.locked?'—':R(me.amt),me.locked?'unlocks at 97% + growth':'at '+me.rate+'% · '+pf(me.ach),me.locked?'dn':'up'),
+    eCard('📦','Q3 earned',R(oh.q3),q3.locked?'held / on review':'logged',oh.q3>0?'up':'dn'),
+    eCard('🎯','To 100% (Oct)',gapOct>0?L(gapOct):'Done ✓',gapOct>0?'sell this much more':'bonus territory',gapOct>0?'dn':'up'),
+    eCard('📈','Oct growth',sg(me.g),me.g>0?'positive ✓ (needed)':'must be positive',me.g>0?'up':'dn')));
+  // milestone ladder for October
+  app.append(mileBar(o[1],o[2]));
+  // qualify in November + Q4 bonus
+  var nb=nextBand(o,'m');
+  app.append(h('div',{class:'push hot'},h('b',{},'Win November'),'A clean month ahead. Hit 100% of November to keep the chain alive and release what you earn.'+(nb&&nb.need>0?' Just '+L(nb.need)+' net takes October past '+nb.at+'% — about '+L(nb.need/2)+'/day in the last days.':'')));
+  // impact brand bonus gate (YTD standing — stable; bonus applies quarterly)
+  var ig=impactGate(DA,'YTD');
+  var ic=h('div',{class:'card'},h('h3',{},'⭐ Impact-brand bonus',h('small',{},'+25% · YTD standing')));
+  ic.append(h('p',{class:'note',style:'margin:0 0 8px'},'The quarter pays +25% extra when overall is ≥100% and all four impact brands are ≥90% (combined ≥97%). '+(ig.ok?'All four are above 90% — protect the lead!':'Close the gaps below to unlock it.')));
+  DA.impact.forEach(function(b){var a=agg(DA.rows(b),'YTD'),pp=P(a[2],a[1]),gap=Math.max(0,a[1]*0.9-a[2]),plab2=pp==null?'—':pp>200?'200%+':Math.round(pp)+'%';
+    ic.append(h('div',{style:'padding:7px 0;border-bottom:1px solid var(--line,#eef2f1)'},h('div',{style:'display:flex;justify-content:space-between;font-size:13px'},h('b',{},b),h('span',{class:'pill '+(pp>=90?'up':pp>=70?'md':'dn')},plab2)),pbar(pp),gap>0?h('small',{style:'display:block;color:var(--muted);margin-top:3px;font-size:11.5px'},'Sell '+L(gap)+' more to cross 90%'):h('small',{style:'display:block;color:var(--ok);margin-top:3px;font-size:11.5px'},'✓ above 90%')));});
+  app.append(ic);
+  // the rules (short, educational)
+  app.append(h('div',{class:'card'},h('h3',{},'How to never leave money behind'),h('div',{class:'lst'},
+    [['🎯','Cross 97%, aim 100%/110% — each slab pays a higher %.'],['⭐','Every impact brand ≥90% — one weak brand cancels the 25% bonus.'],['📅','Reach 40% of the month target by the 17th for the milestone bonus.'],['📈','Positive growth is a must — no growth, no incentive.'],['↩️','Keep saleable returns under 3%; book expiry after close.'],['🔓','Earned money pays only when the next month hits 100%.']].map(function(x){return h('div',{style:'display:flex;gap:10px;padding:7px 0;font-size:13px'},h('span',{},x[0]),h('span',{},x[1]))}))));
+  app.append(h('p',{class:'note'},'Estimates use the company Sales-at-a-Glance figures and the Rise & Shine 2026 slabs. Final amounts depend on coverage, returns and outstanding-dues rules.'));
+}
+function eCard(ic,hd,big,sub,cls){return h('div',{},h('div',{class:'hd'},ic+' '+hd),h('b',{class:cls||''},big),h('small',{},sub))}
+function mileBar(tgt,sale){var pct=tgt?sale/tgt*100:0,w=Math.min(100,pct/1.1*100);
+  return h('div',{class:'mile',style:'margin:2px 0 12px'},h('div',{class:'track'},h('div',{class:'fill',style:'width:'+w+'%'}),[90,100,105,110].map(function(m){return h('div',{class:'mk',style:'left:'+(m/1.1)+'%'})}),h('div',{class:'lbl',style:'left:'+Math.min(90,w)+'%'},Math.round(pct)+'%')),
+    h('div',{style:'display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-weight:700;margin-top:3px'},h('span',{},'90%'),h('span',{},'100%'),h('span',{},'105%'),h('span',{},'110%')))}
+
+/* ---------- NPDs ---------- */
+function vNPD(app,DA){app.append(scopeChips(DA),periodTabs());var p=curP();var ps=DA.npdProducts();
+  if(!ps.length){app.append(h('div',{class:'note'},'No NPD data for this HQ yet.'));return}
+  ps.forEach(function(prod){var D=DA.npd(prod);if(!D||!Object.keys(D).length)return;
+    var sk=sagKeyOf(p),row=D[sk]||D.YTD||[0,0,0];var tg=row[0]||0,sa=row[1]||0,qty=row[2]||0,pp=P(sa,tg);
+    app.append(h('div',{class:'impc'},miniRing(pp),h('div',{class:'meta'},h('b',{},prod),h('div',{style:'margin:5px 0 4px'},pbar(pp)),h('div',{style:'display:flex;justify-content:space-between;font-size:12px;font-variant-numeric:tabular-nums'},h('span',{},L(sa)+' / '+L(tg)),h('span',{},qty?qty+' units':'')),h('small',{},plab(p)))));
+  });
+  // month heatmap of NPD perf
+  var prod0=ps[0],D0=DA.npd(prod0),ms=Object.keys(D0).filter(function(m){return m!=='YTD'});
+  if(DA.isMgr){var hm=h('table',{class:'heat'},h('tr',{},h('th',{},''),ms.map(function(m){return h('th',{style:'text-align:center'},m.charAt(0)+m.slice(1,3).toLowerCase())})));
+    ps.forEach(function(prod){var D=DA.npd(prod);hm.append(h('tr',{},h('td',{},prod.slice(0,8)),ms.map(function(m){var x=D[m]||[0,0,0],pp=P(x[1],x[0]);return h('td',{class:heat(pp)},pp==null?(x[1]?'✓':'–'):Math.round(pp))})))});
+    app.append(h('div',{class:'card'},h('h3',{},'NPD · month by month',h('small',{},'perf %')),h('div',{class:'tbl'},hm)));}
+  app.append(h('p',{class:'note'},'NPD = new products. Book them at every retailer and stockist; doctors drive the repeat.'));
+}
+
+/* ---------- focus lines (compact insights, both roles) ---------- */
+function focusLines(DA){var out=[];var scopes=DA.isMgr?DA.HQS:[DA.scope];
+  scopes.forEach(function(q){var R=DA.isMgr?DA.hqRows(q,'ALL'):DA.rows('ALL');if(!R)return;var o=R[9],po=P(o[2],o[1]);
+    if(po!=null&&po<90)out.push({hot:true,t:(DA.isMgr?q+': ':'')+'October '+pf(po),d:'Short by '+L(o[1]-o[2])+' in October — the fastest win is here.'});
+    var brs=(DA.isMgr?DA.HQS&&Object.keys((G.hq[q]||{})):DA.allBrands());
+  });
+  // brand-level biggest YTD shortfalls for current scope
+  DA.allBrands().map(function(b){var a=agg(DA.rows(b),'YTD');return{b:b,gap:a?a[1]-a[2]:0,p:a?P(a[2],a[1]):null}}).filter(function(x){return x.gap>0.3}).sort(function(a,b){return b.gap-a.gap}).slice(0,3).forEach(function(x){
+    out.push({t:x.b+': '+pf(x.p)+' YTD',d:'₹'+x.gap.toFixed(2)+' L short — push '+( (META[x.b]||['',''])[1]||'the channel')+'.'})});
+  return out}
+
+/* ---------- shell: tabbar + render both roles ---------- */
+function tabbar(T0){return h('div',{class:'tabbar'},[['perf','📊 Performance'],['imp','⭐ Impact Brands'],['inc','💰 Incentive'],['npd','🧪 NPDs']].map(function(x){return h('button',{class:x[0]===T0?'on':'',onclick:function(){set('T',x[0])}},x[1])}))}
+function renderReports(app,DA){var box=h('div',{class:'geo cso'});app.append(box);
+  var T0=get('T','perf');
+  box.append(tabbar(T0));
+  var names={perf:'Performance',imp:'Impact Brands',inc:'Incentive',npd:'NPDs'};
+  if(DA.isMgr)box.append(h('div',{class:'sharebar'},h('button',{onclick:function(){shareView(names[T0])}},'📸 Save / Share for WhatsApp'),h('button',{class:'alt',onclick:function(){shareView(names[T0])}},'⬇️ Download')));
+  box.append(h('p',{class:'note',style:'margin:-2px 0 10px'},DA.title+(DA.isMgr?'':' HQ')+' · company incentive & sales data · '+(DA.asOf||'')+' · ₹ in lakh'+(DA.isMgr?' · only you can see this':'')));
+  try{(T0==='perf'?vPerf:T0==='imp'?vImpact:T0==='inc'?vInc:vNPD)(box,DA)}catch(e){box.append(h('div',{class:'note'},'Could not draw this view: '+e.message))}
+}
+
+U.routes.geo=function(app){if(!isMgr()){app.append(h('div',{class:'note'},'Performance is for the manager.'));return}
+  load();if(!G){app.append(h('div',{class:'geo'},h('div',{class:'card'},h('h3',{},'Reports'),h('p',{},state==='busy'||state==='idle'?'Loading the latest company data…':state==='nokey'?'Tap Sync once — the secure key arrives with it.':state==='nocrypto'?'This browser cannot open the secure file. Please update Chrome / the app.':'Could not load. Check the internet and tap Sync.'))));return}
+  renderReports(app,mkDA(false));};
+U.csoPerf=function(app){var DA=mkDA(true);if(!DA){app.append(h('div',{class:'geo'},h('div',{class:'card'},h('h3',{},'My Reports'),h('p',{class:'note'},'Your figures appear right after a Sync. Tap Sync once and open this again.'))));return}
+  renderReports(app,DA);};
+U.geoReady=function(){return !!G};U.geoReset=function(){if(window.__GEO)return;G=null;state='idle'};
+
+/* earnings snapshot for the dashboard (CSO home) */
+U.earnCard=function(){try{var DA=mkDA(true);if(!DA)return'';var oh=DA.onhold()||{q3:0,sept:0},tot=(oh.q3||0)+(oh.sept||0);
+  var o=agg(DA.rows('ALL'),9),oa=P(o[2],o[1]),open=oa!=null&&oa>=100,gap=Math.max(0,o[1]-o[2]);
+  var c=h('div',{class:'geo'},h('div',{class:'money',style:'margin:0;cursor:pointer',onclick:function(){try{S.tab.perf='brands';S.tab.geo_T='inc';go('perf')}catch(e){}}},
+    h('div',{class:'k'},'💰 Earned so far'),h('h2',{},R(tot)),
+    h('p',{},tot>0?(open?'October '+pf(oa)+' ✓ — it\'s payable. Tap to see your money.':'Hit October 100% ('+L(gap)+' to go) to release it. Tap ›'):'Cross your targets to start earning. Tap to see how ›')));return c}catch(e){return''}};
 })();
 /* Field Tracker – Review mail (manager, best on a laptop): the evening review laid out as an email,
    ready to copy or open in Outlook. Nothing is sent by the app itself. */
