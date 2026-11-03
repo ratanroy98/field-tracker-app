@@ -1,4 +1,4 @@
-window.FT_BUILD='20261104031630';
+window.FT_BUILD='20261104033808';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -1639,7 +1639,7 @@ var st=document.createElement('style');st.textContent=`
 .fame .lg{width:96px;height:96px;object-fit:cover;border-radius:22px;box-shadow:0 8px 24px rgba(0,0,0,.4);animation:pop2 .7s cubic-bezier(.2,1.4,.4,1) both}
 .fame .kick{font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:#F6D776;margin:12px 0 10px;animation:rise .6s ease .2s both}
 .fame .ph{width:min(60vw,250px);aspect-ratio:3/4;border-radius:24px;overflow:hidden;position:relative;border:4px solid #F6D776;box-shadow:0 0 0 8px rgba(246,215,118,.18),0 0 60px rgba(246,215,118,.45),0 24px 60px rgba(0,0,0,.55);animation:lift .95s cubic-bezier(.2,.8,.2,1) .35s both}
-.fame .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.fame .ph img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;background:#1a1446}
 .fame .ph:after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.6) 50%,transparent 65%);transform:translateX(-130%);animation:shine 1.5s ease 1.3s 2}
 .fame .cup{position:absolute;right:-14px;bottom:-14px;font-size:46px;color:#F6D776;animation:bounce 1.2s ease 1.2s infinite;filter:drop-shadow(0 4px 8px rgba(0,0,0,.4))}
 .fame .nm{font-size:27px;font-weight:800;margin-top:18px;background:linear-gradient(90deg,#FFF3C4,#F6D776,#E0A82E,#F6D776,#FFF3C4);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rise .6s ease .9s both,gold 3s linear 1.5s infinite}
@@ -1685,6 +1685,14 @@ var st=document.createElement('style');st.textContent=`
 .qd button{min-height:auto;padding:9px 12px;border-radius:12px;font-size:14px}.qd .y{background:var(--ok);color:#fff;border:0}.qd .n{background:var(--panel);color:var(--ink);border:1px solid var(--line)}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}.chips button{min-height:auto;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:13.5px}.chips button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
 .qdx{background:var(--soft);border-radius:14px;padding:10px;margin:2px 0 8px}
+.hilite{border-radius:18px;padding:14px;margin:0 0 12px;color:#fff;background:linear-gradient(135deg,#7B2FBF 0%,#4B1F74 55%,#2A1456 100%);box-shadow:0 10px 26px rgba(75,31,116,.35);position:relative;overflow:hidden;animation:rise .4s ease both}
+.hilite:before{content:'';position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;background:rgba(246,215,118,.14)}
+.hilite .hk{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;font-weight:800;color:#F6D776}
+.hilite .hrow{display:flex;align-items:center;gap:12px;margin-top:8px;position:relative;z-index:1}
+.hilite .hpic{width:60px;height:60px;border-radius:50%;object-fit:cover;object-position:top center;border:3px solid #F6D776;flex:none;background:#2A1456;display:grid;place-items:center;font-size:26px}
+.hilite .htx b{font-size:18px}.hilite .ht{font-size:13px;opacity:.9;margin-top:2px}
+.hilite .hl{margin-top:10px;display:grid;gap:5px;font-size:13.5px}
+.hilite .hclap{margin-top:10px;font-size:20px;letter-spacing:4px;animation:pulse 1.6s ease infinite}
 `;document.head.appendChild(st);
 
 /* ---------- Hall of Fame ---------- */
@@ -1692,15 +1700,22 @@ var FAME=[
  {id:'bhub',mail:'rajibkundu.kundu@gmail.com',name:'Bhubaneswar Kundu',role:'CSO · Guwahati HQ',items:['🏆 RCL All India Top 10 – July 2026','🏆 RCL All India Top 10 – September 2026','🥇 RCL Quarter Winner – CSO','🛒 RCL Trolley Winner – East Zone'],cheer:'Guwahati is proud of you!'},
  {id:'ratan',mail:'ratanroy98@gmail.com',name:'Ratan Roy',role:'CSM · Guwahati Area',items:['🛒 RCL Trolley Winner – CSM, Guwahati','🌟 Coach of an All India Top 10 CSO – Jul & Sep 2026','🥇 Coach of an RCL Quarter Winner – CSO'],cheer:'Leading Guwahati to the top!'}];
 function fanfare(){if(U.mute)return;try{var A=new(window.AudioContext||window.webkitAudioContext)();[[523,0],[659,.12],[784,.24],[1047,.38],[784,.62],[1047,.74]].forEach(function(n){var o=A.createOscillator(),g=A.createGain(),s=A.currentTime+n[1];o.type='triangle';o.frequency.value=n[0];g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(.13,s+.02);g.gain.exponentialRampToValueAtTime(.0001,s+(n[1]>.6?.6:.28));o.connect(g);g.connect(A.destination);o.start(s);o.stop(s+.7)})}catch(e){}}
+// Claps (short noise bursts) + a crackers/burst of confetti, for celebrations.
+function clapSound(){if(U.mute)return;try{var A=new(window.AudioContext||window.webkitAudioContext)();for(var k=0;k<8;k++){var t=A.currentTime+k*0.085+Math.random()*0.02;var len=0.05,buf=A.createBuffer(1,A.sampleRate*len,A.sampleRate),d=buf.getChannelData(0);for(var j=0;j<d.length;j++)d[j]=(Math.random()*2-1)*Math.pow(1-j/d.length,2);var s=A.createBufferSource();s.buffer=buf;var bp=A.createBiquadFilter();bp.type='bandpass';bp.frequency.value=1600+Math.random()*600;var g=A.createGain();g.gain.value=0.5;s.connect(bp);bp.connect(g);g.connect(A.destination);s.start(t)}}catch(e){}}
+function burst(){try{U.confetti&&U.confetti(90);setTimeout(function(){U.confetti&&U.confetti(60)},380);setTimeout(function(){U.confetti&&U.confetti(55)},820)}catch(e){}}
+function celebrate(){fanfare();clapSound();burst()}
+U.celebrate=celebrate;
+// Preload the champion photos so the frame never opens as a blank box.
+function preloadFame(cb){try{var urls=['rcl','bhub','ratan'].map(function(k){return M[k]}).filter(Boolean);var n=urls.length,done=0;if(!n){cb();return}var fin=function(){if(++done>=n)cb()};urls.forEach(function(u){var im=new Image();im.onload=fin;im.onerror=fin;im.src=u;if(im.complete)fin()});setTimeout(cb,1600)}catch(e){cb()}}
+U.preloadFame=preloadFame;
 function showFame(list){if(document.querySelector('.fame'))return;var i=0,ov=h('div',{class:'fame'}),timer=null;
   function draw(){var p=list[i];ov.innerHTML='';
     ov.append(img('rcl','lg','RCL'),h('div',{class:'kick'},'R-Loc Raft Champions League · Hall of Fame'),
       h('div',{class:'ph'},img(p.id,'',p.name),h('span',{class:'cup'},'🏆')),h('div',{class:'nm'},p.name),h('div',{class:'rl'},p.role+' · '+p.cheer),
-      h('div',{class:'ach'},p.items.map(function(x,k){return h('div',{style:'animation-delay:'+(1.15+k*.18)+'s'},x)})),
-      h('div',{class:'dots'},list.length>1?list.map(function(_,k){return h('i',{class:k===i?'on':''})}):[]),
-      h('div',{class:'go'},i<list.length-1?'Tap for next ›':'Tap to continue'));
-    fanfare();setTimeout(function(){U.confetti(60)},500);setTimeout(function(){U.confetti(40)},1600);clearTimeout(timer);timer=setTimeout(next,6500)}
-  function next(){if(i<list.length-1){i++;draw()}else if(i===list.length-1&&list.length>1){i++;together()}else{clearTimeout(timer);land()}}
+      h('div',{class:'ach'},p.items.map(function(x,k){return h('div',{style:'animation-delay:'+(1.0+k*.16)+'s'},x)})),
+      h('div',{class:'dots'},list.length>1?list.map(function(_,k){return h('i',{class:k<=i?'on':''})}):[]));
+    celebrate();clearTimeout(timer);timer=setTimeout(next,4800)}
+  function next(){if(i<list.length-1){i++;draw()}else{clearTimeout(timer);land()}}
   // Last frame: both champions together + an empty seat for the viewer, then the photos fly into their place on the screen.
   function together(){ov.innerHTML='';var me=who()||{},mine=FAME.some(function(p){return p.mail===String(me.Email||'').toLowerCase()});
     ov.append(img('rcl','lg','RCL'),h('div',{class:'kick'},'Guwahati Hall of Fame'),
@@ -1708,20 +1723,27 @@ function showFame(list){if(document.querySelector('.fame'))return;var i=0,ov=h('
         mine||S.mgr&&!S.viewAs?null:h('div',{class:'tp you',style:'animation-delay:.3s'},h('div',{class:'fimg empty'},'?'),h('b',{},'You next'))),
       h('div',{class:'encb'},encourage()),h('div',{class:'go'},'Tap to continue'));
     fanfare();setTimeout(function(){U.confetti(50)},300);clearTimeout(timer);timer=setTimeout(next,7000)}
-  function land(){var hof=document.querySelector('.hof');var src=[].slice.call(ov.querySelectorAll('.tog .fimg:not(.empty)'));
-    if(!hof||!src.length){ov.style.transition='opacity .35s';ov.style.opacity='0';setTimeout(function(){ov.remove()},350);return}
-    try{hof.scrollIntoView({block:'center'})}catch(e){}
-    var tg=[].slice.call(hof.querySelectorAll('.p img, .p .noimg'));ov.style.transition='opacity .45s ease';
-    src.forEach(function(sEl,k){var t=tg[k];if(!t)return;var a=sEl.getBoundingClientRect(),b=t.getBoundingClientRect();var c=sEl.cloneNode(true);
-      c.style.cssText='position:fixed;z-index:700;margin:0;left:'+a.left+'px;top:'+a.top+'px;width:'+a.width+'px;height:'+a.height+'px;border-radius:50%;object-fit:cover;object-position:top;border:3px solid #F6D776;box-shadow:0 0 30px rgba(246,215,118,.7);transition:all 1s cubic-bezier(.6,0,.2,1) '+(k*.12)+'s';
-      document.body.append(c);t.style.visibility='hidden';
-      requestAnimationFrame(function(){requestAnimationFrame(function(){c.style.left=b.left+'px';c.style.top=b.top+'px';c.style.width=b.width+'px';c.style.height=b.height+'px';c.style.boxShadow='0 0 0 4px rgba(246,215,118,.25)'})});
-      setTimeout(function(){t.style.visibility='';c.remove();try{t.animate([{transform:'scale(1.18)'},{transform:'scale(1)'}],{duration:380,easing:'ease-out'})}catch(e){}},1150+k*120)});
-    ov.style.opacity='0';setTimeout(function(){ov.remove()},1000);setTimeout(function(){U.play&&U.play('cash')},1050)}
-  ov.addEventListener('click',next);document.body.append(ov);draw()}
+  // The wall settles into the Hall of Fame card where it lives on the Today screen.
+  function land(){var hof=document.querySelector('.hof');try{if(hof)hof.scrollIntoView({block:'center'})}catch(e){}
+    burst();U.play&&U.play('cash');
+    ov.style.transition='opacity .6s ease';ov.style.opacity='0';
+    setTimeout(function(){ov.remove();try{if(hof){hof.style.boxShadow='0 0 0 3px rgba(246,215,118,.6)';hof.animate([{transform:'scale(1.12)'},{transform:'scale(1)'}],{duration:520,easing:'ease-out'});setTimeout(function(){hof.style.boxShadow=''},1200)}}catch(e){}},620)}
+  document.body.append(ov);draw()}
 U.showFame=showFame;
 function dailyFame(){if(!S.ready||!who())return;var days=[];try{days=JSON.parse(lsGet('ft_fame_days','[]'))}catch(e){}if(days.indexOf(TODAY)>=0||days.length>=3)return;days.push(TODAY);lsSet('ft_fame_days',JSON.stringify(days));
-  withMedia(function(){setTimeout(function(){showFame(FAME)},300)})}
+  withMedia(function(){preloadFame(function(){showFame(FAME)})})}
+/* Daily "Today's Star" – the stand-out CSO of the day, with a cheer. Fed by the engine (feed "highlight"), fresh each day. */
+function highlightCard(){try{var f=(S.feeds||{}).highlight;if(!f||!f.name)return'';
+  var pk=f.photo||({'rajibkundu.kundu@gmail.com':'bhub','ratanroy98@gmail.com':'ratan'}[String(f.email||'').toLowerCase()]||'');
+  var pic=pk&&M[pk]?h('img',{class:'hpic',src:M[pk],alt:f.name}):h('div',{class:'hpic noimg'},'⭐');
+  var card=h('div',{class:'hilite'},h('div',{class:'hk'},'🎉 Today\'s Star'+(f.date?' · '+f.date:'')),
+    h('div',{class:'hrow'},pic,h('div',{class:'htx'},h('b',{},f.name),f.title?h('div',{class:'ht'},f.title):'')),
+    (f.lines&&f.lines.length)?h('div',{class:'hl'},f.lines.map(function(x){return h('div',{},'🏅 '+x)})):'',
+    h('div',{class:'hclap'},'👏 👏 👏'));
+  try{if(lsGet('ft_hilite_day','')!==TODAY){lsSet('ft_hilite_day',TODAY);setTimeout(function(){celebrate()},450)}}catch(e){}
+  return card;
+}catch(e){return''}}
+U.highlightCard=highlightCard;
 function encourage(){var me=who()||{},em=String(me.Email||'').toLowerCase(),first=(me.Name||'').split(' ')[0];
   if(S.mgr&&!S.viewAs)return'Coach the team – the next photo on this wall could be Karamjit or Prashun.';
   if(em==='rajibkundu.kundu@gmail.com')return'Champion, '+first+'! Keep the crown – win RCL again this quarter.';
@@ -1729,7 +1751,7 @@ function encourage(){var me=who()||{},em=String(me.Email||'').toLowerCase(),firs
   return'Your photo can be here next, '+first+'.'+(pc_!==null?' You are at '+pc_+'% of '+new Date().toLocaleDateString('en-IN',{month:'long'})+' –':'')+' every order brings you closer. Ratan Roy believes in you.'}
 U.encourage=encourage;
 function hofCard(slim){var me=who()||{},mine=FAME.some(function(p){return p.mail===String(me.Email||'').toLowerCase()}),showYou=!mine&&!(S.mgr&&!S.viewAs);
-  return h('div',{class:'hof'+(slim?' slim':''),onclick:function(){withMedia(function(){showFame(FAME)})}},h('div',{class:'hd'},img('rcl','','RCL'),'Guwahati Hall of Fame · RCL'),
+  return h('div',{class:'hof'+(slim?' slim':''),onclick:function(){withMedia(function(){preloadFame(function(){showFame(FAME)})})}},h('div',{class:'hd'},img('rcl','','RCL'),'Guwahati Hall of Fame · RCL'),
   h('div',{class:'pp'+(showYou?' three':'')},FAME.map(function(p){return h('div',{class:'p'},img(p.id,'',p.name),h('b',{},slim?p.name.split(' ')[0]:p.name),slim?'':h('small',{},p.items[0].replace(/^\S+\s/,'')))}).concat(showYou?[h('div',{class:'p you'},h('div',{class:'noimg empty'},'?'),h('b',{},'You next'),slim?'':h('small',{},'Hit 100% and win RCL'))]:[])),
   h('div',{class:'enc'},encourage()),h('div',{class:'tap'},'Tap to celebrate 🎉'))}
 U.hofCard=hofCard;
@@ -2269,7 +2291,7 @@ U.handoverCard=handoverCard;U.brandInputs=brandInputs;
 function todayCSO(app){var keep=[app.querySelector('.fthead')],hero=app.querySelector('.hero'),meets=[].slice.call(app.querySelectorAll('.meet')),hof=app.querySelector('.hof'),ob=[].slice.call(app.querySelectorAll('.note')).filter(function(n){return /saved on your phone/.test(n.textContent)})[0],nav0=app.querySelector('.bnav');
   var pend=U.nagList().length;
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
-  var u=updBanner(),list=[u,nextCard(app),handoverCard(),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
+  var u=updBanner(),list=[u,(U.highlightCard&&U.highlightCard())||"",nextCard(app),handoverCard(),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
   [].concat.apply([],list).forEach(function(n){if(n)app.append(n)})}
 function todayMgr(app){var keep=[app.querySelector('.fthead')];var team=U.teamPanel?U.teamPanel():null,share=[].slice.call(app.querySelectorAll('.tdone'))[0],hof=app.querySelector('.hof');
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
