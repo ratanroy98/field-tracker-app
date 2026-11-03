@@ -35,9 +35,9 @@ var st=document.createElement('style');st.textContent=`
 
 /* ---------- which tab each screen belongs to ---------- */
 var WORKR=['raft','deca','rloc','skin','dexona','stockists','stock','beat','tp'];
-function tabFor(r){if(isMgr()){if(r==='home'||r==='mgr')return'team';if(r==='approve')return'approve';if(r==='meet')return'meet';if(r==='perf'||r==='mail')return'reports';if(r==='msgs'||r==='hof')return'me';if(r==='sell')return'sell';return'team'}
+function tabFor(r){if(isMgr()){if(r==='home'||r==='mgr')return'team';if(r==='approve')return'approve';if(r==='meet')return'meet';if(r==='geo'||r==='perf'||r==='mail')return'reports';if(r==='msgs'||r==='hof')return'me';if(r==='sell')return'sell';return'team'}
   if(r==='home')return'today';if(r==='sell')return'sell';if(r==='learn')return'learn';if(r==='perf'||r==='msgs'||r==='hof')return'me';return'work'}
-function NAV(){return isMgr()?[['team','👥','Team',function(){go('home')}],['approve','✅','Approvals',function(){go('approve')}],['meet','📅','Meetings',function(){go('meet')}],['reports','📈','Reports',function(){go('perf')}],['me','👤','Me',function(){go(U.lsGet('ft_me','msgs'))}]]
+function NAV(){return isMgr()?[['team','👥','Team',function(){go('home')}],['approve','✅','Approvals',function(){go('approve')}],['meet','📅','Meetings',function(){go('meet')}],['reports','📈','Reports',function(){go('geo')}],['me','👤','Me',function(){go(U.lsGet('ft_me','msgs'))}]]
   :[['today','🏠','Today',function(){go('home')}],['work','💼','Work',function(){go(U.lsGet('ft_work','raft'))}],['sell','🛒','Sell',function(){go('sell')}],['learn','🎓','Learn',function(){go('learn')}],['me','👤','Me',function(){go(U.lsGet('ft_me','perf'))}]]}
 function nav(r){var cur=tabFor(r),pend=0,appr=0;
   try{if(!isMgr())TASKS.forEach(function(k){var l=k.status().level;if(l==='bad'||l==='todo')pend++});else appr=(S.entries||[]).filter(function(e){return (e.type==='brick_plan'||e.type==='beat_change'&&e.date>=TODAY)&&e.status==='pending'}).length}catch(e){}

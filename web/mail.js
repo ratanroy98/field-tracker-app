@@ -87,11 +87,11 @@ U.routes.mail=function(app){if(!isMgr()){app.append(h('div',{class:'note'},'Only
     h('small',{style:'color:var(--muted)'},'Sign in to Outlook.com as '+FROM+' once on this laptop. "Open in Outlook.com" opens a new mail with To, Cc, subject and body filled – check it and press Send. If it is blocked, use Copy subject and Copy body.')))};
 
 /* Reports tab gets two sub-tabs for the manager; Team screen shows a "review mail ready" line. */
-function repTabs(r){return h('div',{class:'subtabs'},[['perf','Numbers'],['mail','Review mail']].map(function(x){return h('button',{class:x[0]===r?'on':'',onclick:function(){go(x[0])}},x[1])}))}
+function repTabs(r){return h('div',{class:'subtabs'},[['geo','Performance'],['perf','This month'],['mail','Review mail']].map(function(x){return h('button',{class:x[0]===r?'on':'',onclick:function(){go(x[0])}},x[1])}))}
 var pt=U.tabOfX||{};pt.mail='mail';U.tabOfX=pt;
 var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(!isMgr()||document.getElementById('ftlogin'))return;
   try{var hd=app.querySelector('.fthead');
-    if(r==='perf'||r==='mail'){if(hd&&!app.querySelector('.subtabs.rep')){var t=repTabs(r);t.classList.add('rep');hd.after(t)}
+    if(r==='geo'||r==='perf'||r==='mail'){if(hd&&!app.querySelector('.subtabs.rep')){var t=repTabs(r);t.classList.add('rep');hd.after(t)}
       var nb=app.querySelector('.bnav');if(nb)[].forEach.call(nb.children,function(b){b.classList.toggle('on',/Reports/.test(b.textContent))})}
     if(r==='home'){var D=dates();if(D.length&&!app.querySelector('.mailready')){var c=h('div',{class:'mailready',onclick:function(){go('mail')}},'📧',h('div',{},h('b',{},'Day review mails ready – '+nice(D[0])),h('small',{},'One mail per CSO, Cc Sudipta – send from Outlook')),h('span',{class:'go'},'›'));var tp=app.querySelector('.phase');if(tp)tp.before(c);else if(hd)hd.after(c)}}}catch(e){}};
 try{if(S.ready)render()}catch(e){}
