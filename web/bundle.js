@@ -1,4 +1,4 @@
-window.FT_BUILD='20261104024018';
+window.FT_BUILD='20261104025953';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -2145,6 +2145,10 @@ try{if(S.ready)render()}catch(e){}
 'use strict';
 var U=window.FTUI;if(!U||!U.t)return;
 function isMgr(){return S.mgr&&!S.viewAs}
+/* Less typing: the CSO's calls, POB, inputs, NPD and wholesalers already go into Ventasys and reach Ratan from there,
+   so the app never nags them to re-type those. Only genuinely app-only, one-tap actions are nudged on Today. */
+var NONAG={raft:1,deca:1,rloc:1,skin:1,dexona:1,stock:1,stockists:1,beat:1};
+U.nagList=function(){var o=[];try{(typeof TASKS!=='undefined'?TASKS:[]).forEach(function(k){if(NONAG[k.k])return;var s=k.status();if(s.level==='bad'||s.level==='todo')o.push({k:k,s:s})})}catch(e){}return o};
 var SYNC='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/><path d="M3 21v-5h5"/></svg>';
 var APK='https://github.com/ratanroy98/field-tracker-app/releases/download/latest/GuwahatiFieldTracker.apk';
 
@@ -2181,7 +2185,7 @@ function tabFor(r){if(isMgr()){if(r==='home'||r==='mgr')return'team';if(r==='app
 function NAV(){return isMgr()?[['team','👥','Team',function(){go('home')}],['approve','✅','Approvals',function(){go('approve')}],['meet','📅','Meetings',function(){go('meet')}],['reports','📈','Reports',function(){go('geo')}],['me','👤','Me',function(){go(U.lsGet('ft_me','msgs'))}]]
   :[['today','🏠','Today',function(){go('home')}],['work','💼','Work',function(){go(U.lsGet('ft_work','raft'))}],['sell','🛒','Sell',function(){go('sell')}],['learn','🎓','Learn',function(){go('learn')}],['me','👤','Me',function(){go(U.lsGet('ft_me','perf'))}]]}
 function nav(r){var cur=tabFor(r),pend=0,appr=0;
-  try{if(!isMgr())TASKS.forEach(function(k){var l=k.status().level;if(l==='bad'||l==='todo')pend++});else appr=(S.entries||[]).filter(function(e){return (e.type==='brick_plan'||e.type==='beat_change'&&e.date>=TODAY)&&e.status==='pending'}).length}catch(e){}
+  try{if(!isMgr())pend=U.nagList().length;else appr=(S.entries||[]).filter(function(e){return (e.type==='brick_plan'||e.type==='beat_change'&&e.date>=TODAY)&&e.status==='pending'}).length}catch(e){}
   return h('nav',{class:'bnav'},NAV().map(function(it){var n=it[0]==='today'?pend:it[0]==='approve'?appr:0;return h('button',{class:cur===it[0]?'on':'',onclick:it[3]},h('span',{class:'ic'},it[1]),it[2],n?h('span',{class:'dot'},String(n)):'')}))}
 
 /* ---------- sub-tab rows ---------- */
@@ -2206,12 +2210,12 @@ setInterval(function(){paintSync()},1500);
 /* ---------- Today: one "Next step" card ---------- */
 function field(){try{var tp=tpFor(myEmail(),TODAY);return !tp||/Field|Joint/.test(tp.DayType||'')}catch(e){return true}}
 function steps(app){var S0=U.syncState?U.syncState():{opened:true,unsent:false},L=[];
-  var ci=!!(U.checkinToday&&U.checkinToday());var pend=[];try{TASKS.forEach(function(k){var s=k.status();if(s.level==='bad'||s.level==='todo')pend.push({k:k,s:s})})}catch(e){}
+  var ci=!!(U.checkinToday&&U.checkinToday());var pend=U.nagList();
   pend.sort(function(a,b){return (a.s.level==='bad'?0:1)-(b.s.level==='bad'?0:1)});
   L.push({done:S0.opened,cls:'',t:'Sync to get today\'s latest',p:'Your plan, targets, meetings and messages from Ratan Roy.',b:'🔄 Sync now',f:function(){U.sync()}});
   L.push({done:!U.taskDue||!U.taskDue(),cls:'wa',t:'Read today\'s task and share it',p:'Share it to WhatsApp "Guwahati CSM Team" to confirm you have gone through the full task.',b:'Read & share',f:function(){U.taskSheet()}});
   if(field())L.push({done:ci,cls:'',t:'Start my day',p:'Confirm today\'s brick and take your selfie – one tap.',b:'📍 Start my day',f:function(){var c=app.querySelector('.hero .ci');if(c)c.click()}});
-  var top=pend[0];L.push({done:!top,cls:'',t:top?top.k.t:'Entries',p:top?(top.s.why||'')+(pend.length>1?' · '+(pend.length-1)+' more after this':'')+'. Report in Ventasys first, then copy here.':'',b:'Open',f:function(){go(top.k.k)},lnk:pend.length>1?['See all '+pend.length+' tasks',function(){go(U.lsGet('ft_went','raft'))}]:null});
+  if(pend.length){var top=pend[0];L.push({done:false,cls:'',t:top.k.t,p:(top.s.why||'')+(pend.length>1?' · '+(pend.length-1)+' more after this':''),b:'Open',f:function(){go(top.k.k)},lnk:pend.length>1?['See all '+pend.length+' tasks',function(){go(U.lsGet('ft_went','raft'))}]:null});}
   L.push({done:!U.lessonDoneToday||U.lessonDoneToday(),cls:'',t:'Today\'s 3-minute lesson',p:(U.nextLesson&&U.nextLesson())||'From Ratan Roy',b:'🎓 Start lesson',f:function(){S.tab.learn='today';go('learn')}});
   return L}
 function nextCard(app){var L=steps(app),i=L.findIndex(function(x){return!x.done}),S0=U.syncState?U.syncState():{};
@@ -2226,7 +2230,7 @@ function updBanner(){try{if(!window.AndroidApp||!AndroidApp.version)return'';if(
 function quoteLine(){var qs=(U.C().quotes)||[];if(!qs.length)return'';return h('div',{class:'qline'},h('small',{},'Ratan Roy says'),qs[U.dayIdx()%qs.length])}
 
 function todayCSO(app){var keep=[app.querySelector('.fthead')],hero=app.querySelector('.hero'),meets=[].slice.call(app.querySelectorAll('.meet')),hof=app.querySelector('.hof'),ob=[].slice.call(app.querySelectorAll('.note')).filter(function(n){return /saved on your phone/.test(n.textContent)})[0],nav0=app.querySelector('.bnav');
-  var pend=0;try{TASKS.forEach(function(k){var l=k.status().level;if(l==='bad'||l==='todo')pend++})}catch(e){}
+  var pend=U.nagList().length;
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
   var u=updBanner(),list=[u,nextCard(app),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
   [].concat.apply([],list).forEach(function(n){if(n)app.append(n)})}
@@ -2269,7 +2273,8 @@ var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(doc
   try{topbar(app,r);var t=tabFor(r),hd=app.querySelector('.fthead');
     if(r==='home'){if(isMgr())todayMgr(app);else todayCSO(app)}
     // replace the old sub-tab row on Work screens
-    if(t==='work'){U.lsSet('ft_work',r);var old=app.querySelector('.fthead~.subtabs');if(old&&old.textContent.indexOf('Raft')>=0&&!old.classList.contains('l2'))old.remove();var rows=workTabs(r);var after=hd;rows.forEach(function(x){after.after(x);after=x})}
+    if(t==='work'){U.lsSet('ft_work',r);var old=app.querySelector('.fthead~.subtabs');if(old&&old.textContent.indexOf('Raft')>=0&&!old.classList.contains('l2'))old.remove();var rows=workTabs(r);var after=hd;rows.forEach(function(x){after.after(x);after=x});
+      if(!isMgr()&&WORKR.indexOf(r)>=0&&!app.querySelector('.optnote')){var on=h('div',{class:'qline optnote'},h('small',{},'Optional'),'You don\'t have to fill this. Your calls, POB and inputs are already in Ventasys and reach Ratan from there. The app only needs your check-in, the shared task and today\'s lesson. Use this tab just to see your plan and the ready lists.');after.after(on)}}
     if(t==='me'){var mt=meTabs(r);hd.after(mt);if(r==='perf')app.querySelectorAll('.hof').forEach(function(x){x.remove()})}
     var nb=app.querySelector('.bnav');if(nb)nb.replaceWith(nav(r));else app.append(nav(r));
     if(isMgr()&&r==='perf'&&!app.querySelector('.salestop')){var s1=app.querySelector('.score'),c1=(U.salesTop||salesTop)();if(s1)s1.before(c1);else app.append(c1)}
