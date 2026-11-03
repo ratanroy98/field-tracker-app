@@ -180,9 +180,9 @@ function sitCard(s,openIt){var d=h('details',{class:'lcard sit'});if(openIt)d.op
 function REF(){var f=S.feeds;var k=Object.keys(f).find(function(x){return x.indexOf('rates_')===0});return k?f[k]:null}
 function money(v){return '₹'+(v>=100?Math.round(v).toLocaleString('en-IN'):v.toFixed(2))}
 function vProd(app){var R=UI.REF();if(!R){app.append(h('div',{class:'note'},'Rates and offers are loading…'));return}
-  var r=sub('rates',[['offers','📣 Offers'],['gifts','🎁 Gifts'],['calc','🧮 Profit calculator'],['list','📋 Price list']]);app.append(r[0]);if(r[1]==='gifts'&&UI.vGifts){UI.vGifts(app);return}
+  var r=sub('rates',[['offers','📣 Offers'],['gifts','🎁 Gifts'],['calc','🧮 Profit calculator'],['list','📋 Price list'],['stk','🏬 Stockist terms']]);app.append(r[0]);if(r[1]==='stk'&&UI.vStockist){UI.vStockist(app);return}if(r[1]==='gifts'&&UI.vGifts){UI.vGifts(app);return}
   if(r[1]==='offers'){var w=null;app.append(h('div',{class:'quote'},h('div',{class:'who'},'💬 '+t('says')),h('div',{class:'q'},'Tell every customer the offer AND his profit in rupees. People buy when they see what they earn.')));
-    R.offers.forEach(function(o){app.append(h('div',{class:'lcard sit ocard'},UI.offerImg?UI.offerImg(o):'',h('div',{style:'display:flex;justify-content:space-between;gap:8px'},h('b',{},'🎁 '+o.t),h('span',{class:'chip '+(o.who==='Retailer'?'ok':'warn')},o.who)),h('div',{style:'margin:6px 0'},o.d),h('div',{class:'lbl'},t('say')),h('div',{style:'font-style:italic'},'“'+o.say+'”'),h('button',{class:'ghost',style:'margin-top:8px',onclick:function(){speak(o.t+'. '+o.d+'. '+o.say)}},'🔊 '+t('listen'))))});
+    var OFF=R.offers.slice().sort(function(a,b){return (a.who==='Retailer'?0:1)-(b.who==='Retailer'?0:1)}),hd0=0,hd1=0;OFF.forEach(function(o){if(o.who==='Retailer'&&!hd0){hd0=1;app.append(h('div',{class:'sect'},h('b',{},'For retailers')))}if(o.who!=='Retailer'&&!hd1){hd1=1;app.append(h('div',{class:'sect'},h('b',{},'For stockists only')))}app.append(h('div',{class:'lcard sit ocard'},UI.offerImg?UI.offerImg(o):'',h('div',{style:'display:flex;justify-content:space-between;gap:8px'},h('b',{},'🎁 '+o.t),h('span',{class:'chip '+(o.who==='Retailer'?'ok':'warn')},o.who)),h('div',{style:'margin:6px 0'},o.d),h('div',{class:'lbl'},t('say')),h('div',{style:'font-style:italic'},'“'+o.say+'”'),h('button',{class:'ghost',style:'margin-top:8px',onclick:function(){speak(o.t+'. '+o.d+'. '+o.say)}},'🔊 '+t('listen'))))});
     app.append(h('div',{class:'note'},R.notes.map(function(n){return h('div',{},'• '+n)})));return}
   if(r[1]==='list'){R.products.forEach(function(p){var m=mrpOf(p);var g=1+p.gst/100,ptr=m/g*.8;
     app.append(h('details',{class:'lcard'},h('summary',{},h('b',{},p.n),h('span',{class:'meta'},'  · '+p.u+(m?' · MRP '+(p.mrp?'':'≈')+money(m):''))),
@@ -190,9 +190,8 @@ function vProd(app){var R=UI.REF();if(!R){app.append(h('div',{class:'note'},'Rat
         h('tr',{},h('td',{},'Retailer 20%'),h('td',{class:'r num'},money(ptr*g)),h('td',{class:'r num'},money(m-ptr*g))),
         h('tr',{},h('td',{},'Wholesaler 7%'),h('td',{class:'r num'},money(ptr*.93*g)),h('td',{class:'r num'},money(ptr*.07*g))),
         h('tr',{},h('td',{},'Stockist 10%'),h('td',{class:'r num'},money(ptr*.9*g)),h('td',{class:'r num'},money(ptr*.1*g))))):h('small',{},'Enter MRP from the pack in the calculator.'),
-      h('div',{class:'meta'},['GST '+p.gst+'%',p.sch?'Scheme lots: '+p.sch:'',p.box||'',p.case||'',p.minBill?'Minimum billing: '+p.minBill:'',p.slab||''].filter(Boolean).join(' · ')),
-      p.flat?h('div',{class:'meta'},'Flat rate (direct stockist, one invoice): '+p.flat.map(function(f){return f[0]+' ₹'+f[1]}).join(' · ')):null,
-      p.gift?h('div',{class:'meta',style:'color:var(--accent)'},'🎁 '+p.gift):null))});
+      h('div',{class:'meta'},['GST '+p.gst+'%',p.sch?'Scheme lots: '+p.sch:''].filter(Boolean).join(' · ')),
+      (p.box||p.case||p.minBill||p.slab||p.flat)?h('div',{class:'meta',style:'color:var(--accent);cursor:pointer',onclick:function(){S.tab.rates='stk';render()}},'🏬 Box, case, minimum billing, discounts and flat rates → Stockist terms'):''))});
     app.append(h('small',{style:'color:var(--muted);display:block'},'* incl. GST, per unit. ≈ MRP is worked out from the company rate – always check the MRP printed on the pack.'));return}
   // calculator
   var P=R.products;var st=S.tab.calc||(S.tab.calc={p:8,who:'Retailer',q:10,lot:0,mrp:''});
@@ -224,7 +223,7 @@ function vProd(app){var R=UI.REF();if(!R){app.append(h('div',{class:'note'},'Rat
       h('div',{style:'display:flex;justify-content:space-between;align-items:end;margin-top:6px'},h('span',{},'Profit on this order'),h('span',{class:'big',style:'color:var(--ok)'},money(prof))),
       h('small',{style:'color:var(--muted)'},'Profit per '+unit+': '+money(unitP)+' ('+pp.toFixed(1)+'% of selling price)')),chain,
       h('div',{class:'quote'},h('div',{class:'who'},'🗣️ '+t('say')),h('div',{class:'q'},say),h('button',{class:'ghost',style:'margin-top:8px',onclick:function(){speak(say)}},'🔊 '+t('listen'))),
-      (p.slab||p.flat||p.gift||p.minBill||p.case)?h('div',{class:'note'},[p.minBill?'Minimum billing: '+p.minBill:'',p.case||'',p.slab||'',p.flat?'Flat (direct stockist, one invoice): '+p.flat.map(function(f){return f[0]+' ₹'+f[1]}).join(' · '):'',p.gift?'🎁 '+p.gift:''].filter(Boolean).map(function(x){return h('div',{},'• '+x)})):'')}
+      st.who==='Stockist'&&(p.slab||p.flat||p.gift||p.minBill||p.case)?h('div',{class:'note'},[p.minBill?'Minimum billing: '+p.minBill:'',p.case||'',p.slab||'',p.flat?'Flat (direct stockist, one invoice): '+p.flat.map(function(f){return f[0]+' ₹'+f[1]}).join(' · '):'',p.gift?'🎁 '+p.gift:''].filter(Boolean).map(function(x){return h('div',{},'• '+x)})):'')}
   dIn.oninput=calc;
   sel.onchange=function(){st.p=+sel.value;st.lot=0;st.mrp='';render()};lot.onchange=function(){var L=lots[+lot.value-1];if(L){var a0=+L.split('+')[0];if((+qty.value||0)<a0)qty.value=a0}calc()};qty.oninput=calc;mrp.oninput=calc;
   app.append(h('div',{class:'score'},h('b',{},'Price & profit calculator'),h('label',{},'Product',sel),h('label',{},'Customer'),who,h('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:8px'},h('label',{},'Quantity ('+p.u+')',qty),h('label',{},'MRP ₹ (from pack)',mrp)),h('label',{},'Scheme',lot),st.who==='Stockist'?'':h('label',{},'Extra discount from stockist (% of PTR, out of his 10%'+(st.who==='Wholesaler'?'; max 3% via wholesaler':'')+')',dChips,dIn)),out);calc()}

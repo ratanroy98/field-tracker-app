@@ -99,8 +99,10 @@ function getLoc(cb){var doneF=false;function fin(v){if(doneF)return;doneF=true;c
   try{if(window.AndroidApp&&AndroidApp.requestLocation){AndroidApp.requestLocation();var n=0;var iv=setInterval(function(){var s='';try{s=AndroidApp.getLocation()}catch(e){}if(s){clearInterval(iv);try{fin(JSON.parse(s))}catch(e){fin(null)}}else if(++n>40){clearInterval(iv);fin(null)}},300);return}}catch(e){}
   if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(p){fin({lat:p.coords.latitude,lng:p.coords.longitude,acc:Math.round(p.coords.accuracy)})},function(){fin(null)},{enableHighAccuracy:true,timeout:9000,maximumAge:60000});setTimeout(function(){fin(null)},10000)}else fin(null)}
 function doCheckin(btn){if(checkinToday()){toast(w('checked'));return}if(isMgr()){toast('Pick a CSO with "View as" first.');return}
+  if(U.beforeCheckin&&!(btn&&btn.__go)){U.beforeCheckin(function(extra){if(btn)btn.__go=1;doCheckin2(btn,extra||{})});return}doCheckin2(btn,{})}
+function doCheckin2(btn,extra){
   if(btn){btn.textContent='📍 '+w('locating');btn.disabled=true}
-  getLoc(function(l){var tm=new Date().toTimeString().slice(0,5);var f={time:tm,brick:(typeof brickToday==='function'&&brickToday())||''};if(l){f.lat=l.lat;f.lng=l.lng;f.acc=l.acc}
+  getLoc(function(l){var tm=new Date().toTimeString().slice(0,5);var f=Object.assign({time:tm,brick:(typeof brickToday==='function'&&brickToday())||''},extra||{});if(l){f.lat=l.lat;f.lng=l.lng;f.acc=l.acc}
     save('checkin',f).then(function(ok){if(ok){U.confetti(30);render()}else if(btn){btn.disabled=false;btn.textContent='📍 '+w('checkin')}})})}
 
 /* ---------- share ---------- */
@@ -176,7 +178,7 @@ U.today=function(app,tk,rest){var x=me(),hq=x.HQ;
 function teamPanel(){var box=h('div',{class:'phase'},h('div',{class:'ph'},h('b',{},'👥 '+w('team')),h('small',{},TODAY)));
   var csos=D.users.filter(function(u){return u.Role==='CSO'&&u.Status==='Active'});
   csos.forEach(function(u){var c=checkinToday(u.Email),les=entriesOf('lesson_done',u.Email).filter(function(e){return e.date===TODAY}).length,p=S.feeds['pob_'+u.HQ],req=entriesOf('stock_request',u.Email).filter(function(e){return e.status!=='sent'}).length;
-    box.append(h('div',{class:'lrow',onclick:function(){S.viewAs=u;render()}},h('div',{class:'ic'},(u.Name||'?')[0]),h('div',{class:'tx'},h('b',{},u.Name.split(' ')[0]+' · '+u.HQ),h('small',{},(c?'✅ '+c.time+(c.lat?' 📍':''):'⏳ not checked in')+' · 🎓 '+les+' · POB '+(p?pc(p.done,p.target60)+'%':'—')+(req?' · 📦 '+req+' request':''))),h('span',{class:'st'},'›')))});
+    box.append(h('div',{class:'lrow',onclick:function(){S.viewAs=u;render()}},(c&&c.selfie?h('img',{src:c.selfie,class:'ic',style:'object-fit:cover;border-radius:50%;border:2px solid var(--gold)'}):h('div',{class:'ic'},(u.Name||'?')[0])),h('div',{class:'tx'},h('b',{},u.Name.split(' ')[0]+' · '+u.HQ),h('small',{},(c?'✅ '+c.time+(c.lat?' 📍':''):'⏳ not checked in')+' · 🎓 '+les+' · POB '+(p?pc(p.done,p.target60)+'%':'—')+(req?' · 📦 '+req+' request':''))),h('span',{class:'st'},'›')))});
   var reqs=(S.entries||[]).filter(function(e){return e.type==='stock_request'&&e.status!=='sent'});
   if(reqs.length){box.append(h('div',{class:'sect'},h('b',{},'📦 Stock requests')));reqs.forEach(function(r){var items=Object.keys(r.items||{}).map(function(k){return k+' × '+r.items[k]}).join(', ');
     box.append(h('div',{class:'note'},h('b',{},r.name+' · '+r.date),h('div',{},items),r.note?h('small',{},r.note):null,h('button',{style:'margin-top:6px',onclick:function(){S.db.collection('entries').doc(r._id).update({status:'sent',sentTs:Date.now()}).then(function(){toast('Marked as sent');render()})}},'✅ Mark sent')))})}

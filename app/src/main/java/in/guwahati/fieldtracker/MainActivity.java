@@ -30,8 +30,8 @@ import android.widget.FrameLayout;
 
 public class MainActivity extends Activity {
   static final String APP_URL = "https://script.google.com/macros/s/AKfycbyFp_mIJqqv-vya_y_DFmW7nwzZc83PQY5PnwOdzMPYjFK3EYg-p-ZHz0M7vSgMlV3_/exec";
-  static final int PICK = 11, PERM = 12;
-  WebView web; ProgressBar bar; ValueCallback<Uri[]> pending; TextToSpeech tts; boolean ttsReady; volatile String lastLoc = "";
+  static final int PICK = 11, PERM = 12, SNAP = 13;
+  WebView web; ProgressBar bar; ValueCallback<Uri[]> pending; Uri captureUri; TextToSpeech tts; boolean ttsReady; volatile String lastLoc = "";
 
   @Override protected void onCreate(Bundle b) {
     super.onCreate(b);
@@ -80,6 +80,23 @@ public class MainActivity extends Activity {
       @Override public boolean onShowFileChooser(WebView v, ValueCallback<Uri[]> cb, FileChooserParams fp) {
         if (pending != null) pending.onReceiveValue(null);
         pending = cb;
+        // Selfie check-in: open the front camera directly.
+        if (fp.isCaptureEnabled()) {
+          try {
+            android.content.ContentValues cv = new android.content.ContentValues();
+            cv.put(MediaStore.Images.Media.DISPLAY_NAME, "checkin_" + System.currentTimeMillis() + ".jpg");
+            cv.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+            captureUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
+            Intent cam = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            cam.putExtra(MediaStore.EXTRA_OUTPUT, captureUri);
+            cam.putExtra("android.intent.extras.CAMERA_FACING", 1);
+            cam.putExtra("android.intent.extras.LENS_FACING_FRONT", 1);
+            cam.putExtra("android.intent.extra.USE_FRONT_CAMERA", true);
+            cam.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            startActivityForResult(cam, SNAP);
+            return true;
+          } catch (Exception e) { captureUri = null; }
+        }
         Intent i = new Intent(Intent.ACTION_GET_CONTENT);
         i.addCategory(Intent.CATEGORY_OPENABLE);
         i.setType("image/*");
@@ -118,6 +135,11 @@ public class MainActivity extends Activity {
   }
 
   @Override protected void onActivityResult(int req, int res, Intent data) {
+    if (req == SNAP && pending != null) {
+      pending.onReceiveValue(res == RESULT_OK && captureUri != null ? new Uri[]{captureUri} : null);
+      if (res != RESULT_OK && captureUri != null) { try { getContentResolver().delete(captureUri, null, null); } catch (Exception e) {} }
+      pending = null; captureUri = null; return;
+    }
     if (req != PICK || pending == null) { super.onActivityResult(req, res, data); return; }
     Uri[] out = null;
     if (res == RESULT_OK && data != null) {
