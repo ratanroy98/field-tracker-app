@@ -1,4 +1,4 @@
-window.FT_BUILD='20261104040911';
+window.FT_BUILD='20261104042353';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -1596,7 +1596,8 @@ function vBoard(app){var f=null,k=Object.keys(S.feeds).find(function(x){return x
   app.append(box,h('small',{style:'color:var(--muted)'},'Points: POB % of plan-to-date + 2 per check-in day + 3 per lesson.'))}
 U.vPerf=function(app){var x=me();
   if(isMgr()){var r0=U.sub('perf',[['team','Team'],['board',w('board')]]);app.append(r0[0]);if(r0[1]==='board'){vBoard(app);return}app.append(U.mgrInc());['Agartala','Bongaigaon','Guwahati'].forEach(function(q){var s=scoreCard(q);if(s)app.append(s)});return}
-  var r=U.sub('perf',[['month',t('month')],['pob','POB'],['week',w('week')],['inc',t('inc')],['q4',t('q4')],['badges',w('badges')],['board',w('board')]]);app.append(r[0]);
+  var r=U.sub('perf',[['brands','📊 Brands'],['month',t('month')],['pob','POB'],['week',w('week')],['inc',t('inc')],['q4',t('q4')],['badges',w('badges')],['board',w('board')]]);app.append(r[0]);
+  if(r[1]==='brands'&&U.csoPerf){U.csoPerf(app);return}
   if(r[1]==='month'){var s=scoreCard(x.HQ);if(s)app.append(s)}
   if(r[1]==='pob')[].concat(U.pobCard(x.HQ)).forEach(function(n){app.append(n)});
   if(r[1]==='week')vWeek(app);
@@ -2690,6 +2691,78 @@ U.routes.geo=function(app){if(!isMgr()){app.append(h('div',{class:'note'},'Perfo
   box.append(h('p',{class:'note',style:'margin:-4px 0 10px'},'Source: company Geo sales file · '+(G.asOf||'')+' · ₹ in lakh · only you can see this'));
   try{VIEWS.filter(function(x){return x[0]===v})[0][2](box)}catch(e){box.append(h('div',{class:'note'},'Could not draw this view: '+e.message))}};
 U.geoReady=function(){return !!G};U.geoReset=function(){if(window.__GEO)return;G=null;state='idle'};
+
+/* ============================================================
+   CSO-facing in-depth analysis (own HQ only).
+   Data comes from the per-HQ feed perf_<HQ> in admin.json, which the
+   server delivers ONLY to that HQ's CSO (never other HQs, area or region,
+   and never the encrypted full file / key). Anchored to the incentive (SAG)
+   basis so a CSO's achievement matches what they are paid on, plus the
+   impact brands and every brand for guidance.
+   ============================================================ */
+function csoHQ(){try{if(S.viewAs&&S.viewAs.HQ)return S.viewAs.HQ;var ks=Object.keys(S.feeds||{}).filter(function(k){return k.indexOf('perf_')===0});if(ks.length)return (S.feeds[ks[0]]||{}).hq||ks[0].slice(5);}catch(e){}return null}
+function CF(){var hq=csoHQ();if(!hq)return null;var f=(S.feeds||{})['perf_'+hq];return (f&&f.b)?f:null}
+function sagKey(p){if(p==='tm')return MK[MON.length-1];if(p==='YTD')return'YTD';if(QM[p])return p;return MK[p]}
+function impactList(f){var imp=f.impact||['Deca Durabolin','R-Loc','Dexona','Skinlite'];var all=Object.keys(f.b);return imp.filter(function(b){return all.indexOf(b)>=0})}
+function brandOrder(f){var imp=impactList(f),rest=Object.keys(f.b).filter(function(b){return b!=='ALL'&&imp.indexOf(b)<0});return imp.concat(rest)}
+// SAG row = [bo, ly, tgt, sale, gross, ret, boOnTgt]
+function sagHero(hq,p,sag){var perf=sag?P(sag[3],sag[2]):null,g=sag?gr(sag[3],sag[1]):null;
+  return h('div',{class:'hero'},h('div',{class:'k'},'Your incentive basis · SAG'),h('h2',{},hq+' · '+plab(p)),
+    h('div',{class:'hrow'},ring(perf,78),h('div',{},h('div',{class:'big'},sag?L(sag[3]):'—'),h('small',{},'of '+(sag?L(sag[2]):'—')+' target · LY '+(sag?L(sag[1]):'—')),h('small',{},'Growth '+sg(g)+(sag&&sag[4]?' · gross '+L(sag[4]):'')))))}
+function sagKpi(sag){var perf=P(sag[3],sag[2]),g=gr(sag[3],sag[1]);
+  return h('div',{class:'kp'},
+    h('div',{},h('small',{},'Net sale'),h('b',{},L(sag[3]))),h('div',{},h('small',{},'Target'),h('b',{},L(sag[2]))),
+    h('div',{},h('small',{},'Performance'),h('b',{class:pcls(perf)},pf(perf))),h('div',{},h('small',{},'Growth vs LY'),h('b',{class:gcls(g)},sg(g))),
+    h('div',{},h('small',{},'Gross sale'),h('b',{},L(sag[4]||0))),h('div',{},h('small',{},'Gap to target'),h('b',{class:sag[3]>=sag[2]?'up':'dn'},(sag[3]>=sag[2]?'+':'')+L(sag[3]-sag[2]))),
+    h('div',{},h('small',{},'Last year'),h('b',{},L(sag[1]))),h('div',{},h('small',{},'Sales return'),h('b',{},L(-(sag[5]||0)))))}
+function cImpact(f,p){var l=h('div',{class:'lst'});impactList(f).forEach(function(b){var a=agg(f.b[b],p),pp=P(a[2],a[1]),g=gr(a[2],a[0]),hm=hit(f.b[b]),m=META[b]||['',''];
+  l.append(h('div',{},h('div',{class:'t'},h('b',{},b,tag(b)),h('span',{class:pcls(pp)},pf(pp))),pbar(pp),
+    h('div',{class:'t',style:'font-size:11.5px;color:var(--muted);margin-top:4px'},h('span',{},L(a[2])+' / '+L(a[1])),h('span',{},'Gr '+sg(g)+' · ✓ '+hm[0]+'/'+hm[1]+' mo')),
+    m[1]?h('div',{style:'font-size:11px;color:var(--muted);margin-top:2px'},'Push through '+m[1]):''))});
+  return h('div',{class:'card'},h('h3',{},'Impact brands',h('small',{},plab(p))),l,h('p',{class:'note'},'These four brands carry your incentive along with the HQ total above. Line marks 100% of target.'))}
+function cBrandTable(f,p){var order=brandOrder(f),imp=impactList(f),a=agg(f.b.ALL,p),hh=hit(f.b.ALL);
+  var t=h('table',{},h('tr',{},h('th',{},'Brand'),h('th',{},'Target'),h('th',{},'Sale'),h('th',{},'Perf'),h('th',{},'Gr'),h('th',{},'✓ Mo')));
+  order.forEach(function(b){var rows=f.b[b];if(!rows)return;var x=agg(rows,p);if(!(x[1]||x[2]||x[0]))return;var pp=P(x[2],x[1]),g=gr(x[2],x[0]),hm=hit(rows),isI=imp.indexOf(b)>=0,cl=(x[3]||0)+(x[4]||0);
+    var tr=h('tr',{class:isI?'me':'',style:'cursor:pointer',onclick:function(){var n=tr.nextSibling;if(n&&n.classList&&n.classList.contains('xp')){n.remove();return}
+      var d=h('tr',{class:'xp'},h('td',{colspan:'6',style:'text-align:left;white-space:normal;background:var(--soft2)'},h('div',{style:'display:flex;gap:10px;align-items:center'},spark(rows),h('small',{style:'font-size:11px'},'Perf by month, Jan–Oct (dashed = 100%). '+(META[b]?'Channels: '+META[b][1]+'.':'')+(cl?' Returns '+L(-cl)+'.':'')))));tr.after(d)}},
+      h('td',{},h('b',{},(isI?'★ ':'')+b),tag(b),h('small',{},'LY '+L(x[0]))),h('td',{},L(x[1]).replace(' L','')),h('td',{},L(x[2]).replace(' L','')),h('td',{class:pcls(pp)},pf(pp)),h('td',{class:gcls(g)},sg(g)),h('td',{},hm[0]+'/'+hm[1]));t.append(tr)});
+  t.append(h('tr',{class:'tot'},h('td',{},'All brands'),h('td',{},L(a[1]).replace(' L','')),h('td',{},L(a[2]).replace(' L','')),h('td',{class:pcls(P(a[2],a[1]))},pf(P(a[2],a[1]))),h('td',{class:gcls(gr(a[2],a[0]))},sg(gr(a[2],a[0]))),h('td',{},hh[0]+'/'+hh[1])));
+  return h('div',{class:'card'},h('h3',{},'Every brand',h('small',{},'★ impact · ₹ lakh · tap a brand')),h('div',{class:'tbl'},t),h('p',{class:'note'},'✓ Mo = months in Jan–Oct where you hit the brand target. This is product-wise sale; your incentive total is the SAG figure at the top.'))}
+function cMonths(f){var order=brandOrder(f),imp=impactList(f);
+  var t=h('table',{class:'heat'},h('tr',{},h('th',{},''),MON.map(function(m){return h('th',{style:'text-align:center'},m[0]+m[1])}),h('th',{style:'text-align:center'},'✓')));
+  ['ALL'].concat(order).forEach(function(b){var R=f.b[b];if(!R)return;var hm=hit(R),isA=b==='ALL';
+    t.append(h('tr',{class:isA?'me':''},h('td',{},isA?'All':(imp.indexOf(b)>=0?'★ ':'')+b.slice(0,8)),R.slice(0,10).map(function(r){var p=P(r[2],r[1]);return h('td',{class:heat(p)},p==null?'–':Math.round(p))}),h('td',{},h('b',{},hm[0]+'/'+hm[1]))))});
+  var c=h('div',{class:'card'},h('h3',{},'Target done – month by month',h('small',{},'perf %')),h('div',{class:'tbl'},t),
+    h('div',{class:'leg'},h('span',{style:'--c:#1B8A5A'},'≥105%'),h('span',{style:'--c:#7CC59A'},'100–104%'),h('span',{style:'--c:#F6D776'},'90–99%'),h('span',{style:'--c:#F4A261'},'80–89%'),h('span',{style:'--c:#E5484D'},'<80%')));
+  // growth heatmap
+  function gcell(v){var cls=v==null?'h0':v>=15?'h5':v>=0?'h4':v>=-10?'h3':v>=-25?'h2':'h1';return h('td',{class:cls},v==null?'–':(v>0?'+':'')+Math.round(v))}
+  var gt=h('table',{class:'heat'},h('tr',{},h('th',{},''),MON.map(function(m){return h('th',{style:'text-align:center'},m[0]+m[1])}),h('th',{style:'text-align:center'},'YTD')));
+  ['ALL'].concat(order).forEach(function(b){var R=f.b[b];if(!R)return;var y=R[10],gy=gr(y[2],y[0]),isA=b==='ALL';
+    gt.append(h('tr',{class:isA?'me':''},h('td',{},isA?'All':(imp.indexOf(b)>=0?'★ ':'')+b.slice(0,8)),R.slice(0,10).map(function(r){return gcell(gr(r[2],r[0]))}),h('td',{},h('b',{class:gcls(gy)},sg(gy)))))});
+  var c2=h('div',{class:'card'},h('h3',{},'Growth vs last year – month by month',h('small',{},'%')),h('div',{class:'tbl'},gt),
+    h('div',{class:'leg'},h('span',{style:'--c:#1B8A5A'},'+15% & up'),h('span',{style:'--c:#7CC59A'},'0 to +15%'),h('span',{style:'--c:#F6D776'},'0 to −10%'),h('span',{style:'--c:#F4A261'},'−10 to −25%'),h('span',{style:'--c:#E5484D'},'below −25%')));
+  return [c,c2]}
+function cSAGtable(f){var S2=f.sag||{};
+  var t=h('table',{},h('tr',{},h('th',{},'Period'),h('th',{},'Target'),h('th',{},'Sale'),h('th',{},'Perf'),h('th',{},'Gr'),h('th',{},'Return')));
+  ['JAN','FEB','MAR','Q1','APR','MAY','JUN','Q2','JUL','AUG','SEP','Q3','OCT','NOV','DEC','Q4','YTD'].forEach(function(k){var r=S2[k];if(!r)return;var qq=/Q|YTD/.test(k),p=P(r[3],r[2]),g=gr(r[3],r[1]);
+    if(!r[2]&&!r[3]&&!r[1]&&!qq)return t.append(h('tr',{},h('td',{},k.charAt(0)+k.slice(1).toLowerCase()),h('td',{colspan:'5',style:'text-align:left;color:var(--muted)'},k==='NOV'||k==='DEC'?'Target not on this sheet yet':'Not on incentive sheet')));
+    t.append(h('tr',{class:qq?'tot':''},h('td',{},qq?k:k.charAt(0)+k.slice(1).toLowerCase()),h('td',{},(r[2]||0).toFixed(2)),h('td',{},(r[3]||0).toFixed(2)),h('td',{class:pcls(p)},pf(p)),h('td',{class:gcls(g)},sg(g)),h('td',{},r[5]?'–'+r[5].toFixed(2):'0')))});
+  return h('div',{class:'card'},h('h3',{},'Incentive sheet · month & quarter',h('small',{},'₹ lakh')),h('div',{class:'tbl'},t),h('p',{class:'note'},'Exactly as the company SAG sheet your incentive is calculated on. Blank months are not on the sheet. The slab (₹ earned) shows here once Ratan shares it.'))}
+var CVIEWS=[['ov','Overview'],['br','Brands'],['mo','Months'],['sag','Incentive']];
+U.csoPerf=function(app){var box=h('div',{class:'geo cso'});app.append(box);var f=CF();
+  if(!f){box.append(h('div',{class:'card'},h('h3',{},'My brand analysis'),h('p',{class:'note'},'Your brand-wise figures appear right after a Sync. Tap Sync once and open this again.')));return}
+  var hq=f.hq||csoHQ(),p=per(),cv=get('cv','ov');if(!CVIEWS.some(function(x){return x[0]===cv}))cv='ov';
+  box.append(h('div',{class:'chips main',style:'margin-top:2px'},CVIEWS.map(function(x){return h('button',{class:x[0]===cv?'on':'',onclick:function(){set('cv',x[0])}},x[1])})));
+  box.append(h('p',{class:'note',style:'margin:-4px 0 10px'},hq+' HQ · from the company incentive (SAG) sheet · '+(f.asOf||'')+' · ₹ in lakh'));
+  var sk=sagKey(p),sag=(f.sag||{})[sk]||null;
+  if(cv==='ov'){box.append(periodChips(p),sagHero(hq,p,sag));
+    box.append(h('div',{class:'card'},h('h3',{},'Your incentive numbers',h('small',{},plab(p))),sag?sagKpi(sag):h('p',{class:'note'},'Not on the incentive sheet for this period.')));
+    box.append(cImpact(f,p));
+    box.append(chart(f.b.ALL,hq+' · target vs sale (all brands)'));}
+  else if(cv==='br'){box.append(periodChips(p),cBrandTable(f,p));}
+  else if(cv==='mo'){cMonths(f).forEach(function(c){box.append(c)});}
+  else if(cv==='sag'){box.append(cSAGtable(f));
+    box.append(h('div',{class:'card'},h('h3',{},'How your incentive is read'),h('p',{class:'note',style:'margin:0'},'Incentive = your HQ total (SAG) performance and growth, plus the four impact brands (Deca, R-Loc, Skinlite, Dexona) against their targets. Everything on this screen is from the same incentive sheet, so what you see is what you are measured and paid on.')));}}
 })();
 /* Field Tracker – Review mail (manager, best on a laptop): the evening review laid out as an email,
    ready to copy or open in Outlook. Nothing is sent by the app itself. */
