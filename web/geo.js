@@ -173,6 +173,17 @@ var st2=document.createElement('style');st2.textContent=`
 .geo .money .k{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;color:#FFF3D6}
 .geo .money h2{margin:3px 0 2px;font-size:30px;color:#fff!important;line-height:1;font-variant-numeric:tabular-nums;position:relative;z-index:1}
 .geo .money p{margin:6px 0 0;font-size:13.5px;opacity:.95;position:relative;z-index:1}
+.geo .loss{border-radius:22px;padding:18px 16px;color:#fff;background:radial-gradient(130% 150% at 100% 0,#6D4B6B 0%,#8E2A3F 45%,#5B1220 100%);box-shadow:0 14px 34px rgba(91,18,32,.34);margin:0 0 12px;position:relative;overflow:hidden}
+.geo .loss:after{content:'';position:absolute;right:-30px;bottom:-40px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.06)}
+.geo .loss .k{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;color:#FFD9DE}
+.geo .loss h2{margin:3px 0 2px;font-size:30px;color:#fff!important;line-height:1;font-variant-numeric:tabular-nums;text-decoration:line-through;text-decoration-thickness:2px;position:relative;z-index:1}
+.geo .loss p{margin:6px 0 0;font-size:13.5px;opacity:.96;position:relative;z-index:1}
+.geo .dream{background:linear-gradient(160deg,#102A43,#0F5257);color:#fff;border-radius:18px;padding:15px;margin:0 0 12px}
+.geo .dream h3{color:#fff!important;margin:0 0 4px;font-size:15.5px}
+.geo .dream .sub{font-size:12px;color:#CFE8E4;margin:0 0 10px}
+.geo .dream .row{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.12);font-size:13px;line-height:1.35}
+.geo .dream .row:last-child{border-bottom:0}.geo .dream .row b{color:#F6D776}
+.geo .dream .goal{margin-top:10px;font-size:13.5px;font-weight:700;color:#F6D776}
 .geo .earn{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:0 0 12px}
 .geo .earn>div{background:var(--card,#fff);border:1px solid var(--line,#e5ece9);border-radius:16px;padding:12px;min-width:0}
 .geo .earn .hd{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
@@ -317,16 +328,23 @@ function vInc(app,DA){
     app.append(h('p',{class:'note',style:'margin:0 0 8px'},'Earned so far (paid only when that HQ closes October at 100%). Tap an HQ for the full breakdown. Zone total is deliberately not shown.'));
     DA.HQS.forEach(function(q){if(q==='Dhubri')return;var oh=DA.onhold(q)||{q3:0,sept:0},tot=(oh.q3||0)+(oh.sept||0);var R2=(G.hq[q]||{}).ALL,o=R2?R2[9]:null,oa=o?P(o[2],o[1]):null,open=oa!=null&&oa>=100;
       app.append(h('div',{class:'impc',onclick:(function(qq){return function(){set('sc',qq)}})(q),style:'cursor:pointer'},
-        h('div',{class:'meta'},h('b',{},q+' · '+(CSO[q]||'')),h('div',{style:'display:flex;justify-content:space-between;font-size:12.5px;margin-top:4px'},h('span',{},'Earned '+R(tot)),h('span',{class:'pill '+(open?'up':'dn')},'Oct '+pf(oa)+(open?' ✓':''))),h('small',{style:'display:block;margin-top:3px;color:var(--muted)'},open?'October target met — earned amount is payable':tot>0?'October closed '+pf(oa)+' — held this cycle; November resets it':'No held amount — November is the earning month')),h('span',{class:'st',style:'align-self:center'},'›')))});
+        h('div',{class:'meta'},h('b',{},q+' · '+(CSO[q]||'')),h('div',{style:'display:flex;justify-content:space-between;font-size:12.5px;margin-top:4px'},h('span',{},'Earned '+R(tot)),h('span',{class:'pill '+(open?'up':'dn')},'Oct '+pf(oa)+(open?' ✓':''))),h('small',{style:'display:block;margin-top:3px;color:var(--muted)'},open?'October target met — earned amount is payable':tot>0?'October closed '+pf(oa)+' — '+R(tot)+' lost this cycle':'No held amount — November is the earning month')),h('span',{class:'st',style:'align-self:center'},'›')))});
     return;}
   app.append(scopeChips(DA));var hq=DA.scope,oh=DA.onhold(hq)||{q3:0,sept:0},tot=(oh.q3||0)+(oh.sept||0);
-  var R2=DA.rows('ALL'),o=agg(R2,9),oa=P(o[2],o[1]),octOpen=oa!=null&&oa>=100,gapOct=Math.max(0,o[1]-o[2]),octClosed=(o[1]>0||o[2]>0);
-  // MONEY HERO — their own earned
-  app.append(h('div',{class:'money'},h('div',{class:'k'},'💰 Earned so far · Q3 + September'),h('h2',{},R(tot)),
-    h('p',{},tot>0?(octOpen?'October target met ('+pf(oa)+') — this is now payable. Keep it rolling!':octClosed?'October closed at '+pf(oa)+' — this cycle needed 100% to release it. Your next payday is November.':'This is yours the moment October closes at 100%.'):(octOpen?'Strong month — keep stacking the wins.':'Cross your targets and real money starts stacking here.'))));
-  // October gate / pivot
-  app.append(h('div',{class:'push'+(octOpen?'':' hot')},h('b',{},octOpen?'✓ October secured — '+pf(oa):octClosed?'New month, fresh money':'October decides your earned money'),
-    octOpen?('You closed October at '+pf(oa)+'. '+(tot>0?R(tot)+' is released — well earned.':'Momentum is on your side — push the next slab.')):octClosed?('November resets the scoreboard — a 100% month earns fresh, and Q4 plus the +25% impact bonus are still fully in play. The fastest comeback starts with day one.'):('October is at '+pf(oa)+'. Reaching 100% releases '+R(tot)+'. Balance '+L(gapOct)+' — every order counts.')));
+  var R2=DA.rows('ALL'),o=agg(R2,9),oa=P(o[2],o[1]),octOpen=oa!=null&&oa>=100,gapOct=Math.max(0,o[1]-o[2]),octClosed=(o[1]>0||o[2]>0),lost=(octClosed&&!octOpen)?tot:0;
+  if(octOpen){
+    app.append(h('div',{class:'money'},h('div',{class:'k'},tot>0?'💰 Released · Q3 + September':'💰 October secured'),h('h2',{},tot>0?R(tot):pf(oa)),
+      h('p',{},tot>0?('October target met ('+pf(oa)+') — '+R(tot)+' is yours. This is what winning pays. Now stack the next one.'):('October '+pf(oa)+' ✓ — you kept the chain alive and you\'re earning fresh. Keep every brand climbing.'))));
+    app.append(h('div',{class:'push'},h('b',{},'Keep the chain alive'),'Earned money only lands when the next month is 100% too. Stay above the line in November and nothing can be taken back.'));
+  } else if(lost>0){
+    app.append(h('div',{class:'loss'},h('div',{class:'k'},'💔 Slipped away this cycle'),h('h2',{},R(lost)),
+      h('p',{},'You earned '+R(lost)+' across Q3 and September. The rule is hard — no 100% October, no release — and October closed at '+pf(oa)+'. This one hurts. Let it be the last time it ever happens.')));
+    app.append(h('div',{class:'push hot'},h('b',{},'You were only '+L(gapOct)+' away'),'That thin line — a couple more strong days — is all that stood between keeping '+R(lost)+' and losing it. Next month you close that gap in the first week and never give it back.'));
+  } else {
+    app.append(h('div',{class:'money'},h('div',{class:'k'},'💰 Your earning engine'),h('h2',{},octClosed?pf(oa):'Ready'),
+      h('p',{},octClosed?('October '+pf(oa)+' — '+(oa>=97?'you\'re earning fresh this month. ':'')+'The real money is in the months ahead, and the ceiling this year is huge. See the bigger picture below.'):'Cross your targets and real money starts stacking here.')));
+    app.append(h('div',{class:'push'},h('b',{},'New month, fresh money'),'November resets everything — a 100% month earns from day one, Q4 and the +25% impact bonus are fully open, and the year\'s big prizes are still on the table.'));
+  }
   // results / estimates
   var me=earnOf(o,'m'),q4=earnOf(agg(R2,'Q4'),'q'),q3=earnOf(agg(R2,'Q3'),'q');
   app.append(h('div',{class:'earn'},
@@ -336,8 +354,16 @@ function vInc(app,DA){
     eCard('📈','Oct growth',sg(me.g),me.g>0?'positive ✓ (needed)':'needs to be positive',me.g>0?'up':'dn')));
   // milestone ladder for October (where the month finished)
   app.append(mileBar(o[1],o[2]));
-  // win November
-  app.append(h('div',{class:'push hot'},h('b',{},'Win November'),'A clean month ahead. Hit 100% of November to earn fresh — the higher the slab, the higher the %. Start strong from day one and keep every impact brand moving.'));
+  // THE BIGGER PICTURE — dreams + ceiling (everyone)
+  var teaser=o[1]>0?(function(){var net=1.1*o[1];return net*1e5*RATE_M[slabIdx(net)][2]/100})():0;
+  app.append(h('div',{class:'dream'},h('h3',{},'🌍 The bigger picture'),h('div',{class:'sub'},'What a full, strong year actually pays'),
+    h('div',{class:'row'},'📅',h('span',{},h('b',{},'Every month 100%+: '),'up to 0.90% of your sales + ₹4,000–6,000 milestone')),
+    h('div',{class:'row'},'📦',h('span',{},h('b',{},'Every quarter 110%+: '),'up to 1.40% — plus a 25% impact-brand bonus on top')),
+    h('div',{class:'row'},'🗓️',h('span',{},h('b',{},'Half-yearly bonus: '),'extra again, over and above month & quarter')),
+    h('div',{class:'row'},'🚀',h('span',{},h('b',{},'Productivity Advantage: '),'₹30,000–1,05,000 a year for strong incremental growth')),
+    h('div',{class:'row'},'✈️',h('span',{},h('b',{},'STARNITE: '),'an international trip for 103–115%+ for the year')),
+    teaser>0?h('div',{class:'goal'},'At your HQ\'s scale, one 110% month ≈ '+R(teaser)+' — every single month. Stack twelve of those and add the trip.'):'',
+    h('div',{class:'goal'},'The 2026 ceiling is ₹12 lakh + a trip abroad. That is what you are really playing for — start taking it this month.')));
   // impact brand bonus gate (YTD standing — stable; bonus applies quarterly)
   var ig=impactGate(DA,'YTD');
   var ic=h('div',{class:'card'},h('h3',{},'⭐ Impact-brand bonus',h('small',{},'+25% · YTD standing')));
@@ -401,8 +427,9 @@ U.geoReady=function(){return !!G};U.geoReset=function(){if(window.__GEO)return;G
 
 /* earnings snapshot for the dashboard (CSO home) */
 U.earnCard=function(){try{var DA=mkDA(true);if(!DA)return'';var oh=DA.onhold()||{q3:0,sept:0},tot=(oh.q3||0)+(oh.sept||0);
-  var o=agg(DA.rows('ALL'),9),oa=P(o[2],o[1]),open=oa!=null&&oa>=100,closed=(o[1]>0||o[2]>0);
-  var c=h('div',{class:'geo'},h('div',{class:'money',style:'margin:0;cursor:pointer',onclick:function(){try{S.tab.perf='brands';S.tab.geo_T='inc';go('perf')}catch(e){}}},
-    h('div',{class:'k'},'💰 Earned so far'),h('h2',{},R(tot)),
-    h('p',{},tot>0?(open?'October '+pf(oa)+' ✓ — it\'s payable. Tap to see your money.':'October closed '+pf(oa)+' — November is your next payday. Tap ›'):'Cross your targets to start earning. Tap to see how ›')));return c}catch(e){return''}};
+  var o=agg(DA.rows('ALL'),9),oa=P(o[2],o[1]),open=oa!=null&&oa>=100,closed=(o[1]>0||o[2]>0),lost=(closed&&!open&&tot>0)?tot:0;
+  var cls=lost>0?'loss':'money',k=lost>0?'💔 Slipped away':'💰 Earned so far',
+    p=lost>0?('October closed '+pf(oa)+' — '+R(lost)+' lost this cycle. Tap for your comeback ›'):(tot>0?(open?'October '+pf(oa)+' ✓ — payable. Tap to see your money ›':'Tap to see your money ›'):(open?'October '+pf(oa)+' ✓ — earning fresh. Tap to see how ›':'Cross your targets to start earning. Tap ›'));
+  var c=h('div',{class:'geo'},h('div',{class:cls,style:'margin:0;cursor:pointer',onclick:function(){try{S.tab.perf='brands';S.tab.geo_T='inc';go('perf')}catch(e){}}},
+    h('div',{class:'k'},k),h('h2',{},R(tot)),h('p',{},p)));return c}catch(e){return''}};
 })();
