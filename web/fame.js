@@ -27,7 +27,7 @@ var st=document.createElement('style');st.textContent=`
 .fame .ph{width:min(60vw,250px);aspect-ratio:3/4;border-radius:24px;overflow:hidden;position:relative;border:4px solid #F6D776;box-shadow:0 0 0 8px rgba(246,215,118,.18),0 0 60px rgba(246,215,118,.45),0 24px 60px rgba(0,0,0,.55);animation:lift .95s cubic-bezier(.2,.8,.2,1) .35s both}
 .fame .ph img{width:100%;height:100%;object-fit:cover;display:block}
 .fame .ph:after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.6) 50%,transparent 65%);transform:translateX(-130%);animation:shine 1.5s ease 1.3s 2}
-.fame .cup{position:absolute;right:-14px;bottom:-14px;font-size:46px;animation:bounce 1.2s ease 1.2s infinite;filter:drop-shadow(0 4px 8px rgba(0,0,0,.4))}
+.fame .cup{position:absolute;right:-14px;bottom:-14px;font-size:46px;color:#F6D776;animation:bounce 1.2s ease 1.2s infinite;filter:drop-shadow(0 4px 8px rgba(0,0,0,.4))}
 .fame .nm{font-size:27px;font-weight:800;margin-top:18px;background:linear-gradient(90deg,#FFF3C4,#F6D776,#E0A82E,#F6D776,#FFF3C4);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rise .6s ease .9s both,gold 3s linear 1.5s infinite}
 .fame .rl{font-size:13.5px;opacity:.85;margin-top:2px;animation:rise .6s ease 1s both}
 .fame .ach{display:grid;gap:7px;margin-top:14px;max-width:340px;width:100%}
@@ -81,14 +81,14 @@ function showFame(list){if(document.querySelector('.fame'))return;var i=0,ov=h('
   function next(){if(i<list.length-1){i++;draw()}else{clearTimeout(timer);ov.style.transition='opacity .35s';ov.style.opacity='0';setTimeout(function(){ov.remove()},350)}}
   ov.addEventListener('click',next);document.body.append(ov);draw()}
 U.showFame=showFame;
-function dailyFame(){if(!S.ready||!who())return;if(lsGet('ft_fame_day','')===TODAY)return;var n=+lsGet('ft_fame_n','0');lsSet('ft_fame_day',TODAY);lsSet('ft_fame_n',String(n+1));
-  withMedia(function(){setTimeout(function(){showFame([FAME[n%2===0?0:1]])},300)})}
+function dailyFame(){if(!S.ready||!who())return;var days=[];try{days=JSON.parse(lsGet('ft_fame_days','[]'))}catch(e){}if(days.indexOf(TODAY)>=0||days.length>=3)return;days.push(TODAY);lsSet('ft_fame_days',JSON.stringify(days));
+  withMedia(function(){setTimeout(function(){showFame(FAME)},300)})}
 function hofCard(){return h('div',{class:'hof',onclick:function(){withMedia(function(){showFame(FAME)})}},h('div',{class:'hd'},img('rcl','','RCL'),'Guwahati Hall of Fame · RCL'),
   h('div',{class:'pp'},FAME.map(function(p){return h('div',{class:'p'},img(p.id,'',p.name),h('b',{},p.name),h('small',{},p.items[0].replace(/^\S+\s/,'')))})),h('div',{class:'tap'},'Tap to celebrate 🎉'))}
 
 /* ---------- gifts ---------- */
 var GIFTS=[
- {id:'g_gillette',t:'Gillette Presto razor',who:'Trade stockist',rule:'R-Loc 150: 1 case (18 boxes) → 18 razors. R-Loc D: 1 case (30 boxes) → 15 razors.',more:'2–28 Nov 2026 · min 1 case · non-returnable · razors come in the same LR. Stockist gives 1 razor with each R-Loc 150 box (or every 2 R-Loc D boxes) to retailers.',say:'Sir, book 1 case of R-Loc 150 – you get 18 Gillette Presto razors, one for every box you sell to your retailers.'},
+ {id:'g_gillette',t:'Gillette Presto razor'+(TODAY>'2026-11-28'?' (ended 28 Nov)':''),who:'Trade stockist',rule:'R-Loc 150: 1 case (18 boxes) → 18 razors. R-Loc D: 1 case (30 boxes) → 15 razors.',more:'2–28 Nov 2026 · min 1 case · non-returnable · razors come in the same LR. Stockist gives 1 razor with each R-Loc 150 box (or every 2 R-Loc D boxes) to retailers.',say:'Sir, book 1 case of R-Loc 150 – you get 18 Gillette Presto razors, one for every box you sell to your retailers.'},
  {id:'g_iron',t:'USHA iron',who:'Stockist',rule:'Buy ₹50,000 of Deca-Durabolin → 1 USHA iron.',more:'November 2026 gift slab.',say:'₹50,000 of Deca this month and the USHA iron is yours.'},
  {id:'g_bedsheet',t:'2 Raymond double bedsheets',who:'Stockist',rule:'1 case of Skinlite Cream 15 g / 25 g → 2 bedsheets.',more:'November 2026 gift slab.',say:'One case of Skinlite Cream and you take home 2 Raymond bedsheets.'},
  {id:'g_cooker',t:'Hawkins Classic 4 L cooker',who:'Stockist',rule:'2 cases of Skinlite Cream 15 g / 25 g → 1 cooker.',more:'November 2026 gift slab.',say:'Make it 2 cases of Skinlite Cream and the Hawkins cooker is yours.'},
@@ -105,7 +105,7 @@ var CHECK=[
  {k:'cream',n:'Skinlite Cream 15/25 g (stockist)',f:[['c','Cases']],calc:function(v){var o=[];if(v.c>=2)o.push(['g_cooker',Math.floor(v.c/2),'Hawkins cooker']);if(v.c%2===1)o.push(['g_bedsheet',2,'Raymond bedsheets']);return o},next:function(v){return v.c%2===1?'1 more case → Hawkins cooker instead of bedsheets':v.c<1?'1 case → 2 bedsheets · 2 cases → Hawkins cooker':''}},
  {k:'npd',n:'Skinlite Day Care / Facewash (stockist)',f:[['d','Day Care cases'],['w','Facewash cases']],calc:function(v){var n=v.d+Math.floor(v.w/2);return n?[['g_bottle',n,'water bottle'+(n>1?'s':'')]]:[]},next:function(v){return v.w%2===1?'1 more Facewash case → 1 more bottle':''}},
  {k:'gd',n:'Skinlite retailer bonanza',f:[['p','Facewash / Day Care ₹'],['q','Skinlite Cream ₹']],calc:function(v){return v.p>=300&&v.q>0&&v.p+v.q>=1000?[['g_glucon',1,'Glucon-D 125 g']]:[]},next:function(v){var o=[];if(v.p<300)o.push('₹'+(300-v.p)+' more Facewash/Day Care');if(v.q<=0)o.push('add Skinlite Cream');if(v.p+v.q<1000)o.push('₹'+Math.max(0,1000-v.p-v.q)+' more in total');return o.length?o.join(' · '):''}}];
-function vGifts(app){app.append(h('div',{class:'quote'},h('div',{class:'who'},'💬 '+t('says')),h('div',{class:'q'},'Show the gift picture first, then the profit. A customer who can see the gift orders faster.')));
+function vGifts(app){if(TODAY>'2026-11-30'){app.append(h('div',{class:'note'},'November gifts have ended. This month\'s gifts will appear here as soon as they are loaded.'));return}app.append(h('div',{class:'quote'},h('div',{class:'who'},'💬 '+t('says')),h('div',{class:'q'},'Show the gift picture first, then the profit. A customer who can see the gift orders faster.')));
   var cst=S.tab.gck||(S.tab.gck={k:'r150',v:{}});var ck=CHECK.filter(function(c){return c.k===cst.k})[0];
   var box=h('div',{class:'score'},h('b',{},'🎁 Gift checker'),h('div',{class:'subtabs',style:'margin-top:8px'},CHECK.map(function(c){return h('button',{class:c.k===cst.k?'on':'',onclick:function(){cst.k=c.k;cst.v={};render()}},c.n)})));
   var out=h('div');var ins=ck.f.map(function(f){var i=h('input',{type:'number',inputmode:'numeric',value:cst.v[f[0]]||'',placeholder:'0'});i.oninput=function(){cst.v[f[0]]=+i.value||0;paint(true)};return h('label',{},f[1],i)});
@@ -118,13 +118,13 @@ function vGifts(app){app.append(h('div',{class:'quote'},h('div',{class:'who'},'�
   app.append(h('div',{class:'sect'},h('b',{},'🎁 November gifts')),h('div',{class:'gifts'},GIFTS.map(function(g,i){return h('div',{class:'gift',style:'animation-delay:'+(i*50)+'ms',onclick:function(){giftSheet(g)}},img(g.id),h('div',{class:'tx'},h('b',{},g.t),h('small',{},g.rule),h('span',{class:'who'},g.who)))})))}
 U.vGifts=vGifts;
 function offerImg(o){var s=(o.t||'')+' '+(o.d||'');if(/Gillette|R-Loc.*Bonanza|Bumper Bonanza – R-Loc/i.test(s))return 'g_gillette';if(/Glucon/i.test(s))return 'g_glucon';if(/Hawkins|bedsheet/i.test(s))return 'g_cooker';if(/bottle/i.test(s))return 'g_bottle';if(/USHA|iron/i.test(s))return 'g_iron';return null}
-U.offerImg=function(o){var k=offerImg(o);return k&&M[k]?h('img',{src:M[k],class:'oi',draggable:'false'}):''};
+U.offerImg=function(o){if(TODAY>'2026-11-30')return '';var k=offerImg(o);return k&&M[k]?h('img',{src:M[k],class:'oi',draggable:'false'}):''};
 
 /* ---------- November corrections (from the R-Loc Trade Bonanza circular) ---------- */
 var baseREF=U.REF;U.REF=function(){var R=baseREF();if(!R||R.__fx)return R;R=JSON.parse(JSON.stringify(R));R.__fx=1;
   (R.offers||[]).forEach(function(o){if(/R-Loc/.test(o.t)&&/Bonanza/.test(o.t)){o.who='Trade stockist';o.t='R-Loc Trade Bonanza – Gillette Presto';o.d='2–28 Nov 2026. R-Loc 150: 1 case (18 boxes) → 18 Gillette Presto. R-Loc D: 1 case (30 boxes) → 15 Gillette Presto. Min 1 case, non-returnable, razors come in the same LR. Stockist gives 1 razor per R-Loc 150 box (1 per 2 R-Loc D boxes) to retailers.';o.say='Sir, book 1 case of R-Loc 150 – 18 Gillette Presto razors come free, one for every box you sell to retailers.'}
-    if(/Falcigo/.test(o.t))o.d='Falcigo 60 (1 case = 65): ₹38 (stock <12 months validity) / ₹40 (>12 months). Falcigo 120 (1 case = 105): 1–5 cases ₹105 · more than 5 cases ₹100. Direct stockists, one invoice only.'});
-  (R.products||[]).forEach(function(p){if(p.n==='Falcigo 60 Inj')p.case='1 case = 65 vials';if(p.n==='Falcigo 120 Inj')p.case='1 case = 105 units';if(p.n==='R-Loc 150 Tab'){p.box='1 box = 30 strips · 1 case = 18 boxes';p.gift='Trade Bonanza 2–28 Nov: 1 case → 18 Gillette Presto'}if(p.n==='R-Loc D Tab'){p.box='1 box = 15 strips · 1 case = 30 boxes';p.gift='Trade Bonanza 2–28 Nov: 1 case → 15 Gillette Presto'}});
+    if(/Falcigo/.test(o.t))o.d='Falcigo 60 (1 case = 65): ₹38 (stock <12 months validity) / ₹40 (>12 months). Falcigo 120 (1 case = 150): 1–5 cases ₹105 · more than 5 cases ₹100. Direct stockists, one invoice only.'});
+  (R.products||[]).forEach(function(p){if(p.n==='Falcigo 60 Inj')p.case='1 case = 65 vials';if(p.n==='Falcigo 120 Inj')p.case='1 case = 150 units';if(p.n==='R-Loc 150 Tab'){p.box='1 box = 30 strips · 1 case = 18 boxes';p.gift='Trade Bonanza 2–28 Nov: 1 case → 18 Gillette Presto'}if(p.n==='R-Loc D Tab'){p.box='1 box = 15 strips · 1 case = 30 boxes';p.gift='Trade Bonanza 2–28 Nov: 1 case → 15 Gillette Presto'}});
   return R};
 
 /* ---------- 2-tap doctor log ---------- */

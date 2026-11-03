@@ -45,7 +45,7 @@ var st=document.createElement('style');st.textContent=`
 .prio .tx{flex:1;font-size:15px;line-height:1.35}.prio .tx small{display:block;color:var(--muted);font-size:12.5px}.prio .go{color:var(--muted);font-size:20px}
 .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .tile{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px 4px 10px;text-align:center;font-size:11.5px;line-height:1.25;color:var(--ink);min-height:auto;box-shadow:0 2px 8px rgba(16,40,38,.05);animation:pop .35s ease both}
-.tile .i{display:grid;place-items:center;width:42px;height:42px;margin:0 auto 6px;border-radius:13px;font-size:21px;background:var(--soft)}
+.tile .i{display:grid;place-items:center;width:44px;height:44px;margin:0 auto 7px;border-radius:14px;font-size:21px;color:var(--gold2);background:linear-gradient(145deg,var(--h1),var(--h3));box-shadow:inset 0 0 0 1px rgba(246,215,118,.35),0 4px 10px var(--accsh)}
 .ftsheet{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;animation:fade .2s ease both}
 .ftsheet .pn{background:var(--panel);color:var(--ink);width:100%;max-width:560px;margin:0 auto;border-radius:22px 22px 0 0;max-height:88vh;overflow:auto;padding:8px 16px calc(20px + env(safe-area-inset-bottom));animation:up .28s cubic-bezier(.2,.8,.2,1) both}
 .ftsheet .grab{width:44px;height:5px;border-radius:5px;background:var(--line);margin:6px auto 10px}

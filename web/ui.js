@@ -202,22 +202,32 @@ function vProd(app){var R=UI.REF();if(!R){app.append(h('div',{class:'note'},'Rat
   var lot=h('select',{},[h('option',{value:0},'No scheme')].concat(lots.map(function(l,k){return h('option',{value:k+1},'Scheme '+l)})));lot.value=st.lot;
   var qty=h('input',{type:'number',inputmode:'numeric',value:st.q});var mrp=h('input',{type:'number',inputmode:'decimal',value:st.mrp||(mrpOf(p)?mrpOf(p).toFixed(2):''),placeholder:'MRP on the pack'});
   var out=h('div');
+  var dIn=h('input',{type:'number',inputmode:'decimal',min:'0',max:'10',step:'0.5',value:st.d||0});
+  var dChips=h('div',{class:'chips'},[0,1,2,3,5,7,10].map(function(v){return h('button',{class:(+st.d||0)===v?'on':'',onclick:function(){st.d=v;dIn.value=v;[].forEach.call(dChips.children,function(c){c.classList.toggle('on',+c.textContent.replace('%','')===v)});calc()}},v+'%')}));
   function calc(){lsSet('ft_calc','1');st.q=+qty.value||0;st.lot=+lot.value;st.mrp=mrp.value;var m=+mrp.value||0,g=1+p.gst/100,ptr=m/g*.8;out.innerHTML='';if(!m){out.append(h('div',{class:'note'},'Type the MRP printed on the pack.'));return}
-    var buy=st.who==='Retailer'?ptr*g:st.who==='Wholesaler'?ptr*.93*g:ptr*.9*g,sell=st.who==='Retailer'?m:ptr*g,pct=st.who==='Retailer'?20:st.who==='Wholesaler'?7:10;
+    var cap=st.who==='Wholesaler'?3:10,d=Math.max(0,Math.min(cap,+dIn.value||0));st.d=d;var dd=d/100;
+    var buy=st.who==='Retailer'?ptr*(1-dd)*g:st.who==='Wholesaler'?ptr*(.93-dd)*g:ptr*.9*g,sell=st.who==='Retailer'?m:ptr*g;
     var paid=st.q,free=0,L=lots[st.lot-1];if(L){var ab=L.split('+').map(Number);free=Math.floor(paid/ab[0])*ab[1]}
     var cost=paid*buy,rev=(paid+free)*sell,prof=rev-cost,eff=(paid+free)?cost/(paid+free):0,unitP=sell-eff,pp=sell?unitP/sell*100:0;
     var line=function(a,b){return h('div',{style:'display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line)'},h('span',{},a),h('b',{class:'num'},b))};
-    var unit=p.u.replace(/ of \d+/,'');
-    var say=st.who==='Retailer'?'Sir, you buy at '+money(buy)+' a '+unit+' and sell at MRP '+money(m)+' – that is '+money(m-buy)+' profit on every '+unit+'.'+(free?' With scheme '+L+' you get '+free+' free, so your profit goes up to '+money(unitP)+' a '+unit+' ('+pp.toFixed(0)+'%). On this order you earn '+money(prof)+'.':' On '+paid+' you earn '+money(prof)+'.')
-      :st.who==='Wholesaler'?'You buy at '+money(buy)+' and sell to retailers at '+money(sell)+' – '+money(sell-buy)+' per '+unit+'.'+(free?' Pass the '+L+' scheme to retailers and they will order more.':'')+' This order earns you '+money(prof)+'.'
-      :'Your rate is '+money(buy)+' a '+unit+'. At retailer price '+money(sell)+' you earn 10%; through wholesalers you keep 3%.'+(p.slab?' '+p.slab+'.':'')+(p.flat?' Flat rate available in one invoice.':'');
+    var unit=p.u.replace(/ of \d+/,''),pts=ptr*.9*g;
+    var stkKeepR=10-(st.who==='Retailer'?d:0),stkKeepW=3-(st.who==='Wholesaler'?d:0);
+    var say=st.who==='Retailer'?'Sir, you buy at '+money(buy)+' a '+unit+' and sell at MRP '+money(m)+' – that is '+money(m-buy)+' profit on every '+unit+(d?' (20% margin + '+d+'% extra from the stockist)':'')+'.'+(free?' With scheme '+L+' you get '+free+' free, so your profit goes up to '+money(unitP)+' a '+unit+' ('+pp.toFixed(0)+'%).':'')+' On this order you earn '+money(prof)+'.'
+      :st.who==='Wholesaler'?'You buy at '+money(buy)+(d?' (7% + '+d+'% extra from the stockist)':'')+' and sell to retailers at '+money(sell)+' – '+money(sell-buy)+' per '+unit+'.'+(free?' Pass the '+L+' scheme to retailers and they will order more.':'')+' This order earns you '+money(prof)+'.'
+      :'Your rate is '+money(buy)+' a '+unit+'. Selling to retailers at '+money(sell)+' you earn 10%; through wholesalers you keep 3%. Any extra discount you give comes out of this 10%.'+(p.slab?' '+p.slab+'.':'')+(p.flat?' Flat rate available in one invoice.':'');
+    var chain=h('div',{class:'score'},h('b',{},'Who earns what on one '+unit+' (MRP '+money(m)+')'),
+      line('Retailer buys at',money(st.who==='Retailer'?buy:ptr*g)),line('Retailer earns',money(m-(st.who==='Retailer'?buy:ptr*g))+' ('+((m-(st.who==='Retailer'?buy:ptr*g))/m*100).toFixed(1)+'% of MRP)'),
+      st.who==='Wholesaler'?line('Wholesaler earns',money(sell-buy)+' ('+(7+d)+'% of PTR)'):'',
+      line('Stockist buys at (PTS)',money(pts)),line('Stockist keeps',(st.who==='Wholesaler'?stkKeepW:stkKeepR).toFixed(1)+'% of PTR = '+money(ptr*g*(st.who==='Wholesaler'?stkKeepW:stkKeepR)/100)),
+      d?h('small',{style:'display:block;color:var(--muted);margin-top:4px'},'Extra '+d+'% given by the stockist from his own 10% margin.'):'');
     out.append(h('div',{class:'score'},line('Buys at (incl. GST)',money(buy)+' / '+unit),line('Sells at',money(sell)+' / '+unit),line('Order: pays for',paid+' '+unit+(free?' + '+free+' free':'')),line('Bill value',money(cost)),
       h('div',{style:'display:flex;justify-content:space-between;align-items:end;margin-top:6px'},h('span',{},'Profit on this order'),h('span',{class:'big',style:'color:var(--ok)'},money(prof))),
-      h('small',{style:'color:var(--muted)'},'Profit per '+unit+': '+money(unitP)+' ('+pp.toFixed(1)+'% of selling price, base '+pct+'%'+(free?' + free goods':'')+')')),
+      h('small',{style:'color:var(--muted)'},'Profit per '+unit+': '+money(unitP)+' ('+pp.toFixed(1)+'% of selling price)')),chain,
       h('div',{class:'quote'},h('div',{class:'who'},'🗣️ '+t('say')),h('div',{class:'q'},say),h('button',{class:'ghost',style:'margin-top:8px',onclick:function(){speak(say)}},'🔊 '+t('listen'))),
-      (p.slab||p.flat||p.gift||p.minBill||p.case)?h('div',{class:'note'},[p.minBill?'Minimum billing: '+p.minBill:'',p.case||'',p.slab||'',p.flat?'Flat (direct stockist, one invoice): '+p.flat.map(function(f){return f[0]+' ₹'+f[1]}).join(' · '):'',p.gift?'🎁 '+p.gift:''].filter(Boolean).map(function(x){return h('div',{},'• '+x)})):null)}
+      (p.slab||p.flat||p.gift||p.minBill||p.case)?h('div',{class:'note'},[p.minBill?'Minimum billing: '+p.minBill:'',p.case||'',p.slab||'',p.flat?'Flat (direct stockist, one invoice): '+p.flat.map(function(f){return f[0]+' ₹'+f[1]}).join(' · '):'',p.gift?'🎁 '+p.gift:''].filter(Boolean).map(function(x){return h('div',{},'• '+x)})):'')}
+  dIn.oninput=calc;
   sel.onchange=function(){st.p=+sel.value;st.lot=0;st.mrp='';render()};lot.onchange=function(){var L=lots[+lot.value-1];if(L){var a0=+L.split('+')[0];if((+qty.value||0)<a0)qty.value=a0}calc()};qty.oninput=calc;mrp.oninput=calc;
-  app.append(h('div',{class:'score'},h('b',{},'Price & profit calculator'),h('label',{},'Product',sel),h('label',{},'Customer'),who,h('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:8px'},h('label',{},'Quantity ('+p.u+')',qty),h('label',{},'MRP ₹ (from pack)',mrp)),h('label',{},'Scheme',lot)),out);calc()}
+  app.append(h('div',{class:'score'},h('b',{},'Price & profit calculator'),h('label',{},'Product',sel),h('label',{},'Customer'),who,h('div',{style:'display:grid;grid-template-columns:1fr 1fr;gap:8px'},h('label',{},'Quantity ('+p.u+')',qty),h('label',{},'MRP ₹ (from pack)',mrp)),h('label',{},'Scheme',lot),st.who==='Stockist'?'':h('label',{},'Extra discount from stockist (% of PTR, out of his 10%'+(st.who==='Wholesaler'?'; max 3% via wholesaler':'')+')',dChips,dIn)),out);calc()}
 function mrpOf(p){if(p.mrp)return p.mrp;if(!p.pts)return 0;return Math.round(p.pts*(1+p.gst/100)/.72*100)/100}
 function vQuiz(app){var Q=(C().quiz||[]);if(!Q.length)return;var seed=dayIdx();var pick=[];for(var k=0;k<5&&k<Q.length;k++)pick.push(Q[(seed*7+k*3)%Q.length]);
   var st=S.tab.quizState||(S.tab.quizState={i:0,score:0,ans:null});if(st.day!==TODAY){st.day=TODAY;st.i=0;st.score=0;st.ans=null}
