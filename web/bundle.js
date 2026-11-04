@@ -1,4 +1,4 @@
-window.FT_BUILD='20261104053429';
+window.FT_BUILD='20261104054301';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -812,7 +812,31 @@ says:'Motivation gets you started. Habit keeps you going.'},
 "All four KPI conditions must be met: growth over last year, returns 3 percent or less, outlet coverage 90 percent, doctor coverage 95 percent.",
 "Check the Progress tab every morning: it shows how much more to sell for each level.",
 "Impact brands (Deca, R-Loc, Skinlite, Dexona) also count for the quarter. Push them every week."],
-says:'The incentive is not luck. It is the result of daily discipline. Track it every day.'}];
+says:'The incentive is not luck. It is the result of daily discipline. Track it every day.'},
+{icon:'📊',title:'Read your own numbers',sub:'Reports, POB and incentive',steps:[
+"Open Reports every day. The top shows your HQ sale vs target and your growth — that is exactly what your incentive is read from.",
+"Green means you crossed the target, amber is close, red needs work. Go to the red brands first.",
+"Performance % = your net sale divided by target. Growth % = this year against last year, same period. Both must be strong for incentive.",
+"In the Incentive tab, see what you earned, what it takes to release it, and the next slab. Always chase the next milestone.",
+"Each impact brand must cross 90 percent or the 25 percent bonus is lost — fix the weakest one first.",
+"Numbers are not for fear, they are your map. Read them, then do the one thing that moves them most."],
+says:'The rep who reads his own numbers every day is the rep who grows them.'},
+{icon:'🎯',title:'This month: win the impact brands',sub:'Deca, R-Loc, Skinlite, Dexona',steps:[
+"Four brands decide your biggest bonus: Deca-Durabolin, R-Loc, Skinlite and Dexona. Each must reach 90 percent or more.",
+"Deca: your geriatric, ortho and post-surgery doctors. Ask for the next 5 weak or elderly patients.",
+"R-Loc 150: switch acidity and ulcer patients from competitors, and stock the chemist who serves that doctor.",
+"Skinlite: derma and GP for pigmentation; always add Facewash and Day Care, and place it at the nearby chemist.",
+"Dexona: ortho and surgeons for acute inflammation; book the lot with the wholesaler.",
+"One weak brand cancels the whole 25 percent bonus. Find your weakest brand in Reports and attack it this week."],
+says:'Win the four impact brands and you win the month — and the bonus on top.'},
+{icon:'🚀',title:'Grow your career here',sub:'From CSO to leader',steps:[
+"Every topper was once new. Coverage, consistency and honest reporting are what get you noticed.",
+"Hit your POB and coverage every month — a steady performer is promoted before a lucky one.",
+"Know your products and schemes so well that doctors and chemists trust your word. That trust is your real asset.",
+"Keep your data clean and on time. Managers promote people they can rely on without checking.",
+"The incentive ladder, the Productivity Award and the STARNITE trip are real — chase them and your name travels upward.",
+"Learn one new thing here every day. In a year you will be the one others learn from."],
+says:'Do today\'s work like the person you want to become tomorrow.'}];
 window.COACH=window.COACH||{};
 COACH.hi.phases=['चरण 1 · बुनियाद','चरण 2 · बिक्री कौशल','चरण 3 · बिज़नेस और आँकड़े','चरण 4 · चैंपियन'];
 COACH.hi.phaseSub=['आपके पहले दो हफ़्ते','बोलना, सुनना और मनाना','मार्जिन, स्टॉक और स्टॉकिस्ट','प्लान करें, आगे बढ़ें, जीतें'];
@@ -903,7 +927,31 @@ says:'प्रेरणा शुरुआत कराती है। आद�
 "चारों KPI शर्तें ज़रूरी: पिछले साल से ग्रोथ, रिटर्न 3 प्रतिशत या कम, आउटलेट कवरेज 90 प्रतिशत, डॉक्टर कवरेज 95 प्रतिशत।",
 "हर सुबह Progress टैब देखिए: हर स्तर के लिए कितना और बेचना है, वह दिखता है।",
 "इम्पैक्ट ब्रांड (Deca, R-Loc, Skinlite, Dexona) तिमाही में भी गिने जाते हैं। हर हफ़्ते उन पर ज़ोर दीजिए।"],
-says:'इंसेंटिव क़िस्मत नहीं, रोज़ के अनुशासन का नतीजा है। हर दिन ट्रैक कीजिए।'}];
+says:'इंसेंटिव क़िस्मत नहीं, रोज़ के अनुशासन का नतीजा है। हर दिन ट्रैक कीजिए।'},
+{icon:'📊',title:'अपने नंबर पढ़िए',sub:'Reports, POB और incentive',steps:[
+"हर दिन Reports खोलिए। ऊपर आपके HQ की बिक्री बनाम टारगेट और ग्रोथ दिखती है — इंसेंटिव इसी से बनता है।",
+"हरा मतलब टारगेट पार, पीला मतलब पास, लाल पर काम चाहिए। पहले लाल ब्रांड पर जाइए।",
+"Performance % = नेट बिक्री ÷ टारगेट। Growth % = इस साल बनाम पिछले साल, वही अवधि। इंसेंटिव के लिए दोनों मज़बूत चाहिए।",
+"Incentive टैब में देखिए: क्या कमाया, उसे पाने के लिए क्या चाहिए, और अगला slab। हमेशा अगले milestone के पीछे लगिए।",
+"हर impact brand को 90 प्रतिशत पार करना होगा, वरना 25 प्रतिशत बोनस चला जाता है — पहले सबसे कमज़ोर को ठीक कीजिए।",
+"नंबर डर के लिए नहीं, आपका नक्शा हैं। पढ़िए, फिर वही एक काम कीजिए जो इन्हें सबसे ज़्यादा बढ़ाए।"],
+says:'जो रोज़ अपने नंबर पढ़ता है, वही उन्हें बढ़ाता है।'},
+{icon:'🎯',title:'इस महीने: impact brands जीतिए',sub:'Deca, R-Loc, Skinlite, Dexona',steps:[
+"चार ब्रांड आपका सबसे बड़ा बोनस तय करते हैं: Deca-Durabolin, R-Loc, Skinlite और Dexona। हर एक को 90 प्रतिशत या ज़्यादा चाहिए।",
+"Deca: बुज़ुर्ग, ortho और सर्जरी के बाद वाले मरीज़। अगले 5 कमज़ोर या बुज़ुर्ग मरीज़ माँगिए।",
+"R-Loc 150: एसिडिटी और अल्सर के मरीज़ कॉम्पिटिटर से बदलवाइए, और उस डॉक्टर के पास वाले केमिस्ट में स्टॉक कराइए।",
+"Skinlite: pigmentation के लिए derma और GP; हमेशा Facewash और Day Care जोड़िए, और पास के केमिस्ट में रखवाइए।",
+"Dexona: तेज़ सूजन के लिए ortho और सर्जन; होलसेलर के साथ lot बुक कराइए।",
+"एक कमज़ोर ब्रांड पूरा 25 प्रतिशत बोनस रद्द कर देता है। Reports में अपना सबसे कमज़ोर ब्रांड ढूँढिए और इसी हफ़्ते उस पर टूट पड़िए।"],
+says:'चारों impact brands जीतिए, तो महीना भी जीता और ऊपर से बोनस भी।'},
+{icon:'🚀',title:'यहीं अपना करियर बढ़ाइए',sub:'CSO से लीडर तक',steps:[
+"हर टॉपर कभी नया था। कवरेज, निरंतरता और ईमानदार रिपोर्टिंग से आप नज़र में आते हैं।",
+"हर महीने अपना POB और कवरेज पूरा कीजिए — किस्मत वाले से पहले टिकाऊ परफ़ॉर्मर को प्रमोशन मिलता है।",
+"अपने प्रोडक्ट और स्कीम इतने अच्छे से जानिए कि डॉक्टर और केमिस्ट आपकी बात पर भरोसा करें। यही भरोसा आपकी असली पूँजी है।",
+"डेटा साफ़ और समय पर रखिए। मैनेजर उन्हीं को प्रमोट करते हैं जिन पर बिना जाँचे भरोसा हो।",
+"इंसेंटिव सीढ़ी, Productivity Award और STARNITE ट्रिप असली हैं — इनके पीछे लगिए, आपका नाम ऊपर तक जाएगा।",
+"यहाँ रोज़ एक नई बात सीखिए। एक साल में आप वही होंगे जिनसे बाकी सीखेंगे।"],
+says:'आज का काम उस इंसान की तरह कीजिए जो आप कल बनना चाहते हैं।'}];
 window.COACH=window.COACH||{};
 COACH.bn.phases=['ধাপ ১ · ভিত','ধাপ ২ · বিক্রির দক্ষতা','ধাপ ৩ · ব্যবসা ও সংখ্যা','ধাপ ৪ · চ্যাম্পিয়ন'];
 COACH.bn.phaseSub=['আপনার প্রথম দুই সপ্তাহ','বলা, শোনা ও বোঝানো','মার্জিন, স্টক ও স্টকিস্ট','পরিকল্পনা, নেতৃত্ব, জয়'];
@@ -994,7 +1042,31 @@ says:'প্রেরণা শুরু করায়। অভ্যাস �
 "চারটি KPI শর্তই দরকার: গত বছরের চেয়ে বৃদ্ধি, রিটার্ন ৩ শতাংশ বা কম, আউটলেট কভারেজ ৯০ শতাংশ, ডাক্তার কভারেজ ৯৫ শতাংশ।",
 "প্রতি সকালে Progress ট্যাব দেখুন: প্রতিটি স্তরের জন্য আর কত বেচতে হবে, দেখায়।",
 "ইমপ্যাক্ট ব্র্যান্ড (Deca, R-Loc, Skinlite, Dexona) ত্রৈমাসিকেও গোনা হয়। প্রতি সপ্তাহে জোর দিন।"],
-says:'ইনসেনটিভ ভাগ্য নয়, রোজকার শৃঙ্খলার ফল। প্রতিদিন নজর রাখুন।'}];
+says:'ইনসেনটিভ ভাগ্য নয়, রোজকার শৃঙ্খলার ফল। প্রতিদিন নজর রাখুন।'},
+{icon:'📊',title:'নিজের নম্বর পড়ুন',sub:'Reports, POB আর incentive',steps:[
+"প্রতিদিন Reports খুলুন। উপরে আপনার HQ-এর বিক্রি বনাম টার্গেট আর গ্রোথ দেখায় — ইনসেনটিভ এখান থেকেই হিসাব হয়।",
+"সবুজ মানে টার্গেট পার, হলুদ মানে কাছাকাছি, লাল মানে কাজ বাকি। আগে লাল ব্র্যান্ডে যান।",
+"Performance % = নেট বিক্রি ÷ টার্গেট। Growth % = এ বছর বনাম গত বছর, একই সময়। ইনসেনটিভের জন্য দুটোই শক্ত হতে হবে।",
+"Incentive ট্যাবে দেখুন: কত আয় হয়েছে, তা পেতে কী লাগবে, আর পরের slab। সবসময় পরের milestone-এর পিছনে লাগুন।",
+"প্রতিটি impact brand-কে ৯০ শতাংশ পার করতে হবে, নাহলে ২৫ শতাংশ বোনাস চলে যায় — আগে সবচেয়ে দুর্বলটা ঠিক করুন।",
+"নম্বর ভয়ের জন্য নয়, আপনার মানচিত্র। পড়ুন, তারপর সেই একটি কাজ করুন যা এগুলো সবচেয়ে বাড়ায়।"],
+says:'যে রোজ নিজের নম্বর পড়ে, সে-ই সেগুলো বাড়ায়।'},
+{icon:'🎯',title:'এই মাসে: impact brands জিতুন',sub:'Deca, R-Loc, Skinlite, Dexona',steps:[
+"চারটি ব্র্যান্ড আপনার সবচেয়ে বড় বোনাস ঠিক করে: Deca-Durabolin, R-Loc, Skinlite আর Dexona। প্রত্যেকটিকে ৯০ শতাংশ বা বেশি লাগবে।",
+"Deca: বয়স্ক, ortho আর সার্জারির পরের রোগী। পরের ৫ জন দুর্বল বা বয়স্ক রোগীর জন্য চান।",
+"R-Loc 150: অ্যাসিডিটি আর আলসারের রোগী কম্পিটিটর থেকে বদলান, আর সেই ডাক্তারের কাছের কেমিস্টে স্টক করান।",
+"Skinlite: pigmentation-এর জন্য derma আর GP; সবসময় Facewash আর Day Care যোগ করুন, আর কাছের কেমিস্টে রাখান।",
+"Dexona: তীব্র প্রদাহের জন্য ortho আর সার্জন; হোলসেলারের সঙ্গে lot বুক করান।",
+"একটা দুর্বল ব্র্যান্ড পুরো ২৫ শতাংশ বোনাস বাতিল করে। Reports-এ নিজের সবচেয়ে দুর্বল ব্র্যান্ড খুঁজুন আর এই সপ্তাহেই ঝাঁপিয়ে পড়ুন।"],
+says:'চারটি impact brand জিতুন, মাসও জেতা হবে — উপরে বোনাসও।'},
+{icon:'🚀',title:'এখানেই ক্যারিয়ার গড়ুন',sub:'CSO থেকে লিডার',steps:[
+"প্রতিটি টপার একসময় নতুন ছিল। কভারেজ, নিয়মিততা আর সৎ রিপোর্টিং আপনাকে নজরে আনে।",
+"প্রতি মাসে POB আর কভারেজ পূরণ করুন — ভাগ্যবানের আগে স্থির পারফর্মার প্রমোশন পায়।",
+"প্রোডাক্ট আর স্কিম এত ভালো জানুন যে ডাক্তার আর কেমিস্ট আপনার কথায় ভরসা করে। সেই ভরসাই আপনার আসল সম্পদ।",
+"ডেটা পরিষ্কার আর সময়মতো রাখুন। ম্যানেজার তাদেরই প্রমোট করে, যাদের ওপর না যাচাই করেই ভরসা করা যায়।",
+"ইনসেনটিভ সিঁড়ি, Productivity Award আর STARNITE ট্রিপ সত্যি — এগুলোর পিছনে লাগুন, আপনার নাম ওপরে পৌঁছবে।",
+"এখানে রোজ একটা নতুন জিনিস শিখুন। এক বছরে আপনি হবেন সেই জন, যার থেকে বাকিরা শেখে।"],
+says:'আজকের কাজ সেই মানুষের মতো করুন, কাল যিনি হতে চান।'}];
 window.COACH=window.COACH||{};
 COACH.as.phases=['পৰ্যায় ১ · ভেটি','পৰ্যায় ২ · বিক্ৰীৰ দক্ষতা','পৰ্যায় ৩ · ব্যৱসায় আৰু সংখ্যা','পৰ্যায় ৪ · চেম্পিয়ন'];
 COACH.as.phaseSub=['আপোনাৰ প্ৰথম দুসপ্তাহ','কোৱা, শুনা আৰু বুজোৱা','মাৰ্জিন, ষ্টক আৰু ষ্টকিষ্ট','পৰিকল্পনা, নেতৃত্ব, জয়'];
@@ -1085,7 +1157,31 @@ says:'প্ৰেৰণাই আৰম্ভ কৰায়। অভ্য�
 "চাৰিওটা KPI চৰ্ত লাগে: যোৱা বছৰতকৈ বৃদ্ধি, ৰিটাৰ্ণ ৩ শতাংশ বা কম, আউটলেট কভাৰেজ ৯০ শতাংশ, ডাক্তৰ কভাৰেজ ৯৫ শতাংশ।",
 "প্ৰতি ৰাতিপুৱা Progress টেব চাওক: প্ৰতিটো স্তৰৰ বাবে আৰু কিমান বেচিব লাগিব, দেখুৱায়।",
 "ইম্পেক্ট ব্ৰেণ্ড (Deca, R-Loc, Skinlite, Dexona) ত্ৰৈমাসিকতো গণনা হয়। প্ৰতি সপ্তাহে জোৰ দিয়ক।"],
-says:'ইনচেণ্টিভ ভাগ্য নহয়, প্ৰতিদিনৰ অনুশাসনৰ ফল। প্ৰতিদিনে নজৰ ৰাখক।'}];
+says:'ইনচেণ্টিভ ভাগ্য নহয়, প্ৰতিদিনৰ অনুশাসনৰ ফল। প্ৰতিদিনে নজৰ ৰাখক।'},
+{icon:'📊',title:'নিজৰ নম্বৰ পঢ়ক',sub:'Reports, POB আৰু incentive',steps:[
+"প্ৰতিদিনে Reports খোলক। ওপৰত আপোনাৰ HQ-ৰ বিক্ৰী বনাম টাৰ্গেট আৰু গ্ৰোথ দেখুৱায় — ইনচেণ্টিভ ইয়াৰ পৰাই হিচাপ হয়।",
+"সেউজীয়া মানে টাৰ্গেট পাৰ, হালধীয়া মানে ওচৰ, ৰঙা মানে কাম বাকী। আগেয়ে ৰঙা ব্ৰেণ্ডলৈ যাওক।",
+"Performance % = নেট বিক্ৰী ÷ টাৰ্গেট। Growth % = এই বছৰ বনাম যোৱা বছৰ, একে সময়। ইনচেণ্টিভৰ বাবে দুয়োটা শকত হ\'ব লাগে।",
+"Incentive টেবত চাওক: কিমান উপাৰ্জন হ\'ল, সেয়া পাবলৈ কি লাগে, আৰু পৰৱৰ্তী slab। সদায় পৰৱৰ্তী milestone-ৰ পিছত লাগক।",
+"প্ৰতিটো impact brand-ক ৯০ শতাংশ পাৰ কৰিব লাগিব, নহ\'লে ২৫ শতাংশ ব\'নাছ গুচি যায় — আগেয়ে আটাইতকৈ দুৰ্বলটো ঠিক কৰক।",
+"নম্বৰ ভয়ৰ বাবে নহয়, আপোনাৰ মানচিত্ৰ। পঢ়ক, তাৰ পিছত সেই এটা কাম কৰক যিয়ে ইয়াক আটাইতকৈ বঢ়ায়।"],
+says:'যিয়ে প্ৰতিদিনে নিজৰ নম্বৰ পঢ়ে, তেৱেঁই সেইবোৰ বঢ়ায়।'},
+{icon:'🎯',title:'এই মাহত: impact brands জিনক',sub:'Deca, R-Loc, Skinlite, Dexona',steps:[
+"চাৰিটা ব্ৰেণ্ডে আপোনাৰ আটাইতকৈ ডাঙৰ ব\'নাছ ঠিক কৰে: Deca-Durabolin, R-Loc, Skinlite আৰু Dexona। প্ৰতিটোক ৯০ শতাংশ বা বেছি লাগে।",
+"Deca: বৃদ্ধ, ortho আৰু অস্ত্ৰোপচাৰৰ পিছৰ ৰোগী। পৰৱৰ্তী ৫ জন দুৰ্বল বা বৃদ্ধ ৰোগীৰ বাবে বিচাৰক।",
+"R-Loc 150: এচিডিটি আৰু আলচাৰৰ ৰোগী কম্পিটিটৰৰ পৰা সলনি কৰাওক, আৰু সেই ডাক্তৰৰ ওচৰৰ কেমিষ্টত ষ্টক কৰাওক।",
+"Skinlite: pigmentation-ৰ বাবে derma আৰু GP; সদায় Facewash আৰু Day Care যোগ কৰক, আৰু ওচৰৰ কেমিষ্টত ৰাখক।",
+"Dexona: তীব্ৰ প্ৰদাহৰ বাবে ortho আৰু চাৰ্জন; হ\'লছেলাৰৰ সৈতে lot বুক কৰাওক।",
+"এটা দুৰ্বল ব্ৰেণ্ডে গোটেই ২৫ শতাংশ ব\'নাছ বাতিল কৰে। Reports-ত নিজৰ আটাইতকৈ দুৰ্বল ব্ৰেণ্ড বিচাৰক আৰু এই সপ্তাহতে তাৰ ওপৰত জাঁপ মাৰক।"],
+says:'চাৰিওটা impact brand জিনিলে মাহটোও জিনা হ\'ব — ওপৰত ব\'নাছো।'},
+{icon:'🚀',title:'ইয়াতেই কেৰিয়াৰ গঢ়ক',sub:'CSO-ৰ পৰা লিডাৰলৈ',steps:[
+"প্ৰতিজন টপাৰ এসময়ত নতুন আছিল। কভাৰেজ, নিয়মীয়াতা আৰু সৎ ৰিপৰ্টিঙে আপোনাক চকুত পেলায়।",
+"প্ৰতি মাহত POB আৰু কভাৰেজ পূৰণ কৰক — ভাগ্যৱানতকৈ আগতে স্থিৰ পাৰফৰ্মাৰে প্ৰমোচন পায়।",
+"প্ৰডাক্ট আৰু স্কীম ইমান ভালকৈ জানক যে ডাক্তৰ আৰু কেমিষ্টে আপোনাৰ কথাত ভৰসা কৰে। সেই ভৰসায়েই আপোনাৰ প্ৰকৃত সম্পদ।",
+"ডেটা পৰিষ্কাৰ আৰু সময়মতে ৰাখক। মেনেজাৰে সেইসকলকেই প্ৰমোচন দিয়ে, যিসকলৰ ওপৰত নিৰীক্ষণ নকৰাকৈ ভৰসা কৰিব পাৰি।",
+"ইনচেণ্টিভ জখলা, Productivity Award আৰু STARNITE ট্ৰিপ সঁচা — এইবোৰৰ পিছত লাগক, আপোনাৰ নাম ওপৰলৈ যাব।",
+"ইয়াত প্ৰতিদিনে এটা নতুন কথা শিকক। এবছৰত আপুনি হ\'ব সেইজন, যাৰ পৰা বাকীয়ে শিকিব।"],
+says:'আজিৰ কাম সেই মানুহজনৰ দৰে কৰক, কাইলৈ আপুনি যি হ\'ব বিচাৰে।'}];
 /* Guwahati Field Tracker – premium shell, sounds, coach, progress & incentive. Coach: Ratan Roy. */
 (function(){
 'use strict';
@@ -1475,7 +1571,7 @@ U.settings=function(focus){var body=h('div');
   var close=sheet('⚙️ '+w('settings'),body)};
 
 /* ---------- learning path ---------- */
-var PATH=[['m11','n0','n1','m0','m1','m2','n2'],['m3','m4','n3','n4','m6','m5'],['m8','n5','m7','m9','n6','n7'],['m10','n8','n9','n10','n11']];
+var PATH=[['m11','n0','n1','m0','m1','m2','n2'],['m3','m4','n3','n4','m6','m5'],['m8','n5','m7','m9','n6','n7','n12','n13'],['m10','n8','n9','n10','n11','n14']];
 function allMods(){var c=U.C(),en=COACH.en,o={};(c.modules||en.modules||[]).forEach(function(m,i){o['m'+i]=m});(c.modules2||en.modules2||[]).forEach(function(m,i){o['n'+i]=m});return o}
 function doneSet(){var s={};try{JSON.parse(lsGet('ft_done','[]')).forEach(function(x){s[x]=1})}catch(e){}entriesOf('lesson_done',myEmail()).forEach(function(e){s[e.mod]=1});return s}
 function markDone(id){var d=[];try{d=JSON.parse(lsGet('ft_done','[]'))}catch(e){}if(d.indexOf(id)<0){d.push(id);lsSet('ft_done',JSON.stringify(d));if(!isMgr())directAdd('lesson_done',{mod:id}).catch(function(){})}}

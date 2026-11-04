@@ -119,7 +119,7 @@ U.settings=function(focus){var body=h('div');
   var close=sheet('⚙️ '+w('settings'),body)};
 
 /* ---------- learning path ---------- */
-var PATH=[['m11','n0','n1','m0','m1','m2','n2'],['m3','m4','n3','n4','m6','m5'],['m8','n5','m7','m9','n6','n7'],['m10','n8','n9','n10','n11']];
+var PATH=[['m11','n0','n1','m0','m1','m2','n2'],['m3','m4','n3','n4','m6','m5'],['m8','n5','m7','m9','n6','n7','n12','n13'],['m10','n8','n9','n10','n11','n14']];
 function allMods(){var c=U.C(),en=COACH.en,o={};(c.modules||en.modules||[]).forEach(function(m,i){o['m'+i]=m});(c.modules2||en.modules2||[]).forEach(function(m,i){o['n'+i]=m});return o}
 function doneSet(){var s={};try{JSON.parse(lsGet('ft_done','[]')).forEach(function(x){s[x]=1})}catch(e){}entriesOf('lesson_done',myEmail()).forEach(function(e){s[e.mod]=1});return s}
 function markDone(id){var d=[];try{d=JSON.parse(lsGet('ft_done','[]'))}catch(e){}if(d.indexOf(id)<0){d.push(id);lsSet('ft_done',JSON.stringify(d));if(!isMgr())directAdd('lesson_done',{mod:id}).catch(function(){})}}
