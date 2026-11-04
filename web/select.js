@@ -112,7 +112,9 @@ U.campaignApprovals=function(){try{var L=(S.entries||[]).filter(function(e){retu
 function inputsPendBrand(brand){try{var k=Object.keys(S.feeds||{}).filter(function(z){return z.indexOf('inputs_')===0})[0];var f=k?S.feeds[k]:null;if(!f||!f.brands||!f.brands[brand])return[];return (f.brands[brand].li||[]).map(function(x){return x.it})}catch(e){return[]}}
 function skinRoster(){try{var hq=myHQ2();return (((window.FT_ROSTERS||{}).skin||{})[hq])||[]}catch(e){return[]}}
 function custName(code){try{return (CUST&&CUST[code]&&CUST[code].name)||code}catch(e){return code}}
-function inBrickCode(code,brick){try{return CUST&&CUST[code]&&CUST[code].brick===brick}catch(e){return false}}
+/* tolerant brick/beat match: exact, contains, or shared significant token (TP brick names vs chemist beat names differ) */
+function brickEq(a,b){a=(''+(a||'')).toLowerCase().trim();b=(''+(b||'')).toLowerCase().trim();if(!a||!b)return false;if(a===b)return true;if(a.indexOf(b)>=0||b.indexOf(a)>=0)return true;var ta=a.split(/[^a-z0-9]+/).filter(function(w){return w.length>=4}),tb=b.split(/[^a-z0-9]+/).filter(function(w){return w.length>=4});return ta.some(function(w){return tb.indexOf(w)>=0})}
+function inBrickCode(code,brick){try{return CUST&&CUST[code]&&brickEq(CUST[code].brick,brick)}catch(e){return false}}
 function carryList(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Carry list is the CSO\'s screen.'));return}
   st();var brick=(typeof brickToday==='function'&&brickToday())||'';
   if(!brick){app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📍 Pick today\'s brick first'),h('p',{},'Confirm your brick in “Start my day”, then your carry list appears here.')));return}
@@ -122,7 +124,7 @@ function carryList(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Carry
     var pend=inputsPendBrand(c.brand),items=(c.carry||[]).filter(function(it){return !pend.length||pend.some(function(p){return nameEq(p,it)})});if(!items.length)items=c.carry||[];
     var box=h('div',{class:'selc'},h('div',{style:'font-weight:800;font-size:13px;margin-bottom:4px'},campShort(c.id)+' — carry: '+(items.join(', ')||'—')));
     codes.forEach(function(code){box.append(h('div',{class:'selrow'},h('div',{class:'nm'},custName(code))))});app.append(box)});
-  var sk=skinRoster().filter(function(o){return o.beat===brick});
+  var sk=skinRoster().filter(function(o){return brickEq(o.beat,brick)});
   if(sk.length){any=true;var pendS=inputsPendBrand('Skinlite'),itemsS=(pendS.length?pendS.slice(0,4):['Skinlite range']).concat(['📄 Poster']);
     var box=h('div',{class:'selc'},h('div',{style:'font-weight:800;font-size:13px;margin-bottom:4px'},'Skinlite · '+sk.length+' outlets — carry: '+itemsS.join(', ')));
     sk.slice(0,40).forEach(function(o){box.append(h('div',{class:'selrow'},h('div',{class:'nm'},o.n)))});
@@ -132,7 +134,7 @@ function carryList(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Carry
 U.carryList=carryList;U.routes.carry=function(app){carryList(app)};
 U.carryCard=function(){try{if(isMgr())return'';var brick=(typeof brickToday==='function'&&brickToday())||'';if(!brick)return'';
   var picks=curPicks(),n=0;PICKC().forEach(function(c){n+=(picks[c.id]||[]).filter(function(code){return inBrickCode(code,brick)}).length});
-  n+=skinRoster().filter(function(o){return o.beat===brick}).length;if(!n)return'';
+  n+=skinRoster().filter(function(o){return brickEq(o.beat,brick)}).length;if(!n)return'';
   return h('div',{class:'coachc',style:'cursor:pointer',onclick:function(){go('carry')}},h('div',{class:'k'},'🎒 Carry today · '+brick),h('p',{},n+' customer'+(n>1?'s':'')+' in this brick — tap to see what to carry to each.'));
 }catch(e){return''}};
 

@@ -72,7 +72,7 @@ function vbar(){return h('div',{class:'vbar'},h('span',{},'📋'),h('div',{},h('
 
 /* ---------- selfie check-in ---------- */
 var REASONS=['Doctor / chemist not available','Joint work with Ratan Roy','Urgent stockist order','Rain / road problem','Other'];
-U.beforeCheckin=function(go){var x=who()||{},b=brickToday(),tpv=tpDay(myEmail(),TODAY);if(todays('beat_change').length){go({});return}
+U.beforeCheckin=function(go){var x=who()||{},b=brickToday(),tpv=tpDay(myEmail(),TODAY);
   var body=h('div'),ch={brick:'',reason:''};
   function step1(){body.innerHTML='';body.append(h('div',{class:'lcard',style:'text-align:center'},h('div',{class:'meta'},new Date(TODAY+'T00:00:00').toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'})),h('h3',{style:'margin:6px 0'},(x.Name||'').split(' ')[0]+', today your brick is'),h('div',{class:'big',style:'color:var(--accent)'},b||tpv.beat||'—'),h('small',{style:'color:var(--muted)'},'As per your plan')),
       h('button',{style:'width:100%',onclick:function(){close();go({})}},'✅ Yes, correct'),h('button',{class:'ghost',style:'width:100%;margin-top:8px',onclick:step2},'🔀 No, I am working another brick'))}
