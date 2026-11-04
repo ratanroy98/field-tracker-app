@@ -1,4 +1,4 @@
-window.FT_BUILD='20261104054301';
+window.FT_BUILD='20261104055520';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -1567,6 +1567,9 @@ U.settings=function(focus){var body=h('div');
   body.append(h('div',{class:'sect'},h('b',{},'🎨 '+w('theme'))),h('div',{class:'sw'},Object.keys(THEMES).map(function(k){var th=THEMES[k];return h('button',{class:lsGet('ft_theme','teal')===k?'on':'',onclick:function(){lsSet('ft_theme',k);applyTheme();close();render();U.play('ok')}},h('div',{class:'dots'},h('i',{style:'background:'+th.h1}),h('i',{style:'background:'+th.acc}),h('i',{style:'background:'+th.gold2})),th.n)})));
   body.append(h('div',{class:'sect'},h('b',{},'🔠 '+w('size'))),h('div',{class:'seg'},[['s','A'],['m','A+'],['l','A++']].map(function(z){return h('button',{class:lsGet('ft_size','s')===z[0]?'on':'',onclick:function(){lsSet('ft_size',z[0]);applyTheme();close();render()}},z[1])})));
   body.append(h('div',{class:'sect'},h('b',{},'🔊 '+w('sound'))),h('div',{class:'seg'},[[false,w('on')],[true,w('off')]].map(function(z){return h('button',{class:U.mute===z[0]?'on':'',onclick:function(){U.mute=z[0];lsSet('ft_mute',z[0]?'1':'0');close();render()}},z[1])})));
+  body.append(h('div',{class:'sect'},h('b',{},'📲 App version')));
+  body.append(h('div',{class:'note',style:'margin-top:0'},'Build '+(window.FT_BUILD||'—')+(U.lsGet('ft_latest','')&&U.lsGet('ft_latest','')!==(window.FT_BUILD||'')?' · newer available':' · up to date')));
+  body.append(h('button',{style:'width:100%;margin-top:8px',onclick:function(){try{U.lsSet('ft_upd','1')}catch(e){}var EX='https://script.google.com/macros/s/AKfycbyFp_mIJqqv-vya_y_DFmW7nwzZc83PQY5PnwOdzMPYjFK3EYg-p-ZHz0M7vSgMlV3_/exec';var url=EX+'?v='+Date.now();try{window.top.location.href=url}catch(e){try{window.open(url,'_top')}catch(_){location.href=url}}}},'⬇️ Get the latest version'));
   body.append(h('div',{class:'note',style:'margin-top:14px'},'👤 Coach: Ratan Roy · CSM, Guwahati Area'));
   var close=sheet('⚙️ '+w('settings'),body)};
 
@@ -2153,10 +2156,16 @@ setInterval(btn,3000);
 
 // After every Sync: if a newer version of the screens is published, load it straight away (no reinstall, no waiting).
 var EXEC='https://script.google.com/macros/s/AKfycbyFp_mIJqqv-vya_y_DFmW7nwzZc83PQY5PnwOdzMPYjFK3EYg-p-ZHz0M7vSgMlV3_/exec';
-function checkUpdate(){try{var a=JSON.parse(U.lsGet('ft_auth','null'));if(!a||!window.google||!google.script||!window.FT_BUILD)return;
-  google.script.run.withSuccessHandler(function(r){var b=r&&r.b;if(!b||b===window.FT_BUILD)return;
-    if(U.flushOutbox&&U.outboxCount&&U.outboxCount()>0)return;U.lsSet('ft_upd','1');toast('⬇️ New version found – updating…');
-    setTimeout(function(){try{window.top.location.href=EXEC}catch(e){try{window.open(EXEC,'_top')}catch(_){location.reload()}}},900)}).withFailureHandler(function(){}).api(a,'ver',{})}catch(e){}}
+function reloadLatest(){var url=EXEC+'?v='+Date.now();try{window.top.location.href=url}catch(e){try{window.open(url,'_top')}catch(_){try{location.href=url}catch(__){location.reload()}}}}
+U.reloadLatest=reloadLatest;
+function checkUpdate(silent){try{var a=JSON.parse(U.lsGet('ft_auth','null'));if(!a||!window.google||!google.script||!window.FT_BUILD)return;
+  google.script.run.withSuccessHandler(function(r){var b=r&&r.b;if(!b)return;try{U.lsSet('ft_latest',b)}catch(e){}
+    if(b===window.FT_BUILD)return;
+    if(U.flushOutbox&&U.outboxCount&&U.outboxCount()>0){if(!silent)toast('⬇️ A newer version is ready – sync your pending entries, then it updates.');return}
+    U.lsSet('ft_upd','1');toast('⬇️ New version found – updating…');
+    setTimeout(reloadLatest,900)}).withFailureHandler(function(){}).api(a,'ver',{})}catch(e){}}
+// check on open too (not only after Sync), so the latest screens load even without tapping Sync
+setTimeout(function(){try{checkUpdate(true)}catch(e){}},4000);
 setTimeout(function(){try{if(U.lsGet('ft_upd','')==='1'){U.lsSet('ft_upd','');toast('✅ Updated – you have the latest version with all changes.')}}catch(e){}},2500);
 function doSync(){if(busy)return;try{U.geoReset&&U.geoReset()}catch(e){}if(navigator.onLine===false){toast('📶 No network. Your entries are safe on your phone – tap Sync when network is back.');return}
   busy=true;btn();var t0=Date.now();

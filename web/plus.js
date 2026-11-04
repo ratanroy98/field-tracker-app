@@ -115,6 +115,9 @@ U.settings=function(focus){var body=h('div');
   body.append(h('div',{class:'sect'},h('b',{},'🎨 '+w('theme'))),h('div',{class:'sw'},Object.keys(THEMES).map(function(k){var th=THEMES[k];return h('button',{class:lsGet('ft_theme','teal')===k?'on':'',onclick:function(){lsSet('ft_theme',k);applyTheme();close();render();U.play('ok')}},h('div',{class:'dots'},h('i',{style:'background:'+th.h1}),h('i',{style:'background:'+th.acc}),h('i',{style:'background:'+th.gold2})),th.n)})));
   body.append(h('div',{class:'sect'},h('b',{},'🔠 '+w('size'))),h('div',{class:'seg'},[['s','A'],['m','A+'],['l','A++']].map(function(z){return h('button',{class:lsGet('ft_size','s')===z[0]?'on':'',onclick:function(){lsSet('ft_size',z[0]);applyTheme();close();render()}},z[1])})));
   body.append(h('div',{class:'sect'},h('b',{},'🔊 '+w('sound'))),h('div',{class:'seg'},[[false,w('on')],[true,w('off')]].map(function(z){return h('button',{class:U.mute===z[0]?'on':'',onclick:function(){U.mute=z[0];lsSet('ft_mute',z[0]?'1':'0');close();render()}},z[1])})));
+  body.append(h('div',{class:'sect'},h('b',{},'📲 App version')));
+  body.append(h('div',{class:'note',style:'margin-top:0'},'Build '+(window.FT_BUILD||'—')+(U.lsGet('ft_latest','')&&U.lsGet('ft_latest','')!==(window.FT_BUILD||'')?' · newer available':' · up to date')));
+  body.append(h('button',{style:'width:100%;margin-top:8px',onclick:function(){try{U.lsSet('ft_upd','1')}catch(e){}var EX='https://script.google.com/macros/s/AKfycbyFp_mIJqqv-vya_y_DFmW7nwzZc83PQY5PnwOdzMPYjFK3EYg-p-ZHz0M7vSgMlV3_/exec';var url=EX+'?v='+Date.now();try{window.top.location.href=url}catch(e){try{window.open(url,'_top')}catch(_){location.href=url}}}},'⬇️ Get the latest version'));
   body.append(h('div',{class:'note',style:'margin-top:14px'},'👤 Coach: Ratan Roy · CSM, Guwahati Area'));
   var close=sheet('⚙️ '+w('settings'),body)};
 

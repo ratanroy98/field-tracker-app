@@ -33,10 +33,16 @@ setInterval(btn,3000);
 
 // After every Sync: if a newer version of the screens is published, load it straight away (no reinstall, no waiting).
 var EXEC='https://script.google.com/macros/s/AKfycbyFp_mIJqqv-vya_y_DFmW7nwzZc83PQY5PnwOdzMPYjFK3EYg-p-ZHz0M7vSgMlV3_/exec';
-function checkUpdate(){try{var a=JSON.parse(U.lsGet('ft_auth','null'));if(!a||!window.google||!google.script||!window.FT_BUILD)return;
-  google.script.run.withSuccessHandler(function(r){var b=r&&r.b;if(!b||b===window.FT_BUILD)return;
-    if(U.flushOutbox&&U.outboxCount&&U.outboxCount()>0)return;U.lsSet('ft_upd','1');toast('⬇️ New version found – updating…');
-    setTimeout(function(){try{window.top.location.href=EXEC}catch(e){try{window.open(EXEC,'_top')}catch(_){location.reload()}}},900)}).withFailureHandler(function(){}).api(a,'ver',{})}catch(e){}}
+function reloadLatest(){var url=EXEC+'?v='+Date.now();try{window.top.location.href=url}catch(e){try{window.open(url,'_top')}catch(_){try{location.href=url}catch(__){location.reload()}}}}
+U.reloadLatest=reloadLatest;
+function checkUpdate(silent){try{var a=JSON.parse(U.lsGet('ft_auth','null'));if(!a||!window.google||!google.script||!window.FT_BUILD)return;
+  google.script.run.withSuccessHandler(function(r){var b=r&&r.b;if(!b)return;try{U.lsSet('ft_latest',b)}catch(e){}
+    if(b===window.FT_BUILD)return;
+    if(U.flushOutbox&&U.outboxCount&&U.outboxCount()>0){if(!silent)toast('⬇️ A newer version is ready – sync your pending entries, then it updates.');return}
+    U.lsSet('ft_upd','1');toast('⬇️ New version found – updating…');
+    setTimeout(reloadLatest,900)}).withFailureHandler(function(){}).api(a,'ver',{})}catch(e){}}
+// check on open too (not only after Sync), so the latest screens load even without tapping Sync
+setTimeout(function(){try{checkUpdate(true)}catch(e){}},4000);
 setTimeout(function(){try{if(U.lsGet('ft_upd','')==='1'){U.lsSet('ft_upd','');toast('✅ Updated – you have the latest version with all changes.')}}catch(e){}},2500);
 function doSync(){if(busy)return;try{U.geoReset&&U.geoReset()}catch(e){}if(navigator.onLine===false){toast('📶 No network. Your entries are safe on your phone – tap Sync when network is back.');return}
   busy=true;btn();var t0=Date.now();
