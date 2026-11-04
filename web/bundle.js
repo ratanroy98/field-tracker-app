@@ -1,4 +1,4 @@
-window.FT_BUILD='20261104095713';
+window.FT_BUILD='20261104095913';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -2315,7 +2315,7 @@ var st=document.createElement('style');st.textContent=`
 `;document.head.appendChild(st);
 
 /* ---------- which tab each screen belongs to ---------- */
-var WORKR=['raft','deca','rloc','skin','dexona','pulse','pick','samples','stockists','stock','beat','tp'];
+var WORKR=['raft','deca','rloc','skin','dexona','pulse','pick','carry','samples','stockists','stock','beat','tp'];
 function tabFor(r){if(isMgr()){if(r==='home'||r==='mgr')return'team';if(r==='approve')return'approve';if(r==='meet')return'meet';if(r==='geo'||r==='perf'||r==='mail')return'reports';if(r==='msgs'||r==='hof')return'me';if(r==='sell')return'sell';return'team'}
   if(r==='home')return'today';if(r==='sell')return'sell';if(r==='learn')return'learn';if(r==='perf'||r==='msgs'||r==='hof')return'me';return'work'}
 function NAV(){return isMgr()?[['team','👥','Team',function(){go('home')}],['approve','✅','Approvals',function(){go('approve')}],['meet','📅','Meetings',function(){go('meet')}],['reports','📈','Reports',function(){go('geo')}],['me','👤','Me',function(){go(U.lsGet('ft_me','msgs'))}]]
@@ -2328,7 +2328,7 @@ function nav(r){var cur=tabFor(r),pend=0,appr=0;
 function tabs(list,cur,cls){return h('div',{class:'subtabs'+(cls?' '+cls:'')},list.map(function(x){return h('button',{class:x[0]===cur?'on':'',onclick:x[2]},x[1])}))}
 function workTabs(r){var grp=r==='stockists'?'cust':(r==='tp'||r==='beat')?'tp':'ent';
   var top=tabs([['ent','Entries',function(){go(U.lsGet('ft_went','raft'))}],['cust','Customers',function(){go('stockists')}],['tp','TP & Brick',function(){go('tp')}],['req','Stock request',function(){U.stockSheet&&U.stockSheet()}]],grp);
-  if(grp==='ent'){if(r!=='samples'&&r!=='pulse'&&r!=='pick')U.lsSet('ft_went',r);return[top,tabs([['pick','👨‍⚕️ Pick Drs'],['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['pulse','💉 Pulse'],['samples','💉 All samples'],['stock','Stock statement']].map(function(x){return[x[0],x[1],function(){go(x[0])}]}),r,'l2')]}
+  if(grp==='ent'){if(r!=='samples'&&r!=='pulse'&&r!=='pick'&&r!=='carry')U.lsSet('ft_went',r);return[top,tabs([['carry','🎒 Carry'],['pick','👨‍⚕️ Pick Drs'],['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['pulse','💉 Pulse'],['samples','💉 All samples'],['stock','Stock statement']].map(function(x){return[x[0],x[1],function(){go(x[0])}]}),r,'l2')]}
   if(grp==='tp')return[top,tabs([['tp','TP calendar',function(){go('tp')}],['beat','Change brick',function(){go('beat')}]],r,'l2')];
   return[top]}
 function meTabs(r){var L=isMgr()?[['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']]:[['perf','Progress'],['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']];
@@ -2467,7 +2467,7 @@ U.workStatus=workStatus;
 function todayCSO(app){var keep=[app.querySelector('.fthead')],hero=app.querySelector('.hero'),meets=[].slice.call(app.querySelectorAll('.meet')),hof=app.querySelector('.hof'),ob=[].slice.call(app.querySelectorAll('.note')).filter(function(n){return /saved on your phone/.test(n.textContent)})[0],nav0=app.querySelector('.bnav');
   var pend=U.nagList().length;
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
-  var u=updBanner(),list=[u,(U.pickCard&&U.pickCard())||"",(U.inputsTop&&U.inputsTop())||"",(U.nextMoveCard&&U.nextMoveCard())||"",(U.earnCard&&U.earnCard())||"",(U.teamCard&&U.teamCard())||"",nextCard(app),handoverCard(),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
+  var u=updBanner(),list=[u,(U.carryCard&&U.carryCard())||"",(U.pickCard&&U.pickCard())||"",(U.inputsTop&&U.inputsTop())||"",(U.nextMoveCard&&U.nextMoveCard())||"",(U.earnCard&&U.earnCard())||"",(U.teamCard&&U.teamCard())||"",nextCard(app),handoverCard(),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
   [].concat.apply([],list).forEach(function(n){if(n)app.append(n)})}
 function todayMgr(app){var keep=[app.querySelector('.fthead')];var team=U.teamPanel?U.teamPanel():null,share=[].slice.call(app.querySelectorAll('.tdone'))[0],hof=app.querySelector('.hof');
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
@@ -3405,6 +3405,34 @@ U.campaignApprovals=function(){try{var L=(S.entries||[]).filter(function(e){retu
         h('button',{style:'min-height:auto;padding:8px 12px',onclick:function(){S.db.collection('entries').doc(e._id).update({status:'approved',approvedTs:Date.now()}).then(function(){toast('Approved');render()})}},'✅'),
         h('button',{class:'ghost',style:'min-height:auto;padding:8px 12px',onclick:function(){var n=prompt('What to correct?')||'';S.db.collection('entries').doc(e._id).update({status:'returned',note:n}).then(function(){toast('Returned');render()})}},'↩️'))))});
   return box}catch(e){return null}};
+
+/* ---------- daily carry-per-brick list ---------- */
+function inputsPendBrand(brand){try{var k=Object.keys(S.feeds||{}).filter(function(z){return z.indexOf('inputs_')===0})[0];var f=k?S.feeds[k]:null;if(!f||!f.brands||!f.brands[brand])return[];return (f.brands[brand].li||[]).map(function(x){return x.it})}catch(e){return[]}}
+function skinRoster(){try{var hq=myHQ2();return (((window.FT_ROSTERS||{}).skin||{})[hq])||[]}catch(e){return[]}}
+function custName(code){try{return (CUST&&CUST[code]&&CUST[code].name)||code}catch(e){return code}}
+function inBrickCode(code,brick){try{return CUST&&CUST[code]&&CUST[code].brick===brick}catch(e){return false}}
+function carryList(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Carry list is the CSO\'s screen.'));return}
+  st();var brick=(typeof brickToday==='function'&&brickToday())||'';
+  if(!brick){app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📍 Pick today\'s brick first'),h('p',{},'Confirm your brick in “Start my day”, then your carry list appears here.')));return}
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'🎒 Carry today · '+brick),h('p',{},'Hand these to each listed customer in '+brick+', then report in Ventasys. Nothing to fill here.')));
+  var picks=curPicks(),any=false;
+  PICKC().forEach(function(c){var codes=(picks[c.id]||[]).filter(function(code){return inBrickCode(code,brick)});if(!codes.length)return;any=true;
+    var pend=inputsPendBrand(c.brand),items=(c.carry||[]).filter(function(it){return !pend.length||pend.some(function(p){return nameEq(p,it)})});if(!items.length)items=c.carry||[];
+    var box=h('div',{class:'selc'},h('div',{style:'font-weight:800;font-size:13px;margin-bottom:4px'},campShort(c.id)+' — carry: '+(items.join(', ')||'—')));
+    codes.forEach(function(code){box.append(h('div',{class:'selrow'},h('div',{class:'nm'},custName(code))))});app.append(box)});
+  var sk=skinRoster().filter(function(o){return o.beat===brick});
+  if(sk.length){any=true;var pendS=inputsPendBrand('Skinlite'),itemsS=(pendS.length?pendS.slice(0,4):['Skinlite range']).concat(['📄 Poster']);
+    var box=h('div',{class:'selc'},h('div',{style:'font-weight:800;font-size:13px;margin-bottom:4px'},'Skinlite · '+sk.length+' outlets — carry: '+itemsS.join(', ')));
+    sk.slice(0,40).forEach(function(o){box.append(h('div',{class:'selrow'},h('div',{class:'nm'},o.n)))});
+    if(sk.length>40)box.append(h('div',{class:'selrow',style:'color:var(--muted)'},h('div',{},'+'+(sk.length-40)+' more outlets')));app.append(box)}
+  if(!any)app.append(h('div',{class:'coachc',style:'background:linear-gradient(135deg,#E8F6EE,#D6F0E0);border-color:#9FD9B6'},h('p',{style:'color:#1b6b4a'},'No tagged doctors or Skinlite outlets in '+brick+' yet. Tag doctors in “Pick Drs”.')));
+}catch(e){app.append(h('div',{class:'note'},'Could not build carry list: '+e.message))}}
+U.carryList=carryList;U.routes.carry=function(app){carryList(app)};
+U.carryCard=function(){try{if(isMgr())return'';var brick=(typeof brickToday==='function'&&brickToday())||'';if(!brick)return'';
+  var picks=curPicks(),n=0;PICKC().forEach(function(c){n+=(picks[c.id]||[]).filter(function(code){return inBrickCode(code,brick)}).length});
+  n+=skinRoster().filter(function(o){return o.beat===brick}).length;if(!n)return'';
+  return h('div',{class:'coachc',style:'cursor:pointer',onclick:function(){go('carry')}},h('div',{class:'k'},'🎒 Carry today · '+brick),h('p',{},n+' customer'+(n>1?'s':'')+' in this brick — tap to see what to carry to each.'));
+}catch(e){return''}};
 })();
 /* Field Tracker – Review mail (manager, best on a laptop): the evening review laid out as an email,
    ready to copy or open in Outlook. Nothing is sent by the app itself. */

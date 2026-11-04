@@ -107,4 +107,32 @@ U.campaignApprovals=function(){try{var L=(S.entries||[]).filter(function(e){retu
         h('button',{style:'min-height:auto;padding:8px 12px',onclick:function(){S.db.collection('entries').doc(e._id).update({status:'approved',approvedTs:Date.now()}).then(function(){toast('Approved');render()})}},'✅'),
         h('button',{class:'ghost',style:'min-height:auto;padding:8px 12px',onclick:function(){var n=prompt('What to correct?')||'';S.db.collection('entries').doc(e._id).update({status:'returned',note:n}).then(function(){toast('Returned');render()})}},'↩️'))))});
   return box}catch(e){return null}};
+
+/* ---------- daily carry-per-brick list ---------- */
+function inputsPendBrand(brand){try{var k=Object.keys(S.feeds||{}).filter(function(z){return z.indexOf('inputs_')===0})[0];var f=k?S.feeds[k]:null;if(!f||!f.brands||!f.brands[brand])return[];return (f.brands[brand].li||[]).map(function(x){return x.it})}catch(e){return[]}}
+function skinRoster(){try{var hq=myHQ2();return (((window.FT_ROSTERS||{}).skin||{})[hq])||[]}catch(e){return[]}}
+function custName(code){try{return (CUST&&CUST[code]&&CUST[code].name)||code}catch(e){return code}}
+function inBrickCode(code,brick){try{return CUST&&CUST[code]&&CUST[code].brick===brick}catch(e){return false}}
+function carryList(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Carry list is the CSO\'s screen.'));return}
+  st();var brick=(typeof brickToday==='function'&&brickToday())||'';
+  if(!brick){app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📍 Pick today\'s brick first'),h('p',{},'Confirm your brick in “Start my day”, then your carry list appears here.')));return}
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'🎒 Carry today · '+brick),h('p',{},'Hand these to each listed customer in '+brick+', then report in Ventasys. Nothing to fill here.')));
+  var picks=curPicks(),any=false;
+  PICKC().forEach(function(c){var codes=(picks[c.id]||[]).filter(function(code){return inBrickCode(code,brick)});if(!codes.length)return;any=true;
+    var pend=inputsPendBrand(c.brand),items=(c.carry||[]).filter(function(it){return !pend.length||pend.some(function(p){return nameEq(p,it)})});if(!items.length)items=c.carry||[];
+    var box=h('div',{class:'selc'},h('div',{style:'font-weight:800;font-size:13px;margin-bottom:4px'},campShort(c.id)+' — carry: '+(items.join(', ')||'—')));
+    codes.forEach(function(code){box.append(h('div',{class:'selrow'},h('div',{class:'nm'},custName(code))))});app.append(box)});
+  var sk=skinRoster().filter(function(o){return o.beat===brick});
+  if(sk.length){any=true;var pendS=inputsPendBrand('Skinlite'),itemsS=(pendS.length?pendS.slice(0,4):['Skinlite range']).concat(['📄 Poster']);
+    var box=h('div',{class:'selc'},h('div',{style:'font-weight:800;font-size:13px;margin-bottom:4px'},'Skinlite · '+sk.length+' outlets — carry: '+itemsS.join(', ')));
+    sk.slice(0,40).forEach(function(o){box.append(h('div',{class:'selrow'},h('div',{class:'nm'},o.n)))});
+    if(sk.length>40)box.append(h('div',{class:'selrow',style:'color:var(--muted)'},h('div',{},'+'+(sk.length-40)+' more outlets')));app.append(box)}
+  if(!any)app.append(h('div',{class:'coachc',style:'background:linear-gradient(135deg,#E8F6EE,#D6F0E0);border-color:#9FD9B6'},h('p',{style:'color:#1b6b4a'},'No tagged doctors or Skinlite outlets in '+brick+' yet. Tag doctors in “Pick Drs”.')));
+}catch(e){app.append(h('div',{class:'note'},'Could not build carry list: '+e.message))}}
+U.carryList=carryList;U.routes.carry=function(app){carryList(app)};
+U.carryCard=function(){try{if(isMgr())return'';var brick=(typeof brickToday==='function'&&brickToday())||'';if(!brick)return'';
+  var picks=curPicks(),n=0;PICKC().forEach(function(c){n+=(picks[c.id]||[]).filter(function(code){return inBrickCode(code,brick)}).length});
+  n+=skinRoster().filter(function(o){return o.beat===brick}).length;if(!n)return'';
+  return h('div',{class:'coachc',style:'cursor:pointer',onclick:function(){go('carry')}},h('div',{class:'k'},'🎒 Carry today · '+brick),h('p',{},n+' customer'+(n>1?'s':'')+' in this brick — tap to see what to carry to each.'));
+}catch(e){return''}};
 })();
