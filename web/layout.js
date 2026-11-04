@@ -42,7 +42,7 @@ var st=document.createElement('style');st.textContent=`
 `;document.head.appendChild(st);
 
 /* ---------- which tab each screen belongs to ---------- */
-var WORKR=['raft','deca','rloc','skin','dexona','samples','stockists','stock','beat','tp'];
+var WORKR=['raft','deca','rloc','skin','dexona','pulse','samples','stockists','stock','beat','tp'];
 function tabFor(r){if(isMgr()){if(r==='home'||r==='mgr')return'team';if(r==='approve')return'approve';if(r==='meet')return'meet';if(r==='geo'||r==='perf'||r==='mail')return'reports';if(r==='msgs'||r==='hof')return'me';if(r==='sell')return'sell';return'team'}
   if(r==='home')return'today';if(r==='sell')return'sell';if(r==='learn')return'learn';if(r==='perf'||r==='msgs'||r==='hof')return'me';return'work'}
 function NAV(){return isMgr()?[['team','👥','Team',function(){go('home')}],['approve','✅','Approvals',function(){go('approve')}],['meet','📅','Meetings',function(){go('meet')}],['reports','📈','Reports',function(){go('geo')}],['me','👤','Me',function(){go(U.lsGet('ft_me','msgs'))}]]
@@ -55,7 +55,7 @@ function nav(r){var cur=tabFor(r),pend=0,appr=0;
 function tabs(list,cur,cls){return h('div',{class:'subtabs'+(cls?' '+cls:'')},list.map(function(x){return h('button',{class:x[0]===cur?'on':'',onclick:x[2]},x[1])}))}
 function workTabs(r){var grp=r==='stockists'?'cust':(r==='tp'||r==='beat')?'tp':'ent';
   var top=tabs([['ent','Entries',function(){go(U.lsGet('ft_went','raft'))}],['cust','Customers',function(){go('stockists')}],['tp','TP & Brick',function(){go('tp')}],['req','Stock request',function(){U.stockSheet&&U.stockSheet()}]],grp);
-  if(grp==='ent'){if(r!=='samples')U.lsSet('ft_went',r);return[top,tabs([['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['samples','💉 All samples'],['stock','Stock statement']].map(function(x){return[x[0],x[1],function(){go(x[0])}]}),r,'l2')]}
+  if(grp==='ent'){if(r!=='samples'&&r!=='pulse')U.lsSet('ft_went',r);return[top,tabs([['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['pulse','💉 Pulse'],['samples','💉 All samples'],['stock','Stock statement']].map(function(x){return[x[0],x[1],function(){go(x[0])}]}),r,'l2')]}
   if(grp==='tp')return[top,tabs([['tp','TP calendar',function(){go('tp')}],['beat','Change brick',function(){go('beat')}]],r,'l2')];
   return[top]}
 function meTabs(r){var L=isMgr()?[['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']]:[['perf','Progress'],['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']];
@@ -161,6 +161,20 @@ function allSamples(app){try{var f=inputsFeed();
   if(!pk.length&&!withTo.length)app.append(h('div',{class:'coachc',style:'background:linear-gradient(135deg,#E8F6EE,#D6F0E0);border-color:#9FD9B6'},h('p',{style:'color:#1b6b4a'},'No samples pending with you.')));
 }catch(e){app.append(h('div',{class:'note'},'Could not load samples: '+e.message))}}
 U.inputProgress=inputProgress;U.inputsTop=inputsTop;U.allSamples=allSamples;U.routes.samples=function(app){allSamples(app)};
+
+/* Pulse — assigned doctor list (locked, from FT_ROSTERS), own HQ only. Carry a Deca Module; report Rx in Ventasys. */
+function pulseTab(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Pulse is a CSO list.'));return}
+  var hq=(typeof csoHQ==='function'&&csoHQ())||'';
+  var R=(window.FT_ROSTERS&&FT_ROSTERS.pulse&&FT_ROSTERS.pulse[hq])||[];
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'💉 Pulse doctors — '+R.length+' assigned'),h('p',{},'Your assigned Pulse list. Carry a Deca Module to each and report the Rx in Ventasys. This list is fixed — nothing to fill here.')));
+  if(!R.length){app.append(h('div',{class:'coachc',style:'background:linear-gradient(135deg,#E8F6EE,#D6F0E0);border-color:#9FD9B6'},h('p',{style:'color:#1b6b4a'},'No Pulse doctors assigned to your HQ.')));return}
+  var byc={};R.forEach(function(d){(byc[d.ct||'—']=byc[d.ct||'—']||[]).push(d)});
+  Object.keys(byc).forEach(function(ct){
+    var box=h('div',{class:'coachc'},h('div',{class:'k'},'📍 '+ct+' ('+byc[ct].length+')'));
+    byc[ct].forEach(function(d){box.append(h('p',{style:'margin:3px 0'},h('b',{},d.n),(d.sp?' · '+d.sp:''),(d.mob?' · '+d.mob:'')))});
+    app.append(box)});
+}catch(e){app.append(h('div',{class:'note'},'Could not load Pulse: '+e.message))}}
+U.pulseTab=pulseTab;U.routes.pulse=function(app){pulseTab(app)};
 
 /* WORK tab, brand pages: nothing to FILL here (Ventasys already collects it and we pull it in).
    We only SHOW the status — listed doctors, given to date, what is lying — and point to Ventasys. */
