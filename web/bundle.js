@@ -1,4 +1,4 @@
-window.FT_BUILD='20261104074610';
+window.FT_BUILD='20261104080518';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -2928,6 +2928,15 @@ var st2=document.createElement('style');st2.textContent=`
 .geo .seg2{display:flex;gap:4px;background:var(--soft2);border-radius:12px;padding:4px;margin:0 0 10px}
 .geo .seg2 button{flex:1;border:0;background:transparent;color:var(--muted);border-radius:9px;padding:8px 6px;font-size:12.5px;font-weight:800;min-height:auto}
 .geo .seg2 button.on{background:var(--card,#fff);color:var(--g1);box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.geo .mpwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:14px}
+.geo .mptbl{border-collapse:collapse;width:100%;min-width:440px;font-size:12px}
+.geo .mptbl th,.geo .mptbl td{padding:7px 8px;text-align:right;white-space:nowrap}
+.geo .mptbl th{background:var(--soft2);color:var(--muted);font-weight:800;font-size:11px}
+.geo .mptbl td.b,.geo .mptbl th.b{text-align:left;position:sticky;left:0;background:var(--card,#fff);font-weight:700}
+.geo .mptbl th.b{background:var(--soft2)}
+.geo .mptbl tr.grp td{background:var(--soft2);font-weight:800;color:var(--g1);text-transform:uppercase;font-size:10.5px;letter-spacing:.04em;text-align:left}
+.geo .mptbl tr.tot td{border-top:2px solid var(--line);font-weight:800;background:var(--soft2)}
+.geo .mptbl .pos{color:#1E8E5A}.geo .mptbl .neg{color:#C93B32}.geo .mptbl .mut{color:var(--muted)}
 .geo .mile{margin:0 0 10px}
 .geo .mile .track{position:relative;height:30px;border-radius:8px;background:var(--soft2);overflow:hidden}
 .geo .mile .fill{position:absolute;left:0;top:0;bottom:0;border-radius:8px;background:linear-gradient(90deg,#1B8A5A,#4ADE80)}
@@ -3182,15 +3191,35 @@ function focusLines(DA){var out=[];var scopes=DA.isMgr?DA.HQS:[DA.scope];
     out.push({t:x.b+': '+pf(x.p)+' YTD',d:'₹'+x.gap.toFixed(2)+' L short — push '+( (META[x.b]||['',''])[1]||'the channel')+'.'})});
   return out}
 
+/* ---------- Month Progress (this month, brand-wise, primary + POB) ---------- */
+function Lk(v){if(v==null)return '—';var x=v/1e5;return (x>-0.005&&x<0.005)?'0.00':x.toFixed(2)}
+function mpPct(p){return p==null?'—':p+'%'}
+function mpGr(g){if(g==null)return h('span',{class:'mut'},'—');if(g>999)return h('span',{class:'pos'},'+999%+');if(g<-999)return h('span',{class:'neg'},'−999%+');return h('span',{class:g<0?'neg':g>0?'pos':'mut'},(g>0?'+':'')+g+'%')}
+function mpPerf(p){return h('span',{class:p==null?'mut':p<0?'neg':p>=50?'pos':''},mpPct(p))}
+function mpRow(r){return h('tr',{},h('td',{class:'b'},r.b),h('td',{},Lk(r.tgt)),h('td',{class:'mut'},'—'),h('td',{class:'mut'},'—'),h('td',{class:(r.ach||0)<0?'neg':''},Lk(r.ach)),h('td',{},mpPerf(r.perf)),h('td',{},mpGr(r.gr)))}
+function vMonthProgress(box,DA){
+  var hq=(DA&&DA.scope)||csoHQ(),mp=hq?(S.feeds||{})['mprog_'+hq]:null;
+  if(!mp){box.append(h('div',{class:'note'},'Month progress for your HQ appears right after a Sync.'));return}
+  var t=mp.total||{};
+  box.append(h('div',{class:'hero'},h('div',{class:'k'},'Month Progress · '+(mp.month||'')+(mp.asOf?' · '+mp.asOf:'')),h('h2',{},hq),
+    h('div',{class:'hrow'},ring(Math.max(0,t.perf||0),72),h('div',{},h('div',{class:'big'},mpPct(t.perf)),h('small',{},'primary achievement · ₹'+Lk(t.ach)+'L of ₹'+Lk(t.tgt)+'L'),h('small',{},'POB '+mpPct(mp.pob)+' (₹'+Lk(mp.pobv)+'L) · growth '),mpGr(t.gr)))));
+  var tbl=h('table',{class:'mptbl'});
+  tbl.append(h('tr',{},h('th',{class:'b'},'Brand'),h('th',{},'Target'),h('th',{},'Closing'),h('th',{},'POB'),h('th',{},'Ach'),h('th',{},'Perf%'),h('th',{},'Growth')));
+  (mp.groups||[]).forEach(function(g){tbl.append(h('tr',{class:'grp'},h('td',{colspan:'7',class:'b'},g.name)));(g.rows||[]).forEach(function(r){tbl.append(mpRow(r))})});
+  tbl.append(h('tr',{class:'tot'},h('td',{class:'b'},'TOTAL'),h('td',{},Lk(t.tgt)),h('td',{class:'mut'},'—'),h('td',{},mpPct(mp.pob)),h('td',{class:(t.ach||0)<0?'neg':''},Lk(t.ach)),h('td',{},mpPerf(t.perf)),h('td',{},mpGr(t.gr))));
+  box.append(h('div',{class:'mpwrap'},tbl));
+  box.append(h('p',{class:'note',style:'margin-top:8px'},'Ach & Perf% = primary net sales vs target · POB = secondary vs its target · growth vs last year · ₹ in lakh. Closing stock and brand-wise POB fill in once those figures are loaded.'));
+}
+
 /* ---------- shell: tabbar + render both roles ---------- */
-function tabbar(T0){return h('div',{class:'tabbar'},[['perf','📊 Performance'],['imp','⭐ Impact Brands'],['inc','💰 Incentive'],['npd','🧪 NPDs']].map(function(x){return h('button',{class:x[0]===T0?'on':'',onclick:function(){set('T',x[0])}},x[1])}))}
+function tabbar(T0){return h('div',{class:'tabbar'},[['perf','📊 Performance'],['mp','📅 Month Progress'],['imp','⭐ Impact Brands'],['inc','💰 Incentive'],['npd','🧪 NPDs']].map(function(x){return h('button',{class:x[0]===T0?'on':'',onclick:function(){set('T',x[0])}},x[1])}))}
 function renderReports(app,DA){var box=h('div',{class:'geo cso'});app.append(box);
   var T0=get('T','perf');
   box.append(tabbar(T0));
-  var names={perf:'Performance',imp:'Impact Brands',inc:'Incentive',npd:'NPDs'};
+  var names={perf:'Performance',mp:'Month Progress',imp:'Impact Brands',inc:'Incentive',npd:'NPDs'};
   if(DA.isMgr)box.append(h('div',{class:'sharebar'},h('button',{onclick:function(){shareView(names[T0])}},'📸 Save / Share for WhatsApp'),h('button',{class:'alt',onclick:function(){shareView(names[T0])}},'⬇️ Download')));
   box.append(h('p',{class:'note',style:'margin:-2px 0 10px'},DA.title+(DA.isMgr?'':' HQ')+' · company incentive & sales data · '+(DA.asOf||'')+' · ₹ in lakh'+(DA.isMgr?' · only you can see this':'')));
-  try{(T0==='perf'?vPerf:T0==='imp'?vImpact:T0==='inc'?vInc:vNPD)(box,DA)}catch(e){box.append(h('div',{class:'note'},'Could not draw this view: '+e.message))}
+  try{(T0==='perf'?vPerf:T0==='mp'?vMonthProgress:T0==='imp'?vImpact:T0==='inc'?vInc:vNPD)(box,DA)}catch(e){box.append(h('div',{class:'note'},'Could not draw this view: '+e.message))}
 }
 
 U.routes.geo=function(app){if(!isMgr()){app.append(h('div',{class:'note'},'Performance is for the manager.'));return}
