@@ -135,4 +135,24 @@ U.carryCard=function(){try{if(isMgr())return'';var brick=(typeof brickToday==='f
   n+=skinRoster().filter(function(o){return o.beat===brick}).length;if(!n)return'';
   return h('div',{class:'coachc',style:'cursor:pointer',onclick:function(){go('carry')}},h('div',{class:'k'},'🎒 Carry today · '+brick),h('p',{},n+' customer'+(n>1?'s':'')+' in this brick — tap to see what to carry to each.'));
 }catch(e){return''}};
+
+/* ---------- stock statement upload (photo or PDF) ---------- */
+function stmtEntries(){try{return (S.entries||[]).filter(function(e){return e.type==='stock_statement'&&(!e.email||e.email===myEmail())}).sort(function(a,b){return (b.ts||0)-(a.ts||0)})}catch(e){return[]}}
+function stmtScreen(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Stock statements are uploaded by the CSO.'));return}
+  st();
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📄 Stock statement'),h('p',{},'Upload your stock statement as a photo or a PDF. It goes straight to Ratan Roy — nothing to send on WhatsApp.')));
+  var inp=h('input',{type:'file',accept:'image/*,application/pdf',style:'display:none'});
+  var stx=h('div',{style:'text-align:center;color:var(--muted);font-size:13px;min-height:18px;margin-top:6px'});
+  var btn=h('button',{style:'width:100%',onclick:function(){inp.click()}},'📄 Upload statement (photo or PDF)');
+  inp.addEventListener('change',function(){var f=inp.files&&inp.files[0];if(!f)return;
+    if(typeof uploadPhoto!=='function'){stx.textContent='Upload not ready — Sync and try again.';return}
+    btn.disabled=true;stx.textContent='Uploading…';
+    uploadPhoto(f).then(function(p){var done=(typeof save==='function')?save('stock_statement',{url:p.url,fileId:p.id,name:f.name||'statement',mime:f.type||'',month:(typeof TODAY!=='undefined'?TODAY:'').slice(0,7)}):Promise.resolve(true);
+      Promise.resolve(done).then(function(){stx.textContent='✅ Sent to Ratan Roy';btn.disabled=false;try{render()}catch(e){}})},
+      function(e){btn.disabled=false;stx.textContent=(e&&e.message)||'Upload failed. Try again.'})});
+  app.append(h('div',{class:'selc'},btn,inp,stx));
+  var prev=stmtEntries();
+  if(prev.length){var box=h('div',{class:'coachc'},h('div',{class:'k'},'Uploaded'));prev.slice(0,10).forEach(function(e){box.append(h('p',{style:'margin:3px 0'},'📄 '+(e.name||'statement')+(e.date?' · '+e.date:'')))});app.append(box)}
+}catch(e){app.append(h('div',{class:'note'},'Could not open statement upload: '+e.message))}}
+U.stmtScreen=stmtScreen;U.routes.stockup=function(app){stmtScreen(app)};
 })();

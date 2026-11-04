@@ -97,22 +97,36 @@ public class MainActivity extends Activity {
             return true;
           } catch (Exception e) { captureUri = null; }
         }
+        // Honour whatever the web input accepts (e.g. image/* and application/pdf for statements).
+        String[] acc = fp.getAcceptTypes();
+        java.util.ArrayList<String> mimes = new java.util.ArrayList<>();
+        boolean wantsImage = false;
+        if (acc != null) for (String a : acc) {
+          if (a == null) continue; a = a.trim(); if (a.isEmpty()) continue;
+          if (a.startsWith(".")) { String m = android.webkit.MimeTypeMap.getSingleton().getMimeTypeFromExtension(a.substring(1).toLowerCase()); if (m != null) a = m; }
+          if (!mimes.contains(a)) mimes.add(a);
+          if (a.startsWith("image/")) wantsImage = true;
+        }
+        if (mimes.isEmpty()) { mimes.add("image/*"); wantsImage = true; }
         Intent i = new Intent(Intent.ACTION_GET_CONTENT);
         i.addCategory(Intent.CATEGORY_OPENABLE);
-        i.setType("image/*");
+        if (mimes.size() == 1 && !mimes.get(0).startsWith(".")) i.setType(mimes.get(0));
+        else { i.setType("*/*"); i.putExtra(Intent.EXTRA_MIME_TYPES, mimes.toArray(new String[0])); }
         i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, fp.getMode() == FileChooserParams.MODE_OPEN_MULTIPLE);
-        Intent chooser = Intent.createChooser(i, "Take a photo or choose");
-        // Also offer the camera inside the chooser, so photo-upload screens can snap directly too.
-        try {
-          android.content.ContentValues cv = new android.content.ContentValues();
-          cv.put(MediaStore.Images.Media.DISPLAY_NAME, "photo_" + System.currentTimeMillis() + ".jpg");
-          cv.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-          captureUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
-          Intent cam = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-          cam.putExtra(MediaStore.EXTRA_OUTPUT, captureUri);
-          cam.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-          chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{cam});
-        } catch (Exception e) { captureUri = null; }
+        Intent chooser = Intent.createChooser(i, "Take a photo or choose a file");
+        // Offer the camera inside the chooser only when images are accepted.
+        if (wantsImage) {
+          try {
+            android.content.ContentValues cv = new android.content.ContentValues();
+            cv.put(MediaStore.Images.Media.DISPLAY_NAME, "photo_" + System.currentTimeMillis() + ".jpg");
+            cv.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+            captureUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
+            Intent cam = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            cam.putExtra(MediaStore.EXTRA_OUTPUT, captureUri);
+            cam.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{cam});
+          } catch (Exception e) { captureUri = null; }
+        } else { captureUri = null; }
         try { startActivityForResult(chooser, PICK); }
         catch (Exception e) { pending = null; captureUri = null; return false; }
         return true;
@@ -182,7 +196,7 @@ public class MainActivity extends Activity {
   // Lets the page hand over the sign-in so phone notifications show this CSO's own numbers.
   class AppBridge {
     @JavascriptInterface public void setAuth(String json) { getSharedPreferences("ft", MODE_PRIVATE).edit().putString("auth", json).apply(); Notify.schedule(MainActivity.this); }
-    @JavascriptInterface public String version() { return "6"; }
+    @JavascriptInterface public String version() { return "7"; }
     // Join buttons: phone call, WhatsApp, meeting links open in their own apps.
     @JavascriptInterface public void open(String url) {
       runOnUiThread(() -> { try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); } catch (Exception e) { Toast.makeText(MainActivity.this, "No app to open this", Toast.LENGTH_SHORT).show(); } });
