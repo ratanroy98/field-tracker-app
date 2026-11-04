@@ -1,4 +1,4 @@
-window.FT_BUILD='20261104055754';
+window.FT_BUILD='20261104060327';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -2397,7 +2397,7 @@ U.handoverCard=handoverCard;U.brandInputs=brandInputs;
 function todayCSO(app){var keep=[app.querySelector('.fthead')],hero=app.querySelector('.hero'),meets=[].slice.call(app.querySelectorAll('.meet')),hof=app.querySelector('.hof'),ob=[].slice.call(app.querySelectorAll('.note')).filter(function(n){return /saved on your phone/.test(n.textContent)})[0],nav0=app.querySelector('.bnav');
   var pend=U.nagList().length;
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
-  var u=updBanner(),list=[u,(U.highlightCard&&U.highlightCard())||"",(U.nextMoveCard&&U.nextMoveCard())||"",(U.earnCard&&U.earnCard())||"",nextCard(app),handoverCard(),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
+  var u=updBanner(),list=[u,(U.highlightCard&&U.highlightCard())||"",(U.nextMoveCard&&U.nextMoveCard())||"",(U.earnCard&&U.earnCard())||"",nextCard(app),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
   [].concat.apply([],list).forEach(function(n){if(n)app.append(n)})}
 function todayMgr(app){var keep=[app.querySelector('.fthead')];var team=U.teamPanel?U.teamPanel():null,share=[].slice.call(app.querySelectorAll('.tdone'))[0],hof=app.querySelector('.hof');
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
@@ -2478,6 +2478,7 @@ var st=document.createElement('style');st.textContent=`
 .nowc .tips{margin:0;padding:0;list-style:none}
 .nowc .tips li{padding:4px 0 4px 20px;position:relative;font-size:13px;line-height:1.4}
 .nowc .tips li:before{content:'→';position:absolute;left:0;color:var(--accent,#0F5257);font-weight:800}
+.nowc .morebtn{margin:9px 0 0;border:1px dashed var(--line,#dfe7e4);background:transparent;color:var(--accent,#0F5257);border-radius:10px;padding:8px;width:100%;font-weight:700;font-size:12.5px;min-height:auto}
 .nowc .push{margin:10px 0 0;font-weight:700;color:#13684A;font-size:13.5px}
 .nowc .vent{margin:9px 0 0;font-size:12px;color:var(--muted);border-top:1px dashed var(--line,#e5ece9);padding-top:8px}
 .nowc .nextline{margin:8px 0 0;font-size:12px;color:var(--muted)}
@@ -2541,10 +2542,15 @@ function render(ph,c){var d=ph.build(c)||{};
   var now=new Date(),hr=now.getHours(),mm=now.getMinutes();
   box.append(h('div',{class:'top'},h('div',{class:'clock'},'⏰ Right now · '+(hr%12||12)+(mm<10?':0':':')+mm+(hr<12?' AM':' PM')),h('h3',{},ph.icon+' '+ph.title),h('div',{class:'sub'},'Your digital Ratan Roy, with you all day')));
   var bd=h('div',{class:'bd'});
-  if(d.who)bd.append(h('div',{class:'who'},d.who.replace(/^(Meet|Book orders at|Pull the Rx through at|Go back|Report|Today|Cover|Secure|Work|Visit)/,function(m){return m})));
-  (d.say||[]).forEach(function(s){bd.append(h('div',{class:'say'},h('b',{},s[0]),s[1]))});
-  if(d.profit)bd.append(h('div',{class:'profit'},'💰',h('span',{},d.profit)));
-  if(d.tips&&d.tips.length)bd.append(h('ul',{class:'tips'},d.tips.map(function(t){return h('li',{},t)})));
+  if(d.who)bd.append(h('div',{class:'who'},d.who));
+  var says=d.say||[],more=!!(S.tab&&S.tab.nowmore),extra=(says.length>1)||d.profit||(d.tips&&d.tips.length);
+  if(says[0])bd.append(h('div',{class:'say'},h('b',{},says[0][0]),says[0][1]));
+  if(extra&&more){
+    says.slice(1).forEach(function(s){bd.append(h('div',{class:'say'},h('b',{},s[0]),s[1]))});
+    if(d.profit)bd.append(h('div',{class:'profit'},'💰',h('span',{},d.profit)));
+    if(d.tips&&d.tips.length)bd.append(h('ul',{class:'tips'},d.tips.map(function(t){return h('li',{},t)})));
+  }
+  if(extra)bd.append(h('button',{class:'morebtn',onclick:function(){S.tab.nowmore=!more;try{window.render&&window.render()}catch(e){}}},more?'▴ Show less':'▾ More pitches, profit & tips'));
   bd.append(h('div',{class:'push'},'💪 '+(d.push||push())));
   if(ph.k!=='wrap')bd.append(h('div',{class:'vent'},'📲 As you go: hand over the input/sample and report the Rx, input or order in Ventasys the same day.'));
   box.append(bd);
@@ -2840,6 +2846,17 @@ var st2=document.createElement('style');st2.textContent=`
 .geo .impc .meta b{font-size:15px}.geo .impc .meta small{display:block;color:var(--muted);font-size:11.5px;margin-top:1px}
 .geo .pill{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:2px 9px}
 .geo .pill.up{background:#E8F6EE;color:#13684A}.geo .pill.dn{background:#FBE4DC;color:#9A3412}.geo .pill.md{background:#FDF3D6;color:#8A5A00}
+.geo .estrip{display:flex;align-items:center;gap:10px;border-radius:14px;padding:10px 13px;margin:0;cursor:pointer;color:#fff;box-shadow:0 6px 16px rgba(0,0,0,.14)}
+.geo .estrip.won{background:linear-gradient(120deg,#E98A1E,#B45309)}
+.geo .estrip.lost{background:linear-gradient(120deg,#8E2A3F,#5B1220)}
+.geo .estrip.neu{background:linear-gradient(120deg,#0F5257,#1B7F79)}
+.geo .estrip .amt{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.05}
+.geo .estrip .lbl{font-size:10px;opacity:.92;text-transform:uppercase;letter-spacing:.6px;font-weight:800}
+.geo .estrip .st{margin-left:auto;font-size:12px;opacity:.95;text-align:right;white-space:nowrap}
+.geo .fold{border:1px solid var(--line,#e5ece9);border-radius:16px;margin:0 0 12px;overflow:hidden;background:var(--card,#fff)}
+.geo .fold>button.fh{width:100%;border:0;background:transparent;display:flex;align-items:center;gap:8px;padding:13px 14px;font-weight:800;font-size:14.5px;color:var(--fg,#14302E);min-height:auto}
+.geo .fold>button.fh .ar{margin-left:auto;color:var(--muted);font-size:12px}
+.geo .fold .in{padding:0 14px 13px}
 `;document.head.appendChild(st2);
 
 /* ---------- CSO feed access (own HQ only) ---------- */
@@ -2997,16 +3014,16 @@ function vInc(app,DA){
     eCard('📈','Oct growth',sg(me.g),me.g>0?'positive ✓ (needed)':'needs to be positive',me.g>0?'up':'dn')));
   // milestone ladder for October (where the month finished)
   app.append(mileBar(o[1],o[2]));
-  // THE BIGGER PICTURE — dreams + ceiling (everyone)
+  // THE BIGGER PICTURE — dreams + ceiling (everyone), folded
   var teaser=o[1]>0?(function(){var net=1.1*o[1];return net*1e5*RATE_M[slabIdx(net)][2]/100})():0;
-  app.append(h('div',{class:'dream'},h('h3',{},'🌍 The bigger picture'),h('div',{class:'sub'},'What a full, strong year actually pays'),
+  app.append(foldCard('🌍 The bigger picture'+(teaser>0?' · one 110% month ≈ '+R(teaser):''),'dreamopen',false,function(inner){inner.append(h('div',{class:'dream'},h('h3',{},'🌍 The bigger picture'),h('div',{class:'sub'},'What a full, strong year actually pays'),
     h('div',{class:'row'},'📅',h('span',{},h('b',{},'Every month 100%+: '),'up to 0.90% of your sales + ₹4,000–6,000 milestone')),
     h('div',{class:'row'},'📦',h('span',{},h('b',{},'Every quarter 110%+: '),'up to 1.40% — plus a 25% impact-brand bonus on top')),
     h('div',{class:'row'},'🗓️',h('span',{},h('b',{},'Half-yearly bonus: '),'extra again, over and above month & quarter')),
     h('div',{class:'row'},'🚀',h('span',{},h('b',{},'Productivity Advantage: '),'₹30,000–1,05,000 a year for strong incremental growth')),
     h('div',{class:'row'},'✈️',h('span',{},h('b',{},'STARNITE: '),'an international trip for 103–115%+ for the year')),
     teaser>0?h('div',{class:'goal'},'At your HQ\'s scale, one 110% month ≈ '+R(teaser)+' — every single month. Stack twelve of those and add the trip.'):'',
-    h('div',{class:'goal'},'The 2026 ceiling is ₹12 lakh + a trip abroad. That is what you are really playing for — start taking it this month.')));
+    h('div',{class:'goal'},'The 2026 ceiling is ₹12 lakh + a trip abroad. That is what you are really playing for — start taking it this month.')))}));
   // impact brand bonus gate (YTD standing — stable; bonus applies quarterly)
   var ig=impactGate(DA,'YTD');
   var ic=h('div',{class:'card'},h('h3',{},'⭐ Impact-brand bonus',h('small',{},'+25% · YTD standing')));
@@ -3015,11 +3032,14 @@ function vInc(app,DA){
     ic.append(h('div',{style:'padding:7px 0;border-bottom:1px solid var(--line,#eef2f1)'},h('div',{style:'display:flex;justify-content:space-between;font-size:13px'},h('b',{},b),h('span',{class:'pill '+(pp>=90?'up':pp>=70?'md':'dn')},plab2)),pbar(pp),gap>0?h('small',{style:'display:block;color:var(--muted);margin-top:3px;font-size:11.5px'},'Sell '+L(gap)+' more to cross 90%'):h('small',{style:'display:block;color:var(--ok);margin-top:3px;font-size:11.5px'},'✓ above 90%')));});
   app.append(ic);
   // the rules (short, educational)
-  app.append(h('div',{class:'card'},h('h3',{},'How to never leave money behind'),h('div',{class:'lst'},
-    [['🎯','Cross 97%, aim 100%/110% — each slab pays a higher %.'],['⭐','Every impact brand ≥90% — one weak brand cancels the 25% bonus.'],['📅','Reach 40% of the month target by the 17th for the milestone bonus.'],['📈','Positive growth is a must — no growth, no incentive.'],['↩️','Keep saleable returns under 3%; book expiry after close.'],['🔓','Earned money pays only when the next month hits 100%.']].map(function(x){return h('div',{style:'display:flex;gap:10px;padding:7px 0;font-size:13px'},h('span',{},x[0]),h('span',{},x[1]))}))));
+  app.append(foldCard('📏 How to never leave money behind','rulesopen',false,function(inner){inner.append(h('div',{class:'lst'},
+    [['🎯','Cross 97%, aim 100%/110% — each slab pays a higher %.'],['⭐','Every impact brand ≥90% — one weak brand cancels the 25% bonus.'],['📅','Reach 40% of the month target by the 17th for the milestone bonus.'],['📈','Positive growth is a must — no growth, no incentive.'],['↩️','Keep saleable returns under 3%; book expiry after close.'],['🔓','Earned money pays only when the next month hits 100%.']].map(function(x){return h('div',{style:'display:flex;gap:10px;padding:7px 0;font-size:13px'},h('span',{},x[0]),h('span',{},x[1]))})))}));
   app.append(h('p',{class:'note'},'Estimates use the company Sales-at-a-Glance figures and the Rise & Shine 2026 slabs. Final amounts depend on coverage, returns and outstanding-dues rules.'));
 }
 function eCard(ic,hd,big,sub,cls){return h('div',{},h('div',{class:'hd'},ic+' '+hd),h('b',{class:cls||''},big),h('small',{},sub))}
+function foldCard(title,key,open0,buildFn){var open=get(key,open0?'1':'0')==='1';var box=h('div',{class:'fold'});
+  box.append(h('button',{class:'fh',onclick:function(){set(key,open?'0':'1')}},title,h('span',{class:'ar'},open?'▴':'▾')));
+  if(open){var inner=h('div',{class:'in'});buildFn(inner);box.append(inner)}return box}
 function mileBar(tgt,sale){var pct=tgt?sale/tgt*100:0,w=Math.min(100,pct/1.1*100);
   return h('div',{class:'mile',style:'margin:2px 0 12px'},h('div',{class:'track'},h('div',{class:'fill',style:'width:'+w+'%'}),[90,100,105,110].map(function(m){return h('div',{class:'mk',style:'left:'+(m/1.1)+'%'})}),h('div',{class:'lbl',style:'left:'+Math.min(90,w)+'%'},Math.round(pct)+'%')),
     h('div',{style:'display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-weight:700;margin-top:3px'},h('span',{},'90%'),h('span',{},'100%'),h('span',{},'105%'),h('span',{},'110%')))}
@@ -3071,10 +3091,14 @@ U.geoReady=function(){return !!G};U.geoReset=function(){if(window.__GEO)return;G
 /* earnings snapshot for the dashboard (CSO home) */
 U.earnCard=function(){try{var DA=mkDA(true);if(!DA)return'';var oh=DA.onhold()||{q3:0,sept:0},tot=(oh.q3||0)+(oh.sept||0);
   var o=agg(DA.rows('ALL'),9),oa=P(o[2],o[1]),open=oa!=null&&oa>=100,closed=(o[1]>0||o[2]>0),lost=(closed&&!open&&tot>0)?tot:0;
-  var cls=lost>0?'loss':'money',k=lost>0?'💔 Slipped away':'💰 Earned so far',
-    p=lost>0?('October closed '+pf(oa)+' — '+R(lost)+' lost this cycle. Tap for your comeback ›'):(tot>0?(open?'October '+pf(oa)+' ✓ — payable. Tap to see your money ›':'Tap to see your money ›'):(open?'October '+pf(oa)+' ✓ — earning fresh. Tap to see how ›':'Cross your targets to start earning. Tap ›'));
-  var c=h('div',{class:'geo'},h('div',{class:cls,style:'margin:0;cursor:pointer',onclick:function(){try{S.tab.perf='brands';S.tab.geo_T='inc';go('perf')}catch(e){}}},
-    h('div',{class:'k'},k),h('h2',{},R(tot)),h('p',{},p)));return c}catch(e){return''}};
+  var cls='neu',icon='💰',lbl='Earned so far',st='tap ›';
+  if(lost>0){cls='lost';icon='💔';lbl='Slipped away';st='Oct '+pf(oa)+' · tap ›'}
+  else if(open&&tot>0){cls='won';lbl='Earned · payable';st='Oct '+pf(oa)+' ✓ ›'}
+  else if(open){cls='won';lbl='October '+pf(oa)+' ✓';st='earning fresh ›'}
+  else {st='cross targets ›'}
+  return h('div',{class:'geo'},h('div',{class:'estrip '+cls,onclick:function(){try{S.tab.perf='brands';S.tab.geo_T='inc';go('perf')}catch(e){}}},
+    h('span',{style:'font-size:20px'},icon),h('div',{style:'min-width:0'},h('div',{class:'lbl'},lbl),h('div',{class:'amt'},R(tot))),h('span',{class:'st'},st)));
+}catch(e){return''}};
 })();
 /* Field Tracker – Review mail (manager, best on a laptop): the evening review laid out as an email,
    ready to copy or open in Outlook. Nothing is sent by the app itself. */

@@ -26,6 +26,7 @@ var st=document.createElement('style');st.textContent=`
 .nowc .tips{margin:0;padding:0;list-style:none}
 .nowc .tips li{padding:4px 0 4px 20px;position:relative;font-size:13px;line-height:1.4}
 .nowc .tips li:before{content:'→';position:absolute;left:0;color:var(--accent,#0F5257);font-weight:800}
+.nowc .morebtn{margin:9px 0 0;border:1px dashed var(--line,#dfe7e4);background:transparent;color:var(--accent,#0F5257);border-radius:10px;padding:8px;width:100%;font-weight:700;font-size:12.5px;min-height:auto}
 .nowc .push{margin:10px 0 0;font-weight:700;color:#13684A;font-size:13.5px}
 .nowc .vent{margin:9px 0 0;font-size:12px;color:var(--muted);border-top:1px dashed var(--line,#e5ece9);padding-top:8px}
 .nowc .nextline{margin:8px 0 0;font-size:12px;color:var(--muted)}
@@ -89,10 +90,15 @@ function render(ph,c){var d=ph.build(c)||{};
   var now=new Date(),hr=now.getHours(),mm=now.getMinutes();
   box.append(h('div',{class:'top'},h('div',{class:'clock'},'⏰ Right now · '+(hr%12||12)+(mm<10?':0':':')+mm+(hr<12?' AM':' PM')),h('h3',{},ph.icon+' '+ph.title),h('div',{class:'sub'},'Your digital Ratan Roy, with you all day')));
   var bd=h('div',{class:'bd'});
-  if(d.who)bd.append(h('div',{class:'who'},d.who.replace(/^(Meet|Book orders at|Pull the Rx through at|Go back|Report|Today|Cover|Secure|Work|Visit)/,function(m){return m})));
-  (d.say||[]).forEach(function(s){bd.append(h('div',{class:'say'},h('b',{},s[0]),s[1]))});
-  if(d.profit)bd.append(h('div',{class:'profit'},'💰',h('span',{},d.profit)));
-  if(d.tips&&d.tips.length)bd.append(h('ul',{class:'tips'},d.tips.map(function(t){return h('li',{},t)})));
+  if(d.who)bd.append(h('div',{class:'who'},d.who));
+  var says=d.say||[],more=!!(S.tab&&S.tab.nowmore),extra=(says.length>1)||d.profit||(d.tips&&d.tips.length);
+  if(says[0])bd.append(h('div',{class:'say'},h('b',{},says[0][0]),says[0][1]));
+  if(extra&&more){
+    says.slice(1).forEach(function(s){bd.append(h('div',{class:'say'},h('b',{},s[0]),s[1]))});
+    if(d.profit)bd.append(h('div',{class:'profit'},'💰',h('span',{},d.profit)));
+    if(d.tips&&d.tips.length)bd.append(h('ul',{class:'tips'},d.tips.map(function(t){return h('li',{},t)})));
+  }
+  if(extra)bd.append(h('button',{class:'morebtn',onclick:function(){S.tab.nowmore=!more;try{window.render&&window.render()}catch(e){}}},more?'▴ Show less':'▾ More pitches, profit & tips'));
   bd.append(h('div',{class:'push'},'💪 '+(d.push||push())));
   if(ph.k!=='wrap')bd.append(h('div',{class:'vent'},'📲 As you go: hand over the input/sample and report the Rx, input or order in Ventasys the same day.'));
   box.append(bd);
