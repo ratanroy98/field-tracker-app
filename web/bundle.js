@@ -1,4 +1,4 @@
-window.FT_BUILD='20261104071339';
+window.FT_BUILD='20261104072208';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -2651,10 +2651,10 @@ function avatar(f){try{var M=window.FT_MEDIA||{},ph=f.photo;if(ph&&M[ph])return 
 U.teamCard=function(){try{if(S.mgr&&!S.viewAs)return'';var F=S.feeds||{},hq=myHQ();
   var tf=F['teamperf_'+hq]||F.teamperf,sf=F['spotlight_'+hq]||F.spotlight;if(!tf&&!sf)return'';
   var box=h('div',{class:'team'});
-  if(tf&&tf.rows){var rows=tf.rows.slice().sort(function(a,b){return (b.perf||0)-(a.perf||0)}),mine=myHQ();
-    box.append(h('div',{class:'hd'},'📊 Team performance',h('small',{},tf.period||'')));
+  if(tf&&tf.rows){var mv=function(r){return r.mtd==null?-1:r.mtd},rows=tf.rows.slice().sort(function(a,b){return mv(b)-mv(a)}),mine=myHQ();
+    box.append(h('div',{class:'hd'},'📊 Team · this month',h('small',{},tf.month||tf.asOf||'')));
     var g=h('div',{class:'gauges'});rows.forEach(function(r){var me=r.hq===mine;
-      g.append(h('div',{class:'g'+(me?' me':'')},gauge(r.perf,88),h('div',{class:'nm'},me?'You':(r.name||r.hq)),h('div',{class:'sub'},'this month '+(r.mtd==null?'—':r.mtd+'%'))))});
+      g.append(h('div',{class:'g'+(me?' me':'')},gauge(r.mtd,88),h('div',{class:'nm'},me?'You':(r.name||r.hq)),h('div',{class:'sub'},'YTD '+(r.perf==null?'—':r.perf+'%'))))});
     box.append(g);}
   if(sf){var sp=h('div',{class:'spot'});
     sp.append(h('div',{class:'top'},avatar(sf),h('div',{},h('b',{},'🌟 '+(sf.name||'Top performer')),h('div',{class:'ti'},sf.title||'Doing it right'))));
