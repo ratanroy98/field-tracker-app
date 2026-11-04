@@ -251,6 +251,7 @@ var DEEP={
   pick:function(){go('pick')},
   pulse:function(){go('pulse')},
   samples:function(){go('samples')},
+  stock:function(){go('stock')},
   task:function(){go('home');setTimeout(function(){U.taskSheet&&U.taskSheet()},90)},
   selfie:openCheckin, checkin:openCheckin, brick:openCheckin,
   photo:function(){go('carry')}
