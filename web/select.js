@@ -196,6 +196,9 @@ U.photoCard=function(){try{if(isMgr())return'';return h('div',{class:'coachc',st
 U.noBrickCard=function(){try{if(isMgr())return'';var ci=!!(U.checkinToday&&U.checkinToday());if(ci)return'';
   return h('div',{class:'coachc',style:'cursor:pointer;background:linear-gradient(135deg,#FFF4D6,#FDE8B8);border-color:#F0D18A',onclick:function(){go('photo')}},h('div',{class:'k',style:'color:#5A4300'},'📷 No brick selected yet'),h('p',{style:'color:#6a5320'},'If you are on leave, ignore this. If you are working, keep uploading photos of the doctors/retailers you give inputs to.'))}catch(e){return''}};
 
+/* CSO home card → full own-HQ reports (month / quarter / YTD, brand / Impact / NPD) */
+U.reportsCard=function(){try{if(isMgr())return'';return h('div',{class:'coachc',style:'cursor:pointer',onclick:function(){try{S.tab=S.tab||{};S.tab.perf='brands'}catch(e){}go('perf')}},h('div',{class:'k'},'📊 My reports — month · quarter · YTD'),h('p',{},'Your HQ\'s performance brand-wise, Impact brands and NPDs — monthly, quarterly and year-to-date. Tap to open.'))}catch(e){return''}};
+
 /* ---------- manager: photos & statements to forward to WhatsApp ---------- */
 function relayList(){try{return (S.entries||[]).filter(function(e){return (e.type==='field_photo'||e.type==='stock_statement'||(e.type==='selfie'&&e.url))&&!e.shared}).sort(function(a,b){return (b.ts||0)-(a.ts||0)})}catch(e){return[]}}
 function relayMsg(e){var who=e.name||'CSO',what=e.type==='field_photo'?('the picture of '+(e.toName||'a doctor/retailer')+(e.note?' ('+e.note+')':'')):e.type==='stock_statement'?('the stock statement'+(/\.pdf$/i.test(e.name||'')?' (PDF)':'')):'the selfie';
