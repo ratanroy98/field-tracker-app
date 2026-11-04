@@ -1,4 +1,4 @@
-window.FT_BUILD='20261104114135';
+window.FT_BUILD='20261104120640';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -2470,7 +2470,9 @@ function todayCSO(app){var keep=[app.querySelector('.fthead')],hero=app.querySel
   var pend=U.nagList().length;
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
   var u=updBanner(),list=[u,(U.noBrickCard&&U.noBrickCard())||"",(U.carryCard&&U.carryCard())||"",(U.pickCard&&U.pickCard())||"",(U.photoCard&&U.photoCard())||"",(U.inputsTop&&U.inputsTop())||"",(U.nextMoveCard&&U.nextMoveCard())||"",(U.earnCard&&U.earnCard())||"",(U.teamCard&&U.teamCard())||"",(U.reportsCard&&U.reportsCard())||"",nextCard(app),handoverCard(),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
-  [].concat.apply([],list).forEach(function(n){if(n)app.append(n)})}
+  [].concat.apply([],list).forEach(function(n){if(n)app.append(n)});
+  // Morning: greet the CSO with the brick confirmation on open (field day, not yet confirmed, once per day).
+  try{if(field()&&U.checkinToday&&!U.checkinToday()){var kd='ft_brickpop_'+TODAY;if(U.lsGet&&U.lsGet(kd,'')!=='1'){U.lsSet(kd,'1');setTimeout(function(){try{var c=app.querySelector('.hero .ci');if(c)c.click()}catch(e){}},350)}}}catch(e){}}
 function todayMgr(app){var keep=[app.querySelector('.fthead')];var team=U.teamPanel?U.teamPanel():null,share=[].slice.call(app.querySelectorAll('.tdone'))[0],hof=app.querySelector('.hof');
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
   [team,(U.relayPanel&&U.relayPanel())||null,share,hof,quoteLine()].forEach(function(n){if(n)app.append(n)})}
