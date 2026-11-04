@@ -24,7 +24,14 @@ function isDoctor(c){return /HCP|DOCTOR|DR|GP|RMP|PHYS/.test(c.ty)||/physician|m
 /* current picks: latest campaign_pick entry (approved or pending) -> {camp:[codes]} ; else seed */
 function myEntry(){try{var mine=(S.entries||[]).filter(function(e){return e.type==='campaign_pick'&&(!e.email||e.email===myEmail())});
   mine.sort(function(a,b){return (b.ts||0)-(a.ts||0)});return mine[0]||null}catch(e){return null}}
-function seededPicks(){var sm=seedMap(),p={};PICKC().forEach(function(c){p[c.id]=(sm[c.id]||[]).slice()});return p}
+/* all HQ customers (any brick) for resolving register-seed names -> codes */
+function allHQCust(){try{if(typeof CUST==='undefined'||!CUST)return[];var hq=myHQ2(),out=[];Object.keys(CUST).forEach(function(code){var c=CUST[code];if(!c)return;if(hq&&hqName(c.hq)&&hqName(c.hq)!==hq)return;out.push({code:String(code),name:c.name||String(code)})});return out}catch(e){return[]}}
+var TITLE=/^(dr|prof|mr|mrs|ms|md|smt|sri|shri)\.?$/;
+function toks(s){return String(s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(function(w){return w.length>=3&&!TITLE.test(w)})}
+/* tolerant name match: shares any significant token, so surname-first / first-name-first both match */
+function nameEq(a,b){var ta=toks(a),tb=toks(b);if(!ta.length||!tb.length)return false;return ta.some(function(w){return tb.indexOf(w)>=0})}
+function seededPicks(){var sm=seedMap(),cust=allHQCust(),p={};PICKC().forEach(function(c){var names=sm[c.id]||[],codes=[];
+  cust.forEach(function(cu){if(names.some(function(nm){return nameEq(cu.name,nm)}))codes.push(cu.code)});p[c.id]=codes});return p}
 function curPicks(){var e=myEntry();if(e&&e.picks)return JSON.parse(JSON.stringify(e.picks));return seededPicks()}
 function picksStatus(){var e=myEntry();return e?e.status:'draft'}
 
