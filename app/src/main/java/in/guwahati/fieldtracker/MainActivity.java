@@ -31,7 +31,7 @@ import android.widget.FrameLayout;
 public class MainActivity extends Activity {
   static final String APP_URL = "https://script.google.com/macros/s/AKfycbyFp_mIJqqv-vya_y_DFmW7nwzZc83PQY5PnwOdzMPYjFK3EYg-p-ZHz0M7vSgMlV3_/exec";
   static final int PICK = 11, PERM = 12, SNAP = 13;
-  WebView web; ProgressBar bar; ValueCallback<Uri[]> pending; Uri captureUri; TextToSpeech tts; boolean ttsReady; volatile String lastLoc = "";
+  WebView web; ProgressBar bar; ValueCallback<Uri[]> pending; Uri captureUri; TextToSpeech tts; boolean ttsReady; volatile String lastLoc = ""; volatile String pendingTarget = "";
 
   @Override protected void onCreate(Bundle b) {
     super.onCreate(b);
@@ -135,7 +135,15 @@ public class MainActivity extends Activity {
 
     askPermissions();
     Notify.schedule(this);
+    String g0 = getIntent() != null ? getIntent().getStringExtra("goto") : null;
+    if (g0 != null && !g0.isEmpty()) pendingTarget = g0;
     if (b != null) web.restoreState(b); else web.loadUrl(APP_URL);
+  }
+
+  // A tapped notification routes the web app to the right screen via AndroidApp.openTarget().
+  @Override protected void onNewIntent(Intent in) {
+    super.onNewIntent(in);
+    if (in != null) { String g = in.getStringExtra("goto"); if (g != null && !g.isEmpty()) pendingTarget = g; }
   }
 
   void askPermissions() {
@@ -196,7 +204,9 @@ public class MainActivity extends Activity {
   // Lets the page hand over the sign-in so phone notifications show this CSO's own numbers.
   class AppBridge {
     @JavascriptInterface public void setAuth(String json) { getSharedPreferences("ft", MODE_PRIVATE).edit().putString("auth", json).apply(); Notify.schedule(MainActivity.this); }
-    @JavascriptInterface public String version() { return "7"; }
+    @JavascriptInterface public String version() { return "8"; }
+    // The web deep-link handler polls this; a tapped notification sets the target screen.
+    @JavascriptInterface public String openTarget() { String t = pendingTarget; pendingTarget = ""; return t == null ? "" : t; }
     // Join buttons: phone call, WhatsApp, meeting links open in their own apps.
     @JavascriptInterface public void open(String url) {
       runOnUiThread(() -> { try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); } catch (Exception e) { Toast.makeText(MainActivity.this, "No app to open this", Toast.LENGTH_SHORT).show(); } });

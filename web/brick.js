@@ -72,14 +72,15 @@ function vbar(){return h('div',{class:'vbar'},h('span',{},'📋'),h('div',{},h('
 
 /* ---------- selfie check-in ---------- */
 var REASONS=['Doctor / chemist not available','Joint work with Ratan Roy','Urgent stockist order','Rain / road problem','Other'];
-U.beforeCheckin=function(go){var x=who()||{},b=brickToday(),tpv=tpDay(myEmail(),TODAY);if(todays('beat_change').length){selfie(go);return}
+U.beforeCheckin=function(go){var x=who()||{},b=brickToday(),tpv=tpDay(myEmail(),TODAY);if(todays('beat_change').length){go({});return}
   var body=h('div'),ch={brick:'',reason:''};
   function step1(){body.innerHTML='';body.append(h('div',{class:'lcard',style:'text-align:center'},h('div',{class:'meta'},new Date(TODAY+'T00:00:00').toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'})),h('h3',{style:'margin:6px 0'},(x.Name||'').split(' ')[0]+', today your brick is'),h('div',{class:'big',style:'color:var(--accent)'},b||tpv.beat||'—'),h('small',{style:'color:var(--muted)'},'As per your plan')),
-      h('button',{style:'width:100%',onclick:function(){close();selfie(go)}},'✅ Yes, correct'),h('button',{class:'ghost',style:'width:100%;margin-top:8px',onclick:step2},'🔀 No, I am working another brick'))}
+      h('button',{style:'width:100%',onclick:function(){close();go({})}},'✅ Yes, correct'),h('button',{class:'ghost',style:'width:100%;margin-top:8px',onclick:step2},'🔀 No, I am working another brick'))}
   function step2(){body.innerHTML='';var bricks=bricksOf(myHQ()).filter(function(z){return z!==b});
     body.append(h('small',{},'Which brick today?'),h('div',{class:'chips'},bricks.map(function(z){return h('button',{class:ch.brick===z?'on':'',onclick:function(){ch.brick=z;step2()}},z)})),h('small',{},'Why?'),h('div',{class:'chips'},REASONS.map(function(z){return h('button',{class:ch.reason===z?'on':'',onclick:function(){ch.reason=z;step2()}},z)})),
-      h('button',{style:'width:100%;margin-top:8px',disabled:!(ch.brick&&ch.reason),onclick:function(){save('beat_change',{actual:ch.brick,planned:b,reason:ch.reason,status:'pending'}).then(function(ok){if(ok){close();selfie(go)}})}},'📤 Send to Ratan Roy for approval'),h('button',{class:'ghost',style:'width:100%;margin-top:8px',onclick:step1},'‹ Back'))}
+      h('button',{style:'width:100%;margin-top:8px',disabled:!(ch.brick&&ch.reason),onclick:function(){save('beat_change',{actual:ch.brick,planned:b,reason:ch.reason,status:'pending'}).then(function(ok){if(ok){close();go({})}})}},'📤 Send to Ratan Roy for approval'),h('button',{class:'ghost',style:'width:100%;margin-top:8px',onclick:step1},'‹ Back'))}
   var ov=h('div',{class:'ftsheet'},h('div',{class:'pn'},h('div',{class:'grab'}),h('div',{class:'hd'},h('b',{},'📍 Start my day'),h('button',{class:'ghost',onclick:function(){close()}},'✕')),body));function close(){ov.remove()}document.body.append(ov);step1()};
+U.selfie=function(cb){selfie(function(r){cb&&cb(r)})};
 // Only the latest selfie is kept: the server renames it and removes this CSO's older selfies.
 function keepOnlySelfie(id){try{var a=JSON.parse(U.lsGet('ft_auth','null'));if(!id||!a||!window.google||!google.script)return;google.script.run.withFailureHandler(function(){}).api(a,'selfie',{id:id})}catch(e){}}
 function selfie(go){var body=h('div'),url=null,busy=false;var pic=h('img',{class:'selfie',alt:'',src:'data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#8aa" stroke-width="1.2"><circle cx="12" cy="9" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>')});

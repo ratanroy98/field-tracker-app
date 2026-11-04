@@ -20,8 +20,8 @@ import java.util.Calendar;
 /** Free phone reminders: day plan, POB checks, evening entry and review. No paid service needed. */
 public class Notify extends BroadcastReceiver {
   // hour, minute, slot
-  static final int[][] TIMES = {{8, 0, 0}, {11, 30, 1}, {14, 30, 1}, {17, 0, 1}, {19, 30, 2}, {20, 45, 3}};
-  static final String[] SLOTS = {"plan", "mid", "eve", "review"};
+  static final int[][] TIMES = {{8, 0, 0}, {10, 0, 4}, {10, 15, 4}, {10, 30, 4}, {11, 30, 1}, {13, 0, 5}, {14, 30, 1}, {16, 0, 5}, {17, 0, 1}, {19, 30, 2}, {20, 45, 3}};
+  static final String[] SLOTS = {"plan", "mid", "eve", "review", "selfie", "photo"};
   static final String CH = "ft_daily";
 
   static void meeting(Context c, String id, long at, String title, String body) {
@@ -66,6 +66,8 @@ public class Notify extends BroadcastReceiver {
     if (Intent.ACTION_BOOT_COMPLETED.equals(in.getAction()) || Intent.ACTION_MY_PACKAGE_REPLACED.equals(in.getAction())) { schedule(app); return; }
     final String slot = in.getStringExtra("slot");
     if ("meet".equals(slot)) { show(app, in.getStringExtra("title"), in.getStringExtra("body")); return; }
+    if ("selfie".equals(slot)) { show(app, "📸 Selfie time", "Take your 10:00–10:30 check-in selfie now.", 778, "selfie"); schedule(app); return; }
+    if ("photo".equals(slot)) { show(app, "📷 Field photos", "Upload photos of the doctors/retailers you gave inputs to today.", 779, "photo"); schedule(app); return; }
     final PendingResult pr = goAsync();
     new Thread(() -> {
       try {
@@ -93,7 +95,7 @@ public class Notify extends BroadcastReceiver {
           }
           // Daily task not yet shared to the WhatsApp group: keep reminding (same notification, re-alerts each time).
           JSONObject ng = j.optJSONObject("nag");
-          if (ng != null) show(app, ng.optString("title"), ng.optString("body"), 777);
+          if (ng != null) show(app, ng.optString("title"), ng.optString("body"), 777, "task");
           if (j.optBoolean("skip") || "poll".equals(slot)) { done(app, pr); return; }
           title = j.optString("title", title); body = j.optString("body", body);
         }
@@ -114,11 +116,14 @@ public class Notify extends BroadcastReceiver {
     return "Check your pending tasks and today's POB.";
   }
 
-  static void show(Context c, String title, String body) { show(c, title, body, (int) (System.currentTimeMillis() % 100000)); }
-  static void show(Context c, String title, String body, int id) {
+  static void show(Context c, String title, String body) { show(c, title, body, (int) (System.currentTimeMillis() % 100000), null); }
+  static void show(Context c, String title, String body, int id) { show(c, title, body, id, null); }
+  static void show(Context c, String title, String body, int id, String target) {
     NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
     if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(new NotificationChannel(CH, "Daily reminders", NotificationManager.IMPORTANCE_DEFAULT));
-    PendingIntent open = PendingIntent.getActivity(c, 0, new Intent(c, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), PendingIntent.FLAG_IMMUTABLE);
+    Intent oi = new Intent(c, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    if (target != null && !target.isEmpty()) oi.putExtra("goto", target);
+    PendingIntent open = PendingIntent.getActivity(c, id, oi, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     Notification.Builder b = Build.VERSION.SDK_INT >= 26 ? new Notification.Builder(c, CH) : new Notification.Builder(c);
     b.setSmallIcon(R.mipmap.ic_launcher).setContentTitle(title).setContentText(body)
       .setStyle(new Notification.BigTextStyle().bigText(body)).setAutoCancel(true).setContentIntent(open);

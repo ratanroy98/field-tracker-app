@@ -1,4 +1,4 @@
-window.FT_BUILD='20261104102127';
+window.FT_BUILD='20261104103810';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -2001,14 +2001,15 @@ function vbar(){return h('div',{class:'vbar'},h('span',{},'📋'),h('div',{},h('
 
 /* ---------- selfie check-in ---------- */
 var REASONS=['Doctor / chemist not available','Joint work with Ratan Roy','Urgent stockist order','Rain / road problem','Other'];
-U.beforeCheckin=function(go){var x=who()||{},b=brickToday(),tpv=tpDay(myEmail(),TODAY);if(todays('beat_change').length){selfie(go);return}
+U.beforeCheckin=function(go){var x=who()||{},b=brickToday(),tpv=tpDay(myEmail(),TODAY);if(todays('beat_change').length){go({});return}
   var body=h('div'),ch={brick:'',reason:''};
   function step1(){body.innerHTML='';body.append(h('div',{class:'lcard',style:'text-align:center'},h('div',{class:'meta'},new Date(TODAY+'T00:00:00').toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'})),h('h3',{style:'margin:6px 0'},(x.Name||'').split(' ')[0]+', today your brick is'),h('div',{class:'big',style:'color:var(--accent)'},b||tpv.beat||'—'),h('small',{style:'color:var(--muted)'},'As per your plan')),
-      h('button',{style:'width:100%',onclick:function(){close();selfie(go)}},'✅ Yes, correct'),h('button',{class:'ghost',style:'width:100%;margin-top:8px',onclick:step2},'🔀 No, I am working another brick'))}
+      h('button',{style:'width:100%',onclick:function(){close();go({})}},'✅ Yes, correct'),h('button',{class:'ghost',style:'width:100%;margin-top:8px',onclick:step2},'🔀 No, I am working another brick'))}
   function step2(){body.innerHTML='';var bricks=bricksOf(myHQ()).filter(function(z){return z!==b});
     body.append(h('small',{},'Which brick today?'),h('div',{class:'chips'},bricks.map(function(z){return h('button',{class:ch.brick===z?'on':'',onclick:function(){ch.brick=z;step2()}},z)})),h('small',{},'Why?'),h('div',{class:'chips'},REASONS.map(function(z){return h('button',{class:ch.reason===z?'on':'',onclick:function(){ch.reason=z;step2()}},z)})),
-      h('button',{style:'width:100%;margin-top:8px',disabled:!(ch.brick&&ch.reason),onclick:function(){save('beat_change',{actual:ch.brick,planned:b,reason:ch.reason,status:'pending'}).then(function(ok){if(ok){close();selfie(go)}})}},'📤 Send to Ratan Roy for approval'),h('button',{class:'ghost',style:'width:100%;margin-top:8px',onclick:step1},'‹ Back'))}
+      h('button',{style:'width:100%;margin-top:8px',disabled:!(ch.brick&&ch.reason),onclick:function(){save('beat_change',{actual:ch.brick,planned:b,reason:ch.reason,status:'pending'}).then(function(ok){if(ok){close();go({})}})}},'📤 Send to Ratan Roy for approval'),h('button',{class:'ghost',style:'width:100%;margin-top:8px',onclick:step1},'‹ Back'))}
   var ov=h('div',{class:'ftsheet'},h('div',{class:'pn'},h('div',{class:'grab'}),h('div',{class:'hd'},h('b',{},'📍 Start my day'),h('button',{class:'ghost',onclick:function(){close()}},'✕')),body));function close(){ov.remove()}document.body.append(ov);step1()};
+U.selfie=function(cb){selfie(function(r){cb&&cb(r)})};
 // Only the latest selfie is kept: the server renames it and removes this CSO's older selfies.
 function keepOnlySelfie(id){try{var a=JSON.parse(U.lsGet('ft_auth','null'));if(!id||!a||!window.google||!google.script)return;google.script.run.withFailureHandler(function(){}).api(a,'selfie',{id:id})}catch(e){}}
 function selfie(go){var body=h('div'),url=null,busy=false;var pic=h('img',{class:'selfie',alt:'',src:'data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#8aa" stroke-width="1.2"><circle cx="12" cy="9" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>')});
@@ -2315,7 +2316,7 @@ var st=document.createElement('style');st.textContent=`
 `;document.head.appendChild(st);
 
 /* ---------- which tab each screen belongs to ---------- */
-var WORKR=['raft','deca','rloc','skin','dexona','pulse','pick','carry','samples','stockists','stock','stockup','beat','tp'];
+var WORKR=['raft','deca','rloc','skin','dexona','pulse','pick','carry','photo','samples','stockists','stock','stockup','beat','tp'];
 function tabFor(r){if(isMgr()){if(r==='home'||r==='mgr')return'team';if(r==='approve')return'approve';if(r==='meet')return'meet';if(r==='geo'||r==='perf'||r==='mail')return'reports';if(r==='msgs'||r==='hof')return'me';if(r==='sell')return'sell';return'team'}
   if(r==='home')return'today';if(r==='sell')return'sell';if(r==='learn')return'learn';if(r==='perf'||r==='msgs'||r==='hof')return'me';return'work'}
 function NAV(){return isMgr()?[['team','👥','Team',function(){go('home')}],['approve','✅','Approvals',function(){go('approve')}],['meet','📅','Meetings',function(){go('meet')}],['reports','📈','Reports',function(){go('geo')}],['me','👤','Me',function(){go(U.lsGet('ft_me','msgs'))}]]
@@ -2328,7 +2329,7 @@ function nav(r){var cur=tabFor(r),pend=0,appr=0;
 function tabs(list,cur,cls){return h('div',{class:'subtabs'+(cls?' '+cls:'')},list.map(function(x){return h('button',{class:x[0]===cur?'on':'',onclick:x[2]},x[1])}))}
 function workTabs(r){var grp=r==='stockists'?'cust':(r==='tp'||r==='beat')?'tp':'ent';
   var top=tabs([['ent','Entries',function(){go(U.lsGet('ft_went','raft'))}],['cust','Customers',function(){go('stockists')}],['tp','TP & Brick',function(){go('tp')}],['req','Stock request',function(){U.stockSheet&&U.stockSheet()}]],grp);
-  if(grp==='ent'){if(r!=='samples'&&r!=='pulse'&&r!=='pick'&&r!=='carry'&&r!=='stockup')U.lsSet('ft_went',r);return[top,tabs([['carry','🎒 Carry'],['pick','👨‍⚕️ Pick Drs'],['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['pulse','💉 Pulse'],['stockup','📄 Statement'],['samples','💉 All samples'],['stock','Stock statement']].map(function(x){return[x[0],x[1],function(){go(x[0])}]}),r,'l2')]}
+  if(grp==='ent'){if(r!=='samples'&&r!=='pulse'&&r!=='pick'&&r!=='carry'&&r!=='stockup'&&r!=='photo')U.lsSet('ft_went',r);return[top,tabs([['carry','🎒 Carry'],['pick','👨‍⚕️ Pick Drs'],['photo','📷 Photo'],['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['pulse','💉 Pulse'],['stockup','📄 Statement'],['samples','💉 All samples'],['stock','Stock statement']].map(function(x){return[x[0],x[1],function(){go(x[0])}]}),r,'l2')]}
   if(grp==='tp')return[top,tabs([['tp','TP calendar',function(){go('tp')}],['beat','Change brick',function(){go('beat')}]],r,'l2')];
   return[top]}
 function meTabs(r){var L=isMgr()?[['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']]:[['perf','Progress'],['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']];
@@ -2351,6 +2352,7 @@ function steps(app){var S0=U.syncState?U.syncState():{opened:true,unsent:false},
   L.push({done:S0.opened,cls:'',t:'Sync to get today\'s latest',p:'Your plan, targets, meetings and messages from Ratan Roy.',b:'🔄 Sync now',f:function(){U.sync()}});
   if(fieldDay)L.push({done:ci,cls:'',t:'Confirm today\'s brick',p:'Tap “Start my day” — keep today\'s brick or change it. Your task opens after this.',b:'📍 Start my day',f:function(){var c=app.querySelector('.hero .ci');if(c)c.click()}});
   if(!fieldDay||ci)L.push({done:!U.taskDue||!U.taskDue(),cls:'wa',t:'Share today\'s task on WhatsApp',p:'Your task for the brick — share it to the “Guwahati CSM Team” group to confirm you\'ve gone through it.',b:'Read & share',f:function(){U.taskSheet()}});
+  if(fieldDay&&ci)L.push({done:U.selfieToday?U.selfieToday():true,cls:'',t:'Take your selfie (10:00–10:30)',p:'One geo-selfie for the day — it goes to Ratan Roy.',b:'📸 Take selfie',f:function(){U.doSelfie&&U.doSelfie()}});
   if(pend.length){var top=pend[0];L.push({done:false,cls:'',t:top.k.t,p:(top.s.why||'')+(pend.length>1?' · '+(pend.length-1)+' more after this':''),b:'Open',f:function(){go(top.k.k)},lnk:pend.length>1?['See all '+pend.length+' tasks',function(){go(U.lsGet('ft_went','raft'))}]:null});}
   L.push({done:!U.lessonDoneToday||U.lessonDoneToday(),cls:'',t:'Today\'s 3-minute lesson',p:(U.nextLesson&&U.nextLesson())||'From Ratan Roy',b:'🎓 Start lesson',f:function(){S.tab.learn='today';go('learn')}});
   return L}
@@ -2361,7 +2363,7 @@ function nextCard(app){var L=steps(app),i=L.findIndex(function(x){return!x.done}
   var s=L[i],done=L.filter(function(x){return x.done}).length;
   return h('div',{class:'next '+s.cls},h('div',{class:'k'},h('span',{},'Next step · '+(done+1)+' of '+L.length),dots),h('h3',{},s.t),s.p?h('p',{},s.p):'',
     h('button',{class:'go1',onclick:s.f},s.b),s.lnk?h('a',{class:'lnk',onclick:s.lnk[1]},s.lnk[0]):(S0.unsent&&i>0?h('a',{class:'lnk',onclick:function(){U.sync()}},'You can sync now, or once everything is done'):''))}
-function updBanner(){try{if(!window.AndroidApp||!AndroidApp.version)return'';if(+AndroidApp.version()>=7)return''}catch(e){return''}
+function updBanner(){try{if(!window.AndroidApp||!AndroidApp.version)return'';if(+AndroidApp.version()>=8)return''}catch(e){return''}
   return h('a',{class:'upd',href:APK},h('div',{},h('b',{},'📲 Update the app'),'Opens the camera for selfie & photos, asks camera + location permission, meeting alarms.'),h('span',{class:'btn'},'Update'))}
 function quoteLine(){var qs=(U.C().quotes)||[];if(!qs.length)return'';return h('div',{class:'qline'},h('small',{},'Ratan Roy says'),qs[U.dayIdx()%qs.length])}
 /* Guide, don't collect.
@@ -2467,11 +2469,11 @@ U.workStatus=workStatus;
 function todayCSO(app){var keep=[app.querySelector('.fthead')],hero=app.querySelector('.hero'),meets=[].slice.call(app.querySelectorAll('.meet')),hof=app.querySelector('.hof'),ob=[].slice.call(app.querySelectorAll('.note')).filter(function(n){return /saved on your phone/.test(n.textContent)})[0],nav0=app.querySelector('.bnav');
   var pend=U.nagList().length;
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
-  var u=updBanner(),list=[u,(U.carryCard&&U.carryCard())||"",(U.pickCard&&U.pickCard())||"",(U.inputsTop&&U.inputsTop())||"",(U.nextMoveCard&&U.nextMoveCard())||"",(U.earnCard&&U.earnCard())||"",(U.teamCard&&U.teamCard())||"",nextCard(app),handoverCard(),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
+  var u=updBanner(),list=[u,(U.noBrickCard&&U.noBrickCard())||"",(U.carryCard&&U.carryCard())||"",(U.pickCard&&U.pickCard())||"",(U.photoCard&&U.photoCard())||"",(U.inputsTop&&U.inputsTop())||"",(U.nextMoveCard&&U.nextMoveCard())||"",(U.earnCard&&U.earnCard())||"",(U.teamCard&&U.teamCard())||"",nextCard(app),handoverCard(),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
   [].concat.apply([],list).forEach(function(n){if(n)app.append(n)})}
 function todayMgr(app){var keep=[app.querySelector('.fthead')];var team=U.teamPanel?U.teamPanel():null,share=[].slice.call(app.querySelectorAll('.tdone'))[0],hof=app.querySelector('.hof');
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
-  [team,share,hof,quoteLine()].forEach(function(n){if(n)app.append(n)})}
+  [team,(U.relayPanel&&U.relayPanel())||null,share,hof,quoteLine()].forEach(function(n){if(n)app.append(n)})}
 
 /* ---------- manager routes ---------- */
 U.routes.approve=function(app){var p=U.pendingPlans?U.pendingPlans():null;var ca=U.campaignApprovals?U.campaignApprovals():null;var any=(p&&p.children.length)||ca;if(p&&p.children.length)app.append(p);if(ca)app.append(ca);if(!any)app.append(h('div',{class:'note'},'✅ Nothing waiting for your approval.'));
@@ -2526,8 +2528,9 @@ var DEEP={
   samples:function(){go('samples')},
   stock:function(){go('stockup')},
   task:function(){go('home');setTimeout(function(){U.taskSheet&&U.taskSheet()},90)},
-  selfie:openCheckin, checkin:openCheckin, brick:openCheckin,
-  photo:function(){go('carry')}
+  checkin:openCheckin, brick:openCheckin,
+  selfie:function(){go('home');setTimeout(function(){U.doSelfie&&U.doSelfie()},120)},
+  photo:function(){go('photo')}
 };
 U.deepGo=function(t){t=(''+(t||'')).toLowerCase().replace(/[^a-z]/g,'');if(DEEP[t]){try{DEEP[t]()}catch(e){}return true}return false};
 function deepTarget(){try{var hs=(location.hash||'').replace(/^#\/?/,'').toLowerCase();if(DEEP[hs])return hs;
@@ -2536,6 +2539,8 @@ function deepTarget(){try{var hs=(location.hash||'').replace(/^#\/?/,'').toLower
 function runDeep(){var t=deepTarget();if(!t)return;try{if(location.hash)history.replaceState(null,'',location.pathname+location.search)}catch(e){}U.deepGo(t)}
 window.addEventListener('hashchange',function(){runDeep()});
 (function initDeep(){var n=0,iv=setInterval(function(){n++;try{if(typeof S!=='undefined'&&S&&S.ready){clearInterval(iv);runDeep()}else if(n>40)clearInterval(iv)}catch(e){clearInterval(iv)}},150)})();
+/* a tapped notification sets a native target; poll it (works even inside the Apps Script iframe where a URL hash would not reach us) */
+setInterval(function(){try{if(window.AndroidApp&&AndroidApp.openTarget){var x=(''+AndroidApp.openTarget()).toLowerCase().replace(/[^a-z]/g,'');if(x&&DEEP[x])U.deepGo(x)}}catch(e){}},2000);
 
 try{if(S.ready)render()}catch(e){}
 })();
@@ -3475,6 +3480,61 @@ function stmtScreen(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Stoc
   if(prev.length){var box=h('div',{class:'coachc'},h('div',{class:'k'},'Uploaded'));prev.slice(0,10).forEach(function(e){box.append(h('p',{style:'margin:3px 0'},'📄 '+(e.name||'statement')+(e.date?' · '+e.date:'')))});app.append(box)}
 }catch(e){app.append(h('div',{class:'note'},'Could not open statement upload: '+e.message))}}
 U.stmtScreen=stmtScreen;U.routes.stockup=function(app){stmtScreen(app)};
+
+/* ---------- field photo: take, tag the dr/retailer, submit (reaches Ratan to share) ---------- */
+function photoScreen(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Photos are uploaded by the CSO.'));return}
+  st();var brick=(typeof brickToday==='function'&&brickToday())||'';
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📷 Photo of a visit / input given'),h('p',{},'Take a photo, tag the doctor or retailer it\'s for, and submit. It goes straight to Ratan Roy to share in the group.')));
+  var cust=brickCust(brick),file=null;
+  var sel=h('select',{style:'width:100%;padding:9px;border:1px solid var(--line,#ddd);border-radius:10px'},[h('option',{value:''},cust.length?'— pick who it\'s for —':'— none in brick; type below —')].concat(cust.map(function(c){return h('option',{value:c.code},c.name)})));
+  var other=h('input',{type:'text',placeholder:'or type doctor/retailer name',style:'width:100%;margin-top:6px;padding:9px;border:1px solid var(--line,#ddd);border-radius:10px'});
+  var note=h('input',{type:'text',placeholder:'what was given (optional)',style:'width:100%;margin-top:6px;padding:9px;border:1px solid var(--line,#ddd);border-radius:10px'});
+  var inp=h('input',{type:'file',accept:'image/*',style:'display:none'});
+  var stx=h('div',{style:'text-align:center;color:var(--muted);font-size:13px;min-height:18px;margin-top:6px'});
+  var take=h('button',{style:'width:100%;margin-top:8px',onclick:function(){inp.click()}},'📷 Take / choose photo');
+  var submit=h('button',{style:'width:100%;margin-top:8px',disabled:true,onclick:function(){
+    var c=cust.filter(function(x){return x.code===sel.value})[0],toName=c?c.name:(other.value||'').trim();
+    if(!file){stx.textContent='Take a photo first.';return} if(!toName){stx.textContent='Tag the doctor/retailer first.';return}
+    submit.disabled=true;stx.textContent='Uploading…';
+    uploadPhoto(file).then(function(p){(typeof save==='function'?save('field_photo',{url:p.url,fileId:p.id,toName:toName,toCode:sel.value||'',brick:brick,note:(note.value||'').trim()}):Promise.resolve(true)).then(function(){stx.textContent='✅ Sent to Ratan Roy';file=null;submit.disabled=true;take.textContent='📷 Take / choose photo';try{render()}catch(e){}})},
+      function(e){submit.disabled=false;stx.textContent=(e&&e.message)||'Upload failed. Try again.'})}},'📤 Submit to Ratan Roy');
+  inp.addEventListener('change',function(){var f=inp.files&&inp.files[0];if(!f)return;if(typeof uploadPhoto!=='function'){stx.textContent='Upload not ready — Sync.';return}file=f;take.textContent='📷 Photo chosen — retake';submit.disabled=false;stx.textContent='Now tag who it\'s for, then submit.'});
+  app.append(h('div',{class:'selc'},h('div',{style:'font-weight:700;margin-bottom:6px'},'Who is it for?'),sel,other,note,inp,take,submit,stx));
+  var mine=(S.entries||[]).filter(function(e){return e.type==='field_photo'&&e.date===(typeof TODAY!=='undefined'?TODAY:'')&&(!e.email||e.email===myEmail())});
+  if(mine.length){var box=h('div',{class:'coachc'},h('div',{class:'k'},'Sent today ('+mine.length+')'));mine.forEach(function(e){box.append(h('p',{style:'margin:3px 0'},'📷 '+(e.toName||'visit')+(e.note?' — '+e.note:'')))});app.append(box)}
+}catch(e){app.append(h('div',{class:'note'},'Could not open photo upload: '+e.message))}}
+U.photoScreen=photoScreen;U.routes.photo=function(app){photoScreen(app)};
+
+/* separate geo-selfie (its own 10–10:30 step) */
+function selfieToday(){try{return (S.entries||[]).some(function(e){return (e.type==='selfie')&&e.date===(typeof TODAY!=='undefined'?TODAY:'')&&(!e.email||e.email===myEmail())})}catch(e){return false}}
+U.selfieToday=selfieToday;
+function doSelfie(){try{if(isMgr())return;
+  try{if(window.AndroidApp&&AndroidApp.requestLocation)AndroidApp.requestLocation()}catch(e){}
+  if(typeof U.selfie!=='function'){toast&&toast('Update the app to take a selfie.');return}
+  U.selfie(function(r){var url=r&&r.selfie;if(!url)return;var f={url:url,time:new Date().toTimeString().slice(0,5)};
+    try{if(window.AndroidApp&&AndroidApp.getLocation){var L=AndroidApp.getLocation();if(L&&L!=='null'){var j=JSON.parse(L);f.lat=j.lat;f.lng=j.lng;f.acc=j.acc}}}catch(e){}
+    (typeof save==='function'?save('selfie',f):Promise.resolve(true)).then(function(){toast&&toast('Selfie sent to Ratan Roy');try{render()}catch(e){}})})}catch(e){}}
+U.doSelfie=doSelfie;
+
+/* Today cards: photo (always) + no-brick nudge */
+U.photoCard=function(){try{if(isMgr())return'';return h('div',{class:'coachc',style:'cursor:pointer',onclick:function(){go('photo')}},h('div',{class:'k'},'📷 Add a visit / input photo'),h('p',{},'Tag the doctor or retailer and submit — it reaches Ratan Roy to share in the group.'))}catch(e){return''}};
+U.noBrickCard=function(){try{if(isMgr())return'';var ci=!!(U.checkinToday&&U.checkinToday());if(ci)return'';
+  return h('div',{class:'coachc',style:'cursor:pointer;background:linear-gradient(135deg,#FFF4D6,#FDE8B8);border-color:#F0D18A',onclick:function(){go('photo')}},h('div',{class:'k',style:'color:#5A4300'},'📷 No brick selected yet'),h('p',{style:'color:#6a5320'},'If you are on leave, ignore this. If you are working, keep uploading photos of the doctors/retailers you give inputs to.'))}catch(e){return''}};
+
+/* ---------- manager: photos & statements to forward to WhatsApp ---------- */
+function relayList(){try{return (S.entries||[]).filter(function(e){return (e.type==='field_photo'||e.type==='stock_statement'||(e.type==='selfie'&&e.url))&&!e.shared}).sort(function(a,b){return (b.ts||0)-(a.ts||0)})}catch(e){return[]}}
+function relayMsg(e){var who=e.name||'CSO',what=e.type==='field_photo'?('the picture of '+(e.toName||'a doctor/retailer')+(e.note?' ('+e.note+')':'')):e.type==='stock_statement'?('the stock statement'+(/\.pdf$/i.test(e.name||'')?' (PDF)':'')):'the selfie';
+  return who+' has shared '+what+'. Please share the same in the respective group.'+(e.url?'\n'+e.url:'')}
+U.relayPanel=function(){try{if(!isMgr())return null;var E=relayList();if(!E.length)return null;
+  var box=h('div',{class:'phase'},h('div',{class:'ph'},h('b',{},'📸 Photos & statements to share'),h('small',{},String(E.length))));
+  E.forEach(function(e){var msg=relayMsg(e),kind=e.type==='field_photo'?(e.toName||'visit'):e.type==='stock_statement'?'stock statement':'selfie';
+    box.append(h('div',{class:'lrow',style:'cursor:default;align-items:flex-start'},
+      h('div',{class:'tx'},h('b',{},(e.name||'CSO')+' · '+kind),h('small',{style:'word-break:break-all'},e.url||'')),
+      h('div',{style:'display:flex;gap:6px'},
+        e.url?h('button',{class:'ghost',style:'min-height:auto;padding:8px 10px',onclick:function(){try{if(window.AndroidApp&&AndroidApp.open)AndroidApp.open(e.url);else window.open(e.url,'_blank')}catch(x){}}},'👁'):'',
+        h('button',{style:'min-height:auto;padding:8px 10px',onclick:function(){try{if(window.AndroidApp&&AndroidApp.shareWhatsApp)AndroidApp.shareWhatsApp(msg);else if(window.AndroidApp&&AndroidApp.share)AndroidApp.share(msg);else{toast&&toast('Update the app to share')}}catch(x){}}},'↗ Share'),
+        h('button',{class:'ghost',style:'min-height:auto;padding:8px 10px',onclick:function(){try{S.db.collection('entries').doc(e._id).update({shared:true}).then(function(){toast&&toast('Marked shared');render()})}catch(x){}}},'✓'))))});
+  return box}catch(e){return null}};
 })();
 /* Field Tracker – Review mail (manager, best on a laptop): the evening review laid out as an email,
    ready to copy or open in Outlook. Nothing is sent by the app itself. */

@@ -155,4 +155,59 @@ function stmtScreen(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Stoc
   if(prev.length){var box=h('div',{class:'coachc'},h('div',{class:'k'},'Uploaded'));prev.slice(0,10).forEach(function(e){box.append(h('p',{style:'margin:3px 0'},'📄 '+(e.name||'statement')+(e.date?' · '+e.date:'')))});app.append(box)}
 }catch(e){app.append(h('div',{class:'note'},'Could not open statement upload: '+e.message))}}
 U.stmtScreen=stmtScreen;U.routes.stockup=function(app){stmtScreen(app)};
+
+/* ---------- field photo: take, tag the dr/retailer, submit (reaches Ratan to share) ---------- */
+function photoScreen(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Photos are uploaded by the CSO.'));return}
+  st();var brick=(typeof brickToday==='function'&&brickToday())||'';
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📷 Photo of a visit / input given'),h('p',{},'Take a photo, tag the doctor or retailer it\'s for, and submit. It goes straight to Ratan Roy to share in the group.')));
+  var cust=brickCust(brick),file=null;
+  var sel=h('select',{style:'width:100%;padding:9px;border:1px solid var(--line,#ddd);border-radius:10px'},[h('option',{value:''},cust.length?'— pick who it\'s for —':'— none in brick; type below —')].concat(cust.map(function(c){return h('option',{value:c.code},c.name)})));
+  var other=h('input',{type:'text',placeholder:'or type doctor/retailer name',style:'width:100%;margin-top:6px;padding:9px;border:1px solid var(--line,#ddd);border-radius:10px'});
+  var note=h('input',{type:'text',placeholder:'what was given (optional)',style:'width:100%;margin-top:6px;padding:9px;border:1px solid var(--line,#ddd);border-radius:10px'});
+  var inp=h('input',{type:'file',accept:'image/*',style:'display:none'});
+  var stx=h('div',{style:'text-align:center;color:var(--muted);font-size:13px;min-height:18px;margin-top:6px'});
+  var take=h('button',{style:'width:100%;margin-top:8px',onclick:function(){inp.click()}},'📷 Take / choose photo');
+  var submit=h('button',{style:'width:100%;margin-top:8px',disabled:true,onclick:function(){
+    var c=cust.filter(function(x){return x.code===sel.value})[0],toName=c?c.name:(other.value||'').trim();
+    if(!file){stx.textContent='Take a photo first.';return} if(!toName){stx.textContent='Tag the doctor/retailer first.';return}
+    submit.disabled=true;stx.textContent='Uploading…';
+    uploadPhoto(file).then(function(p){(typeof save==='function'?save('field_photo',{url:p.url,fileId:p.id,toName:toName,toCode:sel.value||'',brick:brick,note:(note.value||'').trim()}):Promise.resolve(true)).then(function(){stx.textContent='✅ Sent to Ratan Roy';file=null;submit.disabled=true;take.textContent='📷 Take / choose photo';try{render()}catch(e){}})},
+      function(e){submit.disabled=false;stx.textContent=(e&&e.message)||'Upload failed. Try again.'})}},'📤 Submit to Ratan Roy');
+  inp.addEventListener('change',function(){var f=inp.files&&inp.files[0];if(!f)return;if(typeof uploadPhoto!=='function'){stx.textContent='Upload not ready — Sync.';return}file=f;take.textContent='📷 Photo chosen — retake';submit.disabled=false;stx.textContent='Now tag who it\'s for, then submit.'});
+  app.append(h('div',{class:'selc'},h('div',{style:'font-weight:700;margin-bottom:6px'},'Who is it for?'),sel,other,note,inp,take,submit,stx));
+  var mine=(S.entries||[]).filter(function(e){return e.type==='field_photo'&&e.date===(typeof TODAY!=='undefined'?TODAY:'')&&(!e.email||e.email===myEmail())});
+  if(mine.length){var box=h('div',{class:'coachc'},h('div',{class:'k'},'Sent today ('+mine.length+')'));mine.forEach(function(e){box.append(h('p',{style:'margin:3px 0'},'📷 '+(e.toName||'visit')+(e.note?' — '+e.note:'')))});app.append(box)}
+}catch(e){app.append(h('div',{class:'note'},'Could not open photo upload: '+e.message))}}
+U.photoScreen=photoScreen;U.routes.photo=function(app){photoScreen(app)};
+
+/* separate geo-selfie (its own 10–10:30 step) */
+function selfieToday(){try{return (S.entries||[]).some(function(e){return (e.type==='selfie')&&e.date===(typeof TODAY!=='undefined'?TODAY:'')&&(!e.email||e.email===myEmail())})}catch(e){return false}}
+U.selfieToday=selfieToday;
+function doSelfie(){try{if(isMgr())return;
+  try{if(window.AndroidApp&&AndroidApp.requestLocation)AndroidApp.requestLocation()}catch(e){}
+  if(typeof U.selfie!=='function'){toast&&toast('Update the app to take a selfie.');return}
+  U.selfie(function(r){var url=r&&r.selfie;if(!url)return;var f={url:url,time:new Date().toTimeString().slice(0,5)};
+    try{if(window.AndroidApp&&AndroidApp.getLocation){var L=AndroidApp.getLocation();if(L&&L!=='null'){var j=JSON.parse(L);f.lat=j.lat;f.lng=j.lng;f.acc=j.acc}}}catch(e){}
+    (typeof save==='function'?save('selfie',f):Promise.resolve(true)).then(function(){toast&&toast('Selfie sent to Ratan Roy');try{render()}catch(e){}})})}catch(e){}}
+U.doSelfie=doSelfie;
+
+/* Today cards: photo (always) + no-brick nudge */
+U.photoCard=function(){try{if(isMgr())return'';return h('div',{class:'coachc',style:'cursor:pointer',onclick:function(){go('photo')}},h('div',{class:'k'},'📷 Add a visit / input photo'),h('p',{},'Tag the doctor or retailer and submit — it reaches Ratan Roy to share in the group.'))}catch(e){return''}};
+U.noBrickCard=function(){try{if(isMgr())return'';var ci=!!(U.checkinToday&&U.checkinToday());if(ci)return'';
+  return h('div',{class:'coachc',style:'cursor:pointer;background:linear-gradient(135deg,#FFF4D6,#FDE8B8);border-color:#F0D18A',onclick:function(){go('photo')}},h('div',{class:'k',style:'color:#5A4300'},'📷 No brick selected yet'),h('p',{style:'color:#6a5320'},'If you are on leave, ignore this. If you are working, keep uploading photos of the doctors/retailers you give inputs to.'))}catch(e){return''}};
+
+/* ---------- manager: photos & statements to forward to WhatsApp ---------- */
+function relayList(){try{return (S.entries||[]).filter(function(e){return (e.type==='field_photo'||e.type==='stock_statement'||(e.type==='selfie'&&e.url))&&!e.shared}).sort(function(a,b){return (b.ts||0)-(a.ts||0)})}catch(e){return[]}}
+function relayMsg(e){var who=e.name||'CSO',what=e.type==='field_photo'?('the picture of '+(e.toName||'a doctor/retailer')+(e.note?' ('+e.note+')':'')):e.type==='stock_statement'?('the stock statement'+(/\.pdf$/i.test(e.name||'')?' (PDF)':'')):'the selfie';
+  return who+' has shared '+what+'. Please share the same in the respective group.'+(e.url?'\n'+e.url:'')}
+U.relayPanel=function(){try{if(!isMgr())return null;var E=relayList();if(!E.length)return null;
+  var box=h('div',{class:'phase'},h('div',{class:'ph'},h('b',{},'📸 Photos & statements to share'),h('small',{},String(E.length))));
+  E.forEach(function(e){var msg=relayMsg(e),kind=e.type==='field_photo'?(e.toName||'visit'):e.type==='stock_statement'?'stock statement':'selfie';
+    box.append(h('div',{class:'lrow',style:'cursor:default;align-items:flex-start'},
+      h('div',{class:'tx'},h('b',{},(e.name||'CSO')+' · '+kind),h('small',{style:'word-break:break-all'},e.url||'')),
+      h('div',{style:'display:flex;gap:6px'},
+        e.url?h('button',{class:'ghost',style:'min-height:auto;padding:8px 10px',onclick:function(){try{if(window.AndroidApp&&AndroidApp.open)AndroidApp.open(e.url);else window.open(e.url,'_blank')}catch(x){}}},'👁'):'',
+        h('button',{style:'min-height:auto;padding:8px 10px',onclick:function(){try{if(window.AndroidApp&&AndroidApp.shareWhatsApp)AndroidApp.shareWhatsApp(msg);else if(window.AndroidApp&&AndroidApp.share)AndroidApp.share(msg);else{toast&&toast('Update the app to share')}}catch(x){}}},'↗ Share'),
+        h('button',{class:'ghost',style:'min-height:auto;padding:8px 10px',onclick:function(){try{S.db.collection('entries').doc(e._id).update({shared:true}).then(function(){toast&&toast('Marked shared');render()})}catch(x){}}},'✓'))))});
+  return box}catch(e){return null}};
 })();
