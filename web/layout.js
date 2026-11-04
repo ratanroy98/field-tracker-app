@@ -39,6 +39,13 @@ var st=document.createElement('style');st.textContent=`
 .coachc .k{font-weight:800;font-size:14.5px;display:flex;align-items:center;gap:7px}
 .coachc p{margin:5px 0 0;font-size:13px;line-height:1.45;color:#6a5320}
 .coachc .big2{font-size:22px;font-weight:800}
+html,body{max-width:100vw;overflow-x:hidden}
+.subtabs{display:flex;gap:6px;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px}
+.subtabs::-webkit-scrollbar{display:none}
+.subtabs button{flex:0 0 auto;white-space:nowrap}
+.qrow{display:flex;gap:8px;margin:0 0 12px}
+.qrow button{flex:1 1 0;min-width:0;border:1px solid var(--line,#e5ece9);background:var(--card,#fff);border-radius:14px;padding:11px 4px;font-size:11.5px;font-weight:800;color:var(--fg,#14302E);display:flex;flex-direction:column;align-items:center;gap:4px;min-height:auto}
+.qrow button .qi{font-size:19px}
 `;document.head.appendChild(st);
 
 /* ---------- which tab each screen belongs to ---------- */
@@ -195,7 +202,7 @@ U.workStatus=workStatus;
 function todayCSO(app){var keep=[app.querySelector('.fthead')],hero=app.querySelector('.hero'),meets=[].slice.call(app.querySelectorAll('.meet')),hof=app.querySelector('.hof'),ob=[].slice.call(app.querySelectorAll('.note')).filter(function(n){return /saved on your phone/.test(n.textContent)})[0],nav0=app.querySelector('.bnav');
   var pend=U.nagList().length;
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
-  var u=updBanner(),list=[u,(U.noBrickCard&&U.noBrickCard())||"",(U.carryCard&&U.carryCard())||"",(U.pickCard&&U.pickCard())||"",(U.photoCard&&U.photoCard())||"",(U.inputsTop&&U.inputsTop())||"",(U.nextMoveCard&&U.nextMoveCard())||"",(U.earnCard&&U.earnCard())||"",(U.teamCard&&U.teamCard())||"",(U.reportsCard&&U.reportsCard())||"",nextCard(app),handoverCard(),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
+  var u=updBanner(),list=[u,nextCard(app),(U.quickRow&&U.quickRow())||"",hero,(U.earnCard&&U.earnCard())||"",(U.teamCard&&U.teamCard())||"",meets,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
   [].concat.apply([],list).forEach(function(n){if(n)app.append(n)});
   // Morning: greet the CSO with the brick confirmation on open (field day, not yet confirmed, once per day).
   try{if(field()&&U.checkinToday&&!U.checkinToday()){var kd='ft_brickpop_'+TODAY;if(U.lsGet&&U.lsGet(kd,'')!=='1'){U.lsSet(kd,'1');setTimeout(function(){try{var c=app.querySelector('.hero .ci');if(c)c.click()}catch(e){}},350)}}}catch(e){}}

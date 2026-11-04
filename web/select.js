@@ -196,6 +196,10 @@ U.photoCard=function(){try{if(isMgr())return'';return h('div',{class:'coachc',st
 U.noBrickCard=function(){try{if(isMgr())return'';var ci=!!(U.checkinToday&&U.checkinToday());if(ci)return'';
   return h('div',{class:'coachc',style:'cursor:pointer;background:linear-gradient(135deg,#FFF4D6,#FDE8B8);border-color:#F0D18A',onclick:function(){go('photo')}},h('div',{class:'k',style:'color:#5A4300'},'📷 No brick selected yet'),h('p',{style:'color:#6a5320'},'If you are on leave, ignore this. If you are working, keep uploading photos of the doctors/retailers you give inputs to.'))}catch(e){return''}};
 
+/* compact home quick-access row */
+U.quickRow=function(){try{if(isMgr())return'';var items=[['🎒','Carry',function(){go('carry')}],['👨‍⚕️','Pick Drs',function(){go('pick')}],['📷','Photo',function(){go('photo')}],['📊','Reports',function(){try{S.tab=S.tab||{};S.tab.perf='brands'}catch(e){}go('perf')}]];
+  return h('div',{class:'qrow'},items.map(function(it){return h('button',{onclick:it[2]},h('span',{class:'qi'},it[0]),it[1])}))}catch(e){return''}};
+
 /* CSO home card → full own-HQ reports (month / quarter / YTD, brand / Impact / NPD) */
 U.reportsCard=function(){try{if(isMgr())return'';return h('div',{class:'coachc',style:'cursor:pointer',onclick:function(){try{S.tab=S.tab||{};S.tab.perf='brands'}catch(e){}go('perf')}},h('div',{class:'k'},'📊 My reports — month · quarter · YTD'),h('p',{},'Your HQ\'s performance brand-wise, Impact brands and NPDs — monthly, quarterly and year-to-date. Tap to open.'))}catch(e){return''}};
 
