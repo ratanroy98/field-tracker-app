@@ -1,4 +1,4 @@
-window.FT_BUILD='20261104141840';
+window.FT_BUILD='20261104143906';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -3351,7 +3351,7 @@ function seedMap(){try{var hq=myHQ2();return (((window.FT_ROSTERS||{}).seeds||{}
 /* customers in a brick, from the shell customer master */
 function brickCust(brick){try{if(typeof CUST==='undefined'||!CUST||!brick)return[];var hq=myHQ2(),out=[];
   Object.keys(CUST).forEach(function(code){var c=CUST[code];if(!c||c.brick!==brick)return;if(hq&&hqName(c.hq)&&hqName(c.hq)!==hq)return;
-    out.push({code:String(code),name:c.name||String(code),spec:c.spec||'',ty:String(c.type||c.ty||'').toUpperCase()})});
+    out.push({code:String(code),name:c.name||String(code),spec:c.spec||'',brick:c.brick||'',ty:String(c.type||c.ty||'').toUpperCase()})});
   out.sort(function(a,b){return a.name.localeCompare(b.name)});return out}catch(e){return[]}}
 function isDoctor(c){return /HCP|DOCTOR|DR|GP|RMP|PHYS/.test(c.ty)||/physician|mbbs|md\b/i.test(c.spec)|| !c.ty}
 
@@ -3553,6 +3553,67 @@ U.relayPanel=function(){try{if(!isMgr())return null;var E=relayList();if(!E.leng
         h('button',{style:'min-height:auto;padding:8px 10px',onclick:function(){try{if(window.AndroidApp&&AndroidApp.shareWhatsApp)AndroidApp.shareWhatsApp(msg);else if(window.AndroidApp&&AndroidApp.share)AndroidApp.share(msg);else{toast&&toast('Update the app to share')}}catch(x){}}},'↗ Share'),
         h('button',{class:'ghost',style:'min-height:auto;padding:8px 10px',onclick:function(){try{S.db.collection('entries').doc(e._id).update({shared:true}).then(function(){toast&&toast('Marked shared');render()})}catch(x){}}},'✓'))))});
   return box}catch(e){return null}};
+
+/* ================= Brand drill-down: brand → input → quantity + doctor/retailer list (pick/approve/photo) ================= */
+var ROUTEB={raft:'R-Loc Raft',deca:'Deca Durabolin',rloc:'R-Loc',skin:'Skinlite',dexona:'Dexona'};
+function ff(){try{var k=Object.keys(S.feeds||{}).filter(function(z){return z.indexOf('inputs_')===0})[0];return k?S.feeds[k]:null}catch(e){return null}}
+function brandItems(brand){var f=ff();if(!f||!f.brands||!f.brands[brand])return[];var b=f.brands[brand],set={},ord=[];['gi','gs','li','ls'].forEach(function(k){(b[k]||[]).forEach(function(x){if(!set[x.it]){set[x.it]=1;ord.push(x.it)}})});return ord}
+function itemQty(brand,item){var f=ff(),b=(f&&f.brands&&f.brands[brand])||{},used=0,bal=0;(b.gi||[]).concat(b.gs||[]).forEach(function(x){if(x.it===item)used+=(+x.q||0)});(b.li||[]).concat(b.ls||[]).forEach(function(x){if(x.it===item)bal+=(+x.q||0)});return{used:used,bal:bal,alloc:used+bal}}
+function givenFor(brand,item){var f=ff(),b=(f&&f.brands&&f.brands[brand])||{},out=[];(b.gi||[]).concat(b.gs||[]).forEach(function(x){if(x.it===item&&x.to&&x.to!=='Not recorded')out.push({to:x.to,q:x.q})});return out}
+var BRANDW=/^(deca|durabolin|rloc|loc|raft|skinlite|dexona|oflin|zipcet|tab|tablet|inj|susp|the|and|set|ps|ind|zhl|india)$/;
+function toksB(s){return toks(s).filter(function(w){return !BRANDW.test(w)})}
+function matchCarry(carry,item){var ta=toksB(carry),tb=toksB(item);if(ta.length&&tb.length&&ta.some(function(w){return tb.indexOf(w)>=0}))return true;var c=(''+carry).toLowerCase().replace(/\(.*\)/,'').trim();return c.length>3&&(''+item).toLowerCase().indexOf(c)>=0}
+function itemCamp(brand,item){var cs=(((window.FT_ROSTERS||{}).campaigns)||[]).filter(function(c){return c.brand===brand});return cs.filter(function(c){return (c.carry||[]).some(function(ci){return matchCarry(ci,item)})})[0]||null}
+function assignedRoster(camp){try{var hq=myHQ2(),R=(window.FT_ROSTERS||{});if(camp&&camp.feed==='pulse_')return (R.pulse&&R.pulse[hq]||[]).map(function(d){return d.n});if(camp&&camp.feed==='skin_')return (R.skin&&R.skin[hq]||[]).map(function(o){return o.n});return[]}catch(e){return[]}}
+function pickedAnywhere(code){var p=curPicks();return Object.keys(p).some(function(k){return (p[k]||[]).indexOf(code)>=0})}
+function pickCands(brand){var brick=(typeof brickToday==='function'&&brickToday())||'',all=brickCust(brick),retail=(brand==='Skinlite');return all.filter(function(c){var doc=isDoctor(c);return retail?!doc:doc})}
+function shortItem(it){return (''+it).replace(/^(Deca-?|R-?Loc Raft|R-?Loc|Skinlite)\s*/i,'').replace(/\s*\(.*\)$/,'').slice(0,18)||it}
+function drow(name,stat){return h('div',{class:'selrow'},h('div',{class:'nm'},name),h('span',{style:'font-size:11.5px;color:var(--muted);white-space:nowrap'},stat))}
+function renderInput(app,brand,item,route){
+  var q=itemQty(brand,item),camp=itemCamp(brand,item),retail=(brand==='Skinlite');
+  app.append(h('div',{class:'selc'},h('div',{style:'font-weight:800;margin-bottom:6px'},item),
+    h('div',{class:'tot'},h('b',{},'Allocated '+q.alloc),h('b',{},'Used '+q.used),h('b',{class:q.bal>0?'':'ok'},'Balance '+q.bal))));
+  var given=givenFor(brand,item),givenNames=given.map(function(g){return g.to});
+  function isGiven(nm){return givenNames.some(function(gn){return nameEq(gn,nm)})}
+  var box=h('div',{class:'selc'});
+  if(retail){ var brick=(typeof brickToday==='function'&&brickToday())||'',outs=((window.FT_ROSTERS||{}).skin||{})[myHQ2()]||[],inB=outs.filter(function(o){return brickEq(o.beat,brick)});
+    box.append(h('div',{style:'font-weight:700;margin-bottom:4px'},'Retailers'+(brick?' · '+brick:'')+' ('+inB.length+')'));
+    given.forEach(function(g){box.append(drow(g.to,'✅ given'))});
+    inB.forEach(function(o){if(isGiven(o.n))return;box.append(drow(o.n,'to give'))});
+    if(!inB.length&&!given.length)box.append(h('div',{style:'color:var(--muted);font-size:12.5px'},'No Skinlite retailers mapped to this brick.'));
+  } else if(camp&&camp.src==='pick'&&camp.count){ var picks=curPicks(),status=picksStatus(),roster=picks[camp.id]||[],rosterShown=0;
+    box.append(h('div',{style:'font-weight:700;margin-bottom:4px'},'Doctors · target '+camp.count));
+    given.forEach(function(g){box.append(drow(g.to,'✅ given'))});
+    roster.forEach(function(code){var nm=custName(code);if(isGiven(nm))return;rosterShown++;box.append(drow(nm,status==='approved'?'not given yet':status==='pending'?'⏳ waiting approval':'• to save'))});
+    var filled=given.length+rosterShown,blanks=Math.max(0,camp.count-filled);
+    if(blanks>0){var cands=pickCands(brand).filter(function(c){return roster.indexOf(c.code)<0&&!isGiven(c.name)&&!pickedAnywhere(c.code)});
+      var sel=h('select',{style:'width:100%;padding:9px;border:1px solid var(--line,#ddd);border-radius:10px;margin-top:6px'},[h('option',{value:''},'— pick doctor ('+blanks+' to fill) —')].concat(cands.map(function(c){return h('option',{value:c.code},c.name+(c.brick?' · '+c.brick:''))})));
+      var sv=h('button',{style:'width:100%;margin-top:6px',onclick:function(){if(!sel.value){toast&&toast('Pick a name first');return}var p=curPicks();p[camp.id]=p[camp.id]||[];if(p[camp.id].indexOf(sel.value)<0)p[camp.id].push(sel.value);(typeof save==='function'?save('campaign_pick',{picks:p,status:'pending'}):Promise.resolve(true)).then(function(ok){if(ok){toast&&toast('Saved — sent to Ratan Roy for approval');try{render()}catch(e){}}})}},'➕ Save & send for approval');
+      box.append(sel,sv);
+    } else box.append(h('div',{style:'font-size:12px;color:#13684A;margin-top:6px'},'✅ All '+camp.count+' doctors filled'));
+  } else if(camp&&camp.src==='assigned'){ box.append(h('div',{style:'font-weight:700;margin-bottom:4px'},'Doctors · assigned'));
+    given.forEach(function(g){box.append(drow(g.to,'✅ given'))});
+    assignedRoster(camp).forEach(function(nm){if(isGiven(nm))return;box.append(drow(nm,'to give'))});
+  } else { box.append(h('div',{style:'font-weight:700;margin-bottom:4px'},retail?'Retailers':'Doctors'));
+    given.forEach(function(g){box.append(drow(g.to,'✅ given'))});
+    if(!given.length)box.append(h('div',{style:'color:var(--muted);font-size:12.5px'},'Given-to is recorded in Ventasys and shows here after Sync.')); }
+  app.append(box);
+  var pinp=h('input',{type:'file',accept:'image/*',style:'display:none'});
+  pinp.addEventListener('change',function(){var fl=pinp.files&&pinp.files[0];if(!fl)return;if(typeof uploadPhoto!=='function'){toast&&toast('Upload not ready — Sync.');return}toast&&toast('Uploading…');
+    uploadPhoto(fl).then(function(p){(typeof save==='function'?save('field_photo',{url:p.url,fileId:p.id,brand:brand,item:item,toName:brand+' / '+item}):Promise.resolve(true)).then(function(){try{alert('Please report the same on Ventasys too.')}catch(e){toast&&toast('Please report the same on Ventasys too.')}try{render()}catch(e){}})},function(e){toast&&toast((e&&e.message)||'Upload failed')})});
+  app.append(h('div',{class:'selc'},h('button',{style:'width:100%',onclick:function(){pinp.click()}},'📷 Upload picture'),pinp));
+}
+function brandView(app,route){try{if(isMgr()){app.append(h('div',{class:'note'},'This is the CSO\'s screen.'));return}
+  st();var brand=ROUTEB[route]||route;
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📦 '+brand),h('p',{},'Tap an input below — only that input\'s quantity and '+(brand==='Skinlite'?'retailers':'doctors')+' show.')));
+  var items=brandItems(brand);
+  if(!items.length){app.append(h('div',{class:'coachc'},h('p',{},'No '+brand+' inputs tracked yet — they appear after a Sync.')));return}
+  S.tab=S.tab||{};var key='binput_'+route;if(!S.tab[key]||items.indexOf(S.tab[key])<0)S.tab[key]=items[0];
+  app.append(h('div',{class:'subtabs l2'},items.map(function(it){return h('button',{class:it===S.tab[key]?'on':'',onclick:function(){S.tab[key]=it;try{render()}catch(e){}}},shortItem(it))})));
+  renderInput(app,brand,S.tab[key],route);
+}catch(e){app.append(h('div',{class:'note'},'Could not open brand: '+e.message))}}
+U.brandView=brandView;U._itemCamp=itemCamp;U._pickCands=pickCands;
+['raft','deca','rloc','skin','dexona'].forEach(function(k){U.routes[k]=function(app){brandView(app,k)}});
 })();
 /* Field Tracker – Review mail (manager, best on a laptop): the evening review laid out as an email,
    ready to copy or open in Outlook. Nothing is sent by the app itself. */
