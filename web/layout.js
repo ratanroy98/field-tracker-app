@@ -60,11 +60,10 @@ function nav(r){var cur=tabFor(r),pend=0,appr=0;
 
 /* ---------- sub-tab rows ---------- */
 function tabs(list,cur,cls){return h('div',{class:'subtabs'+(cls?' '+cls:'')},list.map(function(x){return h('button',{class:x[0]===cur?'on':'',onclick:x[2]},x[1])}))}
-function workTabs(r){var grp=r==='stockists'?'cust':(r==='tp'||r==='beat')?'tp':'ent';
-  var top=tabs([['ent','Entries',function(){go(U.lsGet('ft_went','raft'))}],['cust','Customers',function(){go('stockists')}],['tp','TP & Brick',function(){go('tp')}],['req','Stock request',function(){U.stockSheet&&U.stockSheet()}]],grp);
-  if(grp==='ent'){if(r!=='samples'&&r!=='pulse'&&r!=='pick'&&r!=='carry'&&r!=='stock'&&r!=='photo')U.lsSet('ft_went',r);return[top,tabs([['carry','🎒 Carry'],['pick','👨‍⚕️ Pick Drs'],['photo','📷 Photo'],['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['pulse','💉 Pulse'],['samples','💉 All samples'],['stock','📄 Stock statement']].map(function(x){return[x[0],x[1],function(){go(x[0])}]}),r,'l2')]}
-  if(grp==='tp')return[top,tabs([['tp','TP calendar',function(){go('tp')}],['beat','Change brick',function(){go('beat')}]],r,'l2')];
-  return[top]}
+/* Work = the brand pages only. One clean row of brands; everything else lives in the ≡ menu. */
+function workTabs(r){var B=[['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['pulse','💉 Pulse']];
+  return[tabs(B.map(function(x){return[x[0],x[1],function(){go(x[0])}]}),r)]}
+var BRANDR={raft:1,deca:1,rloc:1,skin:1,dexona:1,pulse:1};
 function meTabs(r){var L=isMgr()?[['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']]:[['perf','Progress'],['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']];
   return tabs(L.map(function(x){return[x[0],x[1],function(){if(x[0]==='set'){U.settings&&U.settings();return}U.lsSet('ft_me',x[0]);go(x[0])}]}),r)}
 
@@ -72,7 +71,9 @@ function meTabs(r){var L=isMgr()?[['msgs','Messages'],['hof','Hall of Fame'],['s
 function topbar(app,r){var hd=app.querySelector('.fthead .row');if(!hd||hd.querySelector('.acts'))return;
   hd.querySelectorAll('.ib').forEach(function(b){b.classList.add('lx')});
   var sb=h('button',{class:'hb',title:'Sync',onclick:function(){U.sync&&U.sync()}});sb.id='ftsynch';paintSync(sb);
-  hd.append(h('div',{class:'acts'},sb,h('button',{class:'hb',title:'Messages',onclick:function(){U.lsSet('ft_me','msgs');go('msgs')}},'💬'),h('button',{class:'hb',title:'Settings',onclick:function(){U.settings&&U.settings()}},'⚙️')))}
+  var acts=h('div',{class:'acts'},sb,h('button',{class:'hb',title:'Messages',onclick:function(){U.lsSet('ft_me','msgs');go('msgs')}},'💬'),h('button',{class:'hb',title:'Settings',onclick:function(){U.settings&&U.settings()}},'⚙️'));
+  if(!isMgr())acts.append(h('button',{class:'hb',title:'Menu',style:'font-size:24px;line-height:1',onclick:function(){U.openMenu&&U.openMenu()}},'≡'));
+  hd.append(acts)}
 function paintSync(b){b=b||document.getElementById('ftsynch');if(!b||!U.syncState)return;var s=U.syncState();var cls='hb'+(s.busy?' spin':s.due?' due':'');var html=SYNC+(s.unsent&&!s.busy?'<i class="dot"></i>':'');
   if(b.className!==cls)b.className=cls;if(b._h!==html){b.innerHTML=html;b._h=html}b.title=s.busy?'Syncing…':'Sync · '+s.ago}
 setInterval(function(){paintSync()},1500);
@@ -86,7 +87,7 @@ function steps(app){var S0=U.syncState?U.syncState():{opened:true,unsent:false},
   if(fieldDay)L.push({done:ci,cls:'',t:'Confirm today\'s brick',p:'Tap “Start my day” — keep today\'s brick or change it. Your task opens after this.',b:'📍 Start my day',f:function(){var c=app.querySelector('.hero .ci');if(c)c.click()}});
   if(!fieldDay||ci)L.push({done:!U.taskDue||!U.taskDue(),cls:'wa',t:'Share today\'s task on WhatsApp',p:'Your task for the brick — share it to the “Guwahati CSM Team” group to confirm you\'ve gone through it.',b:'Read & share',f:function(){U.taskSheet()}});
   if(fieldDay&&ci)L.push({done:U.selfieToday?U.selfieToday():true,cls:'',t:'Take your selfie (10:00–10:30)',p:'One geo-selfie for the day — it goes to Ratan Roy.',b:'📸 Take selfie',f:function(){U.doSelfie&&U.doSelfie()}});
-  if(pend.length){var top=pend[0];L.push({done:false,cls:'',t:top.k.t,p:(top.s.why||'')+(pend.length>1?' · '+(pend.length-1)+' more after this':''),b:'Open',f:function(){go(top.k.k)},lnk:pend.length>1?['See all '+pend.length+' tasks',function(){go(U.lsGet('ft_went','raft'))}]:null});}
+  if(pend.length){var top=pend[0];L.push({done:false,cls:'',t:top.k.t,p:(top.s.why||'')+(pend.length>1?' · '+(pend.length-1)+' more after this':''),b:'Open',f:function(){go(top.k.k)},lnk:pend.length>1?['See all '+pend.length+' tasks',function(){go(U.lsGet('ft_work','raft'))}]:null});}
   L.push({done:!U.lessonDoneToday||U.lessonDoneToday(),cls:'',t:'Today\'s 3-minute lesson',p:(U.nextLesson&&U.nextLesson())||'From Ratan Roy',b:'🎓 Start lesson',f:function(){S.tab.learn='today';go('learn')}});
   return L}
 function nextCard(app){var L=steps(app),i=L.findIndex(function(x){return!x.done}),S0=U.syncState?U.syncState():{};
@@ -202,7 +203,7 @@ U.workStatus=workStatus;
 function todayCSO(app){var keep=[app.querySelector('.fthead')],hero=app.querySelector('.hero'),meets=[].slice.call(app.querySelectorAll('.meet')),hof=app.querySelector('.hof'),ob=[].slice.call(app.querySelectorAll('.note')).filter(function(n){return /saved on your phone/.test(n.textContent)})[0],nav0=app.querySelector('.bnav');
   var pend=U.nagList().length;
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
-  var u=updBanner(),list=[u,nextCard(app),(U.quickRow&&U.quickRow())||"",hero,(U.earnCard&&U.earnCard())||"",(U.teamCard&&U.teamCard())||"",meets,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
+  var u=updBanner(),list=[u,hof,(U.progressCard&&U.progressCard())||"",nextCard(app),hero,(U.carryCard&&U.carryCard())||"",(U.earnCard&&U.earnCard())||"",meets,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_work','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',quoteLine()];
   [].concat.apply([],list).forEach(function(n){if(n)app.append(n)});
   // Morning: greet the CSO with the brick confirmation on open (field day, not yet confirmed, once per day).
   try{if(field()&&U.checkinToday&&!U.checkinToday()){var kd='ft_brickpop_'+TODAY;if(U.lsGet&&U.lsGet(kd,'')!=='1'){U.lsSet(kd,'1');setTimeout(function(){try{var c=app.querySelector('.hero .ci');if(c)c.click()}catch(e){}},350)}}}catch(e){}}
@@ -245,7 +246,7 @@ var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(doc
   try{topbar(app,r);var t=tabFor(r),hd=app.querySelector('.fthead');
     if(r==='home'){if(isMgr())todayMgr(app);else todayCSO(app)}
     // replace the old sub-tab row on Work screens
-    if(t==='work'){U.lsSet('ft_work',r);var old=app.querySelector('.fthead~.subtabs');if(old&&old.textContent.indexOf('Raft')>=0&&!old.classList.contains('l2'))old.remove();var rows=workTabs(r);var after=hd;rows.forEach(function(x){after.after(x);after=x});
+    if(t==='work'&&BRANDR[r]){U.lsSet('ft_work',r);var old=app.querySelector('.fthead~.subtabs');if(old&&old.textContent.indexOf('Raft')>=0&&!old.classList.contains('l2'))old.remove();var rows=workTabs(r);var after=hd;rows.forEach(function(x){after.after(x);after=x});
       }
     if(t==='me'){var mt=meTabs(r);hd.after(mt);if(r==='perf')app.querySelectorAll('.hof').forEach(function(x){x.remove()})}
     var nb=app.querySelector('.bnav');if(nb)nb.replaceWith(nav(r));else app.append(nav(r));
@@ -259,6 +260,9 @@ var DEEP={
   home:function(){go('home')},
   carry:function(){go('carry')},
   pick:function(){go('pick')},
+  brands:function(){go('brands')},
+  primary:function(){go('primary')},
+  shakti:function(){go('shakti')},
   pulse:function(){go('pulse')},
   samples:function(){go('samples')},
   stock:function(){go('stock')},

@@ -1,4 +1,4 @@
-window.FT_BUILD='20261104143906';
+window.FT_BUILD='20261104152054';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -2334,11 +2334,10 @@ function nav(r){var cur=tabFor(r),pend=0,appr=0;
 
 /* ---------- sub-tab rows ---------- */
 function tabs(list,cur,cls){return h('div',{class:'subtabs'+(cls?' '+cls:'')},list.map(function(x){return h('button',{class:x[0]===cur?'on':'',onclick:x[2]},x[1])}))}
-function workTabs(r){var grp=r==='stockists'?'cust':(r==='tp'||r==='beat')?'tp':'ent';
-  var top=tabs([['ent','Entries',function(){go(U.lsGet('ft_went','raft'))}],['cust','Customers',function(){go('stockists')}],['tp','TP & Brick',function(){go('tp')}],['req','Stock request',function(){U.stockSheet&&U.stockSheet()}]],grp);
-  if(grp==='ent'){if(r!=='samples'&&r!=='pulse'&&r!=='pick'&&r!=='carry'&&r!=='stock'&&r!=='photo')U.lsSet('ft_went',r);return[top,tabs([['carry','🎒 Carry'],['pick','👨‍⚕️ Pick Drs'],['photo','📷 Photo'],['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['pulse','💉 Pulse'],['samples','💉 All samples'],['stock','📄 Stock statement']].map(function(x){return[x[0],x[1],function(){go(x[0])}]}),r,'l2')]}
-  if(grp==='tp')return[top,tabs([['tp','TP calendar',function(){go('tp')}],['beat','Change brick',function(){go('beat')}]],r,'l2')];
-  return[top]}
+/* Work = the brand pages only. One clean row of brands; everything else lives in the ≡ menu. */
+function workTabs(r){var B=[['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['pulse','💉 Pulse']];
+  return[tabs(B.map(function(x){return[x[0],x[1],function(){go(x[0])}]}),r)]}
+var BRANDR={raft:1,deca:1,rloc:1,skin:1,dexona:1,pulse:1};
 function meTabs(r){var L=isMgr()?[['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']]:[['perf','Progress'],['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']];
   return tabs(L.map(function(x){return[x[0],x[1],function(){if(x[0]==='set'){U.settings&&U.settings();return}U.lsSet('ft_me',x[0]);go(x[0])}]}),r)}
 
@@ -2346,7 +2345,9 @@ function meTabs(r){var L=isMgr()?[['msgs','Messages'],['hof','Hall of Fame'],['s
 function topbar(app,r){var hd=app.querySelector('.fthead .row');if(!hd||hd.querySelector('.acts'))return;
   hd.querySelectorAll('.ib').forEach(function(b){b.classList.add('lx')});
   var sb=h('button',{class:'hb',title:'Sync',onclick:function(){U.sync&&U.sync()}});sb.id='ftsynch';paintSync(sb);
-  hd.append(h('div',{class:'acts'},sb,h('button',{class:'hb',title:'Messages',onclick:function(){U.lsSet('ft_me','msgs');go('msgs')}},'💬'),h('button',{class:'hb',title:'Settings',onclick:function(){U.settings&&U.settings()}},'⚙️')))}
+  var acts=h('div',{class:'acts'},sb,h('button',{class:'hb',title:'Messages',onclick:function(){U.lsSet('ft_me','msgs');go('msgs')}},'💬'),h('button',{class:'hb',title:'Settings',onclick:function(){U.settings&&U.settings()}},'⚙️'));
+  if(!isMgr())acts.append(h('button',{class:'hb',title:'Menu',style:'font-size:24px;line-height:1',onclick:function(){U.openMenu&&U.openMenu()}},'≡'));
+  hd.append(acts)}
 function paintSync(b){b=b||document.getElementById('ftsynch');if(!b||!U.syncState)return;var s=U.syncState();var cls='hb'+(s.busy?' spin':s.due?' due':'');var html=SYNC+(s.unsent&&!s.busy?'<i class="dot"></i>':'');
   if(b.className!==cls)b.className=cls;if(b._h!==html){b.innerHTML=html;b._h=html}b.title=s.busy?'Syncing…':'Sync · '+s.ago}
 setInterval(function(){paintSync()},1500);
@@ -2360,7 +2361,7 @@ function steps(app){var S0=U.syncState?U.syncState():{opened:true,unsent:false},
   if(fieldDay)L.push({done:ci,cls:'',t:'Confirm today\'s brick',p:'Tap “Start my day” — keep today\'s brick or change it. Your task opens after this.',b:'📍 Start my day',f:function(){var c=app.querySelector('.hero .ci');if(c)c.click()}});
   if(!fieldDay||ci)L.push({done:!U.taskDue||!U.taskDue(),cls:'wa',t:'Share today\'s task on WhatsApp',p:'Your task for the brick — share it to the “Guwahati CSM Team” group to confirm you\'ve gone through it.',b:'Read & share',f:function(){U.taskSheet()}});
   if(fieldDay&&ci)L.push({done:U.selfieToday?U.selfieToday():true,cls:'',t:'Take your selfie (10:00–10:30)',p:'One geo-selfie for the day — it goes to Ratan Roy.',b:'📸 Take selfie',f:function(){U.doSelfie&&U.doSelfie()}});
-  if(pend.length){var top=pend[0];L.push({done:false,cls:'',t:top.k.t,p:(top.s.why||'')+(pend.length>1?' · '+(pend.length-1)+' more after this':''),b:'Open',f:function(){go(top.k.k)},lnk:pend.length>1?['See all '+pend.length+' tasks',function(){go(U.lsGet('ft_went','raft'))}]:null});}
+  if(pend.length){var top=pend[0];L.push({done:false,cls:'',t:top.k.t,p:(top.s.why||'')+(pend.length>1?' · '+(pend.length-1)+' more after this':''),b:'Open',f:function(){go(top.k.k)},lnk:pend.length>1?['See all '+pend.length+' tasks',function(){go(U.lsGet('ft_work','raft'))}]:null});}
   L.push({done:!U.lessonDoneToday||U.lessonDoneToday(),cls:'',t:'Today\'s 3-minute lesson',p:(U.nextLesson&&U.nextLesson())||'From Ratan Roy',b:'🎓 Start lesson',f:function(){S.tab.learn='today';go('learn')}});
   return L}
 function nextCard(app){var L=steps(app),i=L.findIndex(function(x){return!x.done}),S0=U.syncState?U.syncState():{};
@@ -2476,7 +2477,7 @@ U.workStatus=workStatus;
 function todayCSO(app){var keep=[app.querySelector('.fthead')],hero=app.querySelector('.hero'),meets=[].slice.call(app.querySelectorAll('.meet')),hof=app.querySelector('.hof'),ob=[].slice.call(app.querySelectorAll('.note')).filter(function(n){return /saved on your phone/.test(n.textContent)})[0],nav0=app.querySelector('.bnav');
   var pend=U.nagList().length;
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
-  var u=updBanner(),list=[u,nextCard(app),(U.quickRow&&U.quickRow())||"",hero,(U.earnCard&&U.earnCard())||"",(U.teamCard&&U.teamCard())||"",meets,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
+  var u=updBanner(),list=[u,hof,(U.progressCard&&U.progressCard())||"",nextCard(app),hero,(U.carryCard&&U.carryCard())||"",(U.earnCard&&U.earnCard())||"",meets,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_work','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',quoteLine()];
   [].concat.apply([],list).forEach(function(n){if(n)app.append(n)});
   // Morning: greet the CSO with the brick confirmation on open (field day, not yet confirmed, once per day).
   try{if(field()&&U.checkinToday&&!U.checkinToday()){var kd='ft_brickpop_'+TODAY;if(U.lsGet&&U.lsGet(kd,'')!=='1'){U.lsSet(kd,'1');setTimeout(function(){try{var c=app.querySelector('.hero .ci');if(c)c.click()}catch(e){}},350)}}}catch(e){}}
@@ -2519,7 +2520,7 @@ var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(doc
   try{topbar(app,r);var t=tabFor(r),hd=app.querySelector('.fthead');
     if(r==='home'){if(isMgr())todayMgr(app);else todayCSO(app)}
     // replace the old sub-tab row on Work screens
-    if(t==='work'){U.lsSet('ft_work',r);var old=app.querySelector('.fthead~.subtabs');if(old&&old.textContent.indexOf('Raft')>=0&&!old.classList.contains('l2'))old.remove();var rows=workTabs(r);var after=hd;rows.forEach(function(x){after.after(x);after=x});
+    if(t==='work'&&BRANDR[r]){U.lsSet('ft_work',r);var old=app.querySelector('.fthead~.subtabs');if(old&&old.textContent.indexOf('Raft')>=0&&!old.classList.contains('l2'))old.remove();var rows=workTabs(r);var after=hd;rows.forEach(function(x){after.after(x);after=x});
       }
     if(t==='me'){var mt=meTabs(r);hd.after(mt);if(r==='perf')app.querySelectorAll('.hof').forEach(function(x){x.remove()})}
     var nb=app.querySelector('.bnav');if(nb)nb.replaceWith(nav(r));else app.append(nav(r));
@@ -2533,6 +2534,9 @@ var DEEP={
   home:function(){go('home')},
   carry:function(){go('carry')},
   pick:function(){go('pick')},
+  brands:function(){go('brands')},
+  primary:function(){go('primary')},
+  shakti:function(){go('shakti')},
   pulse:function(){go('pulse')},
   samples:function(){go('samples')},
   stock:function(){go('stock')},
@@ -3331,6 +3335,22 @@ U.earnCard=function(){try{var DA=mkDA(true);if(!DA)return'';var oh=DA.onhold()||
     h('div',{class:'k'},'💰 Earn this November'),h('h2',{},'up to '+R(pot.p110)),
     h('p',{},R(pot.p100)+' at 100% · '+R(pot.p110)+' at 110% — plus Q4 & the 25% impact bonus. '+tag+'. Tap ›')));
 }catch(e){return''}};
+
+/* Progress card for the CSO dashboard: Impact brands, then NPDs, then Others clubbed — Target + Closing stock (closing from Ratan's backend upload) */
+function pLak(v){return v==null?'—':'₹'+(v/1e5).toFixed(2)+'L'}
+U.progressCard=function(){try{if(S.mgr&&!S.viewAs)return'';var hq=csoHQ();if(!hq)return'';var mp=(S.feeds||{})['mprog_'+hq];
+  var open=function(){try{S.tab=S.tab||{};S.tab.perf='brands';S.tab.geo_T='mp'}catch(e){}go('perf')};
+  if(!mp)return h('div',{class:'coachc',style:'cursor:pointer',onclick:open},h('div',{class:'k'},'📈 Progress'),h('p',{},'Your month progress — Impact brands, NPDs and others with target and closing stock — appears right after a Sync. Tap to open.'));
+  var box=h('div',{class:'coachc',style:'cursor:pointer',onclick:open},h('div',{class:'k'},'📈 Progress · '+(mp.month||'')+(mp.asOf?' · '+mp.asOf:'')));
+  (mp.groups||[]).forEach(function(g){var nm=(g.name||'').toLowerCase();
+    if(nm.indexOf('other')>=0){var tg=0,cl=0,hascl=false;(g.rows||[]).forEach(function(r){tg+=(r.tgt||0);if(r.cl!=null){cl+=r.cl;hascl=true}});
+      box.append(h('p',{style:'margin:7px 0 0;font-size:13px'},h('b',{},'Others'),' — Tgt '+pLak(tg)+' · Closing '+(hascl?pLak(cl):'—')));
+    }else{box.append(h('p',{style:'margin:8px 0 2px;font-weight:800;color:var(--accent,#0F5257);font-size:12px;letter-spacing:.3px'},(g.name||'').toUpperCase()));
+      (g.rows||[]).forEach(function(r){box.append(h('p',{style:'margin:2px 0;font-size:13px'},r.b+' — Tgt '+pLak(r.tgt)+' · Closing '+(r.cl!=null?pLak(r.cl):'—')))});}
+  });
+  box.append(h('p',{style:'margin-top:8px;font-size:11.5px;color:var(--muted)'},'Closing stock is loaded from the backend. Tap for full month progress.'));
+  return box;
+}catch(e){return''}};
 })();
 /* Field Tracker — campaign doctor selection, done brick-by-brick.
    As the CSO covers a brick, he tags that brick's doctors into campaigns (Deca injection, Deca core, R-Loc, Raft),
@@ -3395,11 +3415,15 @@ function pickScreen(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Doct
   var hq=myHQ2(),bricks=(typeof bricksOf==='function'?bricksOf(hq):[])||[];
   if(brick&&bricks.indexOf(brick)<0)bricks=[brick].concat(bricks);
   var picks=curPicks(),status=picksStatus(),locked=(status==='approved');
+  var only=(S.tab&&S.tab.pickOnly)||'';
+  var CAMPS=only?PICKC().filter(function(c){return c.id===only}):PICKC();
   // header + status
-  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'👨‍⚕️ Your campaign doctors'),
-    h('p',{},'Tag each doctor as you cover the brick. Targets build up across the month. '+(status==='pending'?'⏳ Sent to Ratan Roy for approval.':status==='approved'?'✅ Approved — tap “Request change” to edit.':status==='returned'?'↩️ Returned by Ratan — adjust and resend.':'Draft — save when ready.'))));
+  var hdr=only==='shakti'?'💉 Shakti Campaign doctors':'👨‍⚕️ Your campaign doctors';
+  var intro=only==='shakti'?'Pick 8 doctors (2 per week) for the Shakti prescription camps. ':'Tag each doctor as you cover the brick. Targets build up across the month. ';
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},hdr),
+    h('p',{},intro+(status==='pending'?'⏳ Sent to Ratan Roy for approval.':status==='approved'?'✅ Approved — tap “Request change” to edit.':status==='returned'?'↩️ Returned by Ratan — adjust and resend.':'Draft — save when ready.'))));
   // totals vs targets
-  var tot=h('div',{class:'tot'});PICKC().forEach(function(c){var n=(picks[c.id]||[]).length,tg=c.count||0;tot.append(h('b',{class:n>=tg?'ok':''},campShort(c.id)+' '+n+'/'+tg))});
+  var tot=h('div',{class:'tot'});CAMPS.forEach(function(c){var n=(picks[c.id]||[]).length,tg=c.count||0;tot.append(h('b',{class:n>=tg?'ok':''},campShort(c.id)+' '+n+'/'+tg))});
   // brick selector
   var sel=h('select',{onchange:function(){S.tab.pickBrick=sel.value;render()}},bricks.map(function(b){return h('option',{value:b,selected:b===S.tab.pickBrick?'selected':null},b+(b===brick?' (today)':''))}));
   var box=h('div',{class:'selc'},h('div',{style:'display:flex;align-items:center;gap:8px;margin-bottom:4px'},h('b',{style:'font-size:13px'},'Brick:'),sel),tot);
@@ -3407,7 +3431,7 @@ function pickScreen(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Doct
   if(!docs.length)box.append(h('div',{class:'selrow',style:'border:0;color:var(--muted)'},h('div',{},'No doctors found in this brick'+(typeof CUST==='undefined'?' (customer list still loading — Sync).':'.'))));
   docs.forEach(function(d){
     var cg=h('div',{class:'cg'});
-    PICKC().forEach(function(c){var on=(picks[c.id]||[]).indexOf(d.code)>=0;
+    CAMPS.forEach(function(c){var on=(picks[c.id]||[]).indexOf(d.code)>=0;
       cg.append(h('button',{class:on?'on':'',disabled:locked?'':null,onclick:function(){
         var arr=picks[c.id]||(picks[c.id]=[]);var i=arr.indexOf(d.code);if(i>=0)arr.splice(i,1);else arr.push(d.code);
         S.tab._pdirty=picks;render()}},campShort(c.id)))});
@@ -3422,7 +3446,9 @@ function pickScreen(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Doct
   app.append(bar);
 }catch(e){app.append(h('div',{class:'note'},'Could not load selection: '+e.message))}}
 
-U.pickScreen=pickScreen;U.routes.pick=function(app){pickScreen(app)};
+U.pickScreen=pickScreen;U.routes.pick=function(app){if(S.tab)S.tab.pickOnly=null;pickScreen(app)};
+/* Shakti Campaign: the same picker, focused on the Shakti camp list (CSO fills → save → Ratan approves → reflects) */
+U.routes.shakti=function(app){S.tab=S.tab||{};S.tab.pickOnly='shakti';pickScreen(app)};
 
 /* a small card for the Today/Work screens linking into selection */
 U.pickCard=function(){try{if(isMgr())return'';var picks=curPicks(),status=picksStatus(),miss=[];
@@ -3614,6 +3640,22 @@ function brandView(app,route){try{if(isMgr()){app.append(h('div',{class:'note'},
 }catch(e){app.append(h('div',{class:'note'},'Could not open brand: '+e.message))}}
 U.brandView=brandView;U._itemCamp=itemCamp;U._pickCands=pickCands;
 ['raft','deca','rloc','skin','dexona'].forEach(function(k){U.routes[k]=function(app){brandView(app,k)}});
+
+/* Pulse as an input drill-down: Deca Module allocated/used/balance + assigned doctor list, given Yes/No */
+function pulseView(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Pulse is the CSO\'s list.'));return}
+  st();var hq=myHQ2(),R=((window.FT_ROSTERS||{}).pulse||{})[hq]||[],brand='Deca Durabolin';
+  var items=brandItems(brand),item=items.filter(function(it){return /module/i.test(it)})[0]||'Deca Module',q=itemQty(brand,item);
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'💉 Pulse · Deca Module'),h('p',{},'Carry a Deca Module to each assigned doctor and report the Rx in Ventasys. “Given” turns to Yes once it is reported.')));
+  app.append(h('div',{class:'selc'},h('div',{style:'font-weight:800;margin-bottom:6px'},item),
+    h('div',{class:'tot'},h('b',{},'Allocated '+q.alloc),h('b',{},'Used '+q.used),h('b',{class:q.bal>0?'':'ok'},'Balance '+q.bal))));
+  var given=givenFor(brand,item),givenNames=given.map(function(g){return g.to});
+  function isGiven(nm){return givenNames.some(function(gn){return nameEq(gn,nm)})}
+  if(!R.length){app.append(h('div',{class:'coachc',style:'background:linear-gradient(135deg,#E8F6EE,#D6F0E0);border-color:#9FD9B6'},h('p',{style:'color:#1b6b4a'},'No Pulse doctors assigned to your HQ.')));return}
+  var byc={};R.forEach(function(d){(byc[d.ct||'—']=byc[d.ct||'—']||[]).push(d)});
+  Object.keys(byc).forEach(function(ct){var box=h('div',{class:'selc'},h('div',{style:'font-weight:700;margin-bottom:4px'},'📍 '+ct+' ('+byc[ct].length+')'));
+    byc[ct].forEach(function(d){box.append(drow(d.n+(d.sp?' · '+d.sp:''),isGiven(d.n)?'✅ Yes':'• No'))});app.append(box)});
+}catch(e){app.append(h('div',{class:'note'},'Could not open Pulse: '+e.message))}}
+U.routes.pulse=function(app){pulseView(app)};
 })();
 /* Field Tracker – Review mail (manager, best on a laptop): the evening review laid out as an email,
    ready to copy or open in Outlook. Nothing is sent by the app itself. */
@@ -3712,4 +3754,71 @@ var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(!is
       var nb=app.querySelector('.bnav');if(nb)[].forEach.call(nb.children,function(b){b.classList.toggle('on',/Reports/.test(b.textContent))})}
     if(r==='home'){var D=dates();if(D.length&&!app.querySelector('.mailready')){var c=h('div',{class:'mailready',onclick:function(){go('mail')}},'📧',h('div',{},h('b',{},'Day review mails ready – '+nice(D[0])),h('small',{},'One mail per CSO, Cc Sudipta – send from Outlook')),h('span',{class:'go'},'›'));var tp=app.querySelector('.phase');if(tp)tp.before(c);else if(hd)hd.after(c)}}}catch(e){}};
 try{if(S.ready)render()}catch(e){}
+})();
+/* Field Tracker — right-side ≡ menu (CSO), plus the Brand Inputs list and Primary plan screens.
+   Loaded last: every route it points to (brands/primary/perf/shakti/stock/tp) already exists by now. */
+(function(){
+'use strict';
+var U=window.FTUI;if(!U||!U.t)return;
+function isMgr(){return S.mgr&&!S.viewAs}
+function myHQ(){try{if(S.viewAs&&S.viewAs.HQ)return S.viewAs.HQ;if(S.me&&S.me.HQ)return S.me.HQ;var k=Object.keys(S.feeds||{}).filter(function(z){return z.indexOf('perf_')===0})[0];return k?k.slice(5):''}catch(e){return''}}
+
+var css=document.createElement('style');css.textContent=`
+.ftmenu-ov{position:fixed;inset:0;background:rgba(10,20,18,.42);z-index:9998;opacity:0;transition:opacity .2s;display:flex;justify-content:flex-end}
+.ftmenu-ov.on{opacity:1}
+.ftmenu{width:80%;max-width:330px;height:100%;background:var(--card,#fff);box-shadow:-10px 0 34px rgba(0,0,0,.28);transform:translateX(100%);transition:transform .22s ease;display:flex;flex-direction:column;overflow-y:auto}
+.ftmenu-ov.on .ftmenu{transform:translateX(0)}
+.ftmenu .mh{padding:20px 16px 14px;background:linear-gradient(135deg,var(--h1,#0F5257),var(--h3,#1B7F79));color:#fff}
+.ftmenu .mh b{font-size:17px}.ftmenu .mh small{display:block;opacity:.85;font-size:12px;margin-top:2px}
+.ftmenu .mi{display:flex;align-items:center;gap:14px;padding:16px;border:0;border-bottom:1px solid var(--line,#eef2f1);font-size:15px;font-weight:700;color:var(--fg,#14302E);background:none;width:100%;text-align:left;min-height:auto;cursor:pointer}
+.ftmenu .mi .mic{font-size:21px;width:28px;text-align:center}
+.ftmenu .mi .ar{margin-left:auto;color:var(--muted)}
+.ftmenu .mi:active{background:var(--soft,#F2F5F4)}
+.ftmenu .mi small{display:block;font-weight:600;color:var(--muted);font-size:11.5px;margin-top:2px}
+.brandlist{display:flex;flex-direction:column;gap:8px}
+.brandlist .bl{display:flex;align-items:center;gap:13px;padding:15px 14px;border:1px solid var(--line,#e5ece9);background:var(--card,#fff);border-radius:16px;font-size:15px;font-weight:800;color:var(--fg,#14302E);width:100%;text-align:left;min-height:auto;cursor:pointer}
+.brandlist .bl .ar{margin-left:auto;color:var(--muted);font-weight:600}
+.pmile{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:14px;border:1px solid var(--line,#e5ece9);background:var(--card,#fff);margin:0 0 8px}
+.pmile .pc{width:52px;height:52px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;background:linear-gradient(135deg,#0F5257,#1B7F79)}
+.pmile .pm{flex:1;min-width:0}.pmile .pm b{font-size:14.5px}.pmile .pm small{display:block;color:var(--muted);font-size:12px;margin-top:1px}
+.pmile .pw{font-size:20px;font-weight:800;color:var(--accent,#0F5257);white-space:nowrap}
+`;document.head.appendChild(css);
+
+var MENU=[
+ ['📦','Brand Inputs','Quantity, balance & doctor lists','brands'],
+ ['🗓️','Primary plan','Stockist-wise plan & milestones','primary'],
+ ['📊','Performance','Incentive · monthly / quarterly / YTD','perf'],
+ ['💉','Shakti Campaign','Pick 8 doctors (2 / week)','shakti'],
+ ['📄','Stock statement','Upload your stock statement','stock'],
+ ['🗺️','TP','Your tour plan & bricks','tp']
+];
+function close(){var o=document.querySelector('.ftmenu-ov');if(o){o.classList.remove('on');setTimeout(function(){try{o.remove()}catch(e){}},220)}}
+U.closeMenu=close;
+function goItem(r){try{if(r==='perf'){S.tab=S.tab||{};S.tab.perf='brands';S.tab.geo_T='inc';go('perf');return}go(r)}catch(e){}}
+U.openMenu=function(){if(isMgr()||document.querySelector('.ftmenu-ov'))return;
+  var panel=h('div',{class:'ftmenu'},h('div',{class:'mh'},h('b',{},'Menu'),h('small',{},'Everything in one place')));
+  MENU.forEach(function(m){panel.append(h('button',{class:'mi',onclick:function(){close();goItem(m[3])}},h('span',{class:'mic'},m[0]),h('span',{},m[1],h('small',{},m[2])),h('span',{class:'ar'},'›')))});
+  var ov=h('div',{class:'ftmenu-ov',onclick:function(e){if(e.target===ov)close()}},panel);
+  document.body.append(ov);requestAnimationFrame(function(){ov.classList.add('on')});};
+
+/* Brand Inputs — the list of brands; each opens the input drill-down */
+var BL=[['raft','R-Loc Raft','🩹'],['deca','Deca Durabolin','💉'],['rloc','R-Loc','💊'],['skin','Skinlite','🧴'],['dexona','Dexona','💊'],['pulse','Pulse · Deca Module','🩺']];
+U.routes.brands=function(app){if(isMgr()){app.append(h('div',{class:'note'},'Brand inputs are the CSO\'s screen.'));return}
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📦 Brand Inputs'),h('p',{},'Tap a brand to see its inputs — quantity allocated, used and balance — and the doctor or retailer list. Photo & doctor picking are inside each brand.')));
+  var grid=h('div',{class:'brandlist'});
+  BL.forEach(function(b){grid.append(h('button',{class:'bl',onclick:function(){go(b[0])}},h('span',{style:'font-size:22px'},b[2]),b[1],h('span',{class:'ar'},'›')))});
+  app.append(grid);};
+
+/* Primary plan — the month's milestone plan; stockist-wise rows fill from Ratan's backend upload (feed primary_<HQ>) */
+var MS=[['MS-1','20%','primary by 7–9 Nov'],['MS-2','40%','by 17–19 Nov'],['MS-3','60%','by 22–24 Nov'],['Close','100%','by 28 Nov']];
+U.routes.primary=function(app){if(isMgr()){app.append(h('div',{class:'note'},'Primary plan is the CSO\'s screen.'));return}
+  var hq=myHQ(),f=(S.feeds||{})['primary_'+hq];
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'🗓️ Primary plan'+(hq?' · '+hq:'')),h('p',{},'The month runs on three milestones. Hit each percentage of your primary target by its dates — then close at 100% one day before the last working day.')));
+  MS.forEach(function(m){app.append(h('div',{class:'pmile'},h('div',{class:'pc'},m[1]),h('div',{class:'pm'},h('b',{},m[0]),h('small',{},m[2])),h('span',{class:'pw'},m[1])))});
+  if(f&&f.rows&&f.rows.length){var box=h('div',{class:'selc'},h('div',{style:'font-weight:800;margin-bottom:6px'},'Stockist-wise plan'+(f.month?' · '+f.month:'')));
+    var t=h('table',{style:'width:100%;font-size:12.5px'},h('tr',{},h('th',{style:'text-align:left'},'Stockist'),h('th',{style:'text-align:right'},'Plan'),h('th',{style:'text-align:right'},'Done')));
+    f.rows.forEach(function(r){t.append(h('tr',{},h('td',{},r.name||r.n||''),h('td',{style:'text-align:right'},r.plan!=null?('₹'+(r.plan/1e5).toFixed(2)+'L'):'—'),h('td',{style:'text-align:right'},r.done!=null?('₹'+(r.done/1e5).toFixed(2)+'L'):'—')))});
+    box.append(h('div',{class:'tbl'},t));app.append(box);
+  }else{app.append(h('div',{class:'coachc',style:'background:var(--soft,#F2F5F4);border-color:var(--line,#e5ece9)'},h('p',{style:'margin:0'},'Your stockist-wise primary plan appears here once Ratan uploads it. For now, work the three milestones above with each stockist.')));}
+};
 })();

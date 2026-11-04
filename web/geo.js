@@ -475,4 +475,20 @@ U.earnCard=function(){try{var DA=mkDA(true);if(!DA)return'';var oh=DA.onhold()||
     h('div',{class:'k'},'💰 Earn this November'),h('h2',{},'up to '+R(pot.p110)),
     h('p',{},R(pot.p100)+' at 100% · '+R(pot.p110)+' at 110% — plus Q4 & the 25% impact bonus. '+tag+'. Tap ›')));
 }catch(e){return''}};
+
+/* Progress card for the CSO dashboard: Impact brands, then NPDs, then Others clubbed — Target + Closing stock (closing from Ratan's backend upload) */
+function pLak(v){return v==null?'—':'₹'+(v/1e5).toFixed(2)+'L'}
+U.progressCard=function(){try{if(S.mgr&&!S.viewAs)return'';var hq=csoHQ();if(!hq)return'';var mp=(S.feeds||{})['mprog_'+hq];
+  var open=function(){try{S.tab=S.tab||{};S.tab.perf='brands';S.tab.geo_T='mp'}catch(e){}go('perf')};
+  if(!mp)return h('div',{class:'coachc',style:'cursor:pointer',onclick:open},h('div',{class:'k'},'📈 Progress'),h('p',{},'Your month progress — Impact brands, NPDs and others with target and closing stock — appears right after a Sync. Tap to open.'));
+  var box=h('div',{class:'coachc',style:'cursor:pointer',onclick:open},h('div',{class:'k'},'📈 Progress · '+(mp.month||'')+(mp.asOf?' · '+mp.asOf:'')));
+  (mp.groups||[]).forEach(function(g){var nm=(g.name||'').toLowerCase();
+    if(nm.indexOf('other')>=0){var tg=0,cl=0,hascl=false;(g.rows||[]).forEach(function(r){tg+=(r.tgt||0);if(r.cl!=null){cl+=r.cl;hascl=true}});
+      box.append(h('p',{style:'margin:7px 0 0;font-size:13px'},h('b',{},'Others'),' — Tgt '+pLak(tg)+' · Closing '+(hascl?pLak(cl):'—')));
+    }else{box.append(h('p',{style:'margin:8px 0 2px;font-weight:800;color:var(--accent,#0F5257);font-size:12px;letter-spacing:.3px'},(g.name||'').toUpperCase()));
+      (g.rows||[]).forEach(function(r){box.append(h('p',{style:'margin:2px 0;font-size:13px'},r.b+' — Tgt '+pLak(r.tgt)+' · Closing '+(r.cl!=null?pLak(r.cl):'—')))});}
+  });
+  box.append(h('p',{style:'margin-top:8px;font-size:11.5px;color:var(--muted)'},'Closing stock is loaded from the backend. Tap for full month progress.'));
+  return box;
+}catch(e){return''}};
 })();
