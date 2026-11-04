@@ -46,7 +46,8 @@ function gauge(pct,sz){sz=sz||92;var w=sz,hh=Math.round(sz*0.60),cx=w/2,cy=Math.
 function avatar(f){try{var M=window.FT_MEDIA||{},ph=f.photo;if(ph&&M[ph])return h('div',{class:'av'},h('img',{src:M[ph],alt:f.name||'',draggable:'false'}))}catch(e){}
   return h('div',{class:'av'},(f.name||'★')[0])}
 
-U.teamCard=function(){try{if(S.mgr&&!S.viewAs)return'';var tf=(S.feeds||{}).teamperf,sf=(S.feeds||{}).spotlight;if(!tf&&!sf)return'';
+U.teamCard=function(){try{if(S.mgr&&!S.viewAs)return'';var F=S.feeds||{},hq=myHQ();
+  var tf=F['teamperf_'+hq]||F.teamperf,sf=F['spotlight_'+hq]||F.spotlight;if(!tf&&!sf)return'';
   var box=h('div',{class:'team'});
   if(tf&&tf.rows){var rows=tf.rows.slice().sort(function(a,b){return (b.perf||0)-(a.perf||0)}),mine=myHQ();
     box.append(h('div',{class:'hd'},'📊 Team performance',h('small',{},tf.period||'')));
