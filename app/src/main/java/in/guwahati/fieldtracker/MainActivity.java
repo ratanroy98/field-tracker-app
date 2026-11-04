@@ -101,8 +101,20 @@ public class MainActivity extends Activity {
         i.addCategory(Intent.CATEGORY_OPENABLE);
         i.setType("image/*");
         i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, fp.getMode() == FileChooserParams.MODE_OPEN_MULTIPLE);
-        try { startActivityForResult(Intent.createChooser(i, "Choose photo"), PICK); }
-        catch (Exception e) { pending = null; return false; }
+        Intent chooser = Intent.createChooser(i, "Take a photo or choose");
+        // Also offer the camera inside the chooser, so photo-upload screens can snap directly too.
+        try {
+          android.content.ContentValues cv = new android.content.ContentValues();
+          cv.put(MediaStore.Images.Media.DISPLAY_NAME, "photo_" + System.currentTimeMillis() + ".jpg");
+          cv.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+          captureUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
+          Intent cam = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+          cam.putExtra(MediaStore.EXTRA_OUTPUT, captureUri);
+          cam.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+          chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{cam});
+        } catch (Exception e) { captureUri = null; }
+        try { startActivityForResult(chooser, PICK); }
+        catch (Exception e) { pending = null; captureUri = null; return false; }
         return true;
       }
     });
@@ -120,6 +132,7 @@ public class MainActivity extends Activity {
       if (checkSelfPermission(Manifest.permission.ACCESS_MEDIA_LOCATION) != PackageManager.PERMISSION_GRANTED) need.add(Manifest.permission.ACCESS_MEDIA_LOCATION);
     }
     if (Build.VERSION.SDK_INT >= 23 && checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) { need.add(Manifest.permission.ACCESS_FINE_LOCATION); need.add(Manifest.permission.ACCESS_COARSE_LOCATION); }
+    if (Build.VERSION.SDK_INT >= 23 && checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) need.add(Manifest.permission.CAMERA);
     if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) need.add(Manifest.permission.POST_NOTIFICATIONS);
     if (!need.isEmpty() && Build.VERSION.SDK_INT >= 23) requestPermissions(need.toArray(new String[0]), PERM);
   }
@@ -142,13 +155,15 @@ public class MainActivity extends Activity {
     }
     if (req != PICK || pending == null) { super.onActivityResult(req, res, data); return; }
     Uri[] out = null;
-    if (res == RESULT_OK && data != null) {
-      if (data.getClipData() != null) {
+    if (res == RESULT_OK) {
+      if (data != null && data.getClipData() != null) {
         int n = data.getClipData().getItemCount(); out = new Uri[n];
         for (int k = 0; k < n; k++) out[k] = original(data.getClipData().getItemAt(k).getUri());
-      } else if (data.getData() != null) out = new Uri[]{original(data.getData())};
+      } else if (data != null && data.getData() != null) out = new Uri[]{original(data.getData())};
+      else if (captureUri != null) out = new Uri[]{captureUri}; // camera was chosen inside the chooser
     }
-    pending.onReceiveValue(out); pending = null;
+    if ((out == null || res != RESULT_OK) && captureUri != null) { try { getContentResolver().delete(captureUri, null, null); } catch (Exception e) {} }
+    pending.onReceiveValue(out); pending = null; captureUri = null;
   }
 
   // Read-aloud for the coach lessons, in English, Hindi, Bengali and Assamese.
@@ -167,7 +182,7 @@ public class MainActivity extends Activity {
   // Lets the page hand over the sign-in so phone notifications show this CSO's own numbers.
   class AppBridge {
     @JavascriptInterface public void setAuth(String json) { getSharedPreferences("ft", MODE_PRIVATE).edit().putString("auth", json).apply(); Notify.schedule(MainActivity.this); }
-    @JavascriptInterface public String version() { return "5"; }
+    @JavascriptInterface public String version() { return "6"; }
     // Join buttons: phone call, WhatsApp, meeting links open in their own apps.
     @JavascriptInterface public void open(String url) {
       runOnUiThread(() -> { try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); } catch (Exception e) { Toast.makeText(MainActivity.this, "No app to open this", Toast.LENGTH_SHORT).show(); } });

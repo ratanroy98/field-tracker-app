@@ -88,8 +88,8 @@ function nextCard(app){var L=steps(app),i=L.findIndex(function(x){return!x.done}
   var s=L[i],done=L.filter(function(x){return x.done}).length;
   return h('div',{class:'next '+s.cls},h('div',{class:'k'},h('span',{},'Next step · '+(done+1)+' of '+L.length),dots),h('h3',{},s.t),s.p?h('p',{},s.p):'',
     h('button',{class:'go1',onclick:s.f},s.b),s.lnk?h('a',{class:'lnk',onclick:s.lnk[1]},s.lnk[0]):(S0.unsent&&i>0?h('a',{class:'lnk',onclick:function(){U.sync()}},'You can sync now, or once everything is done'):''))}
-function updBanner(){try{if(!window.AndroidApp||!AndroidApp.version)return'';if(+AndroidApp.version()>=5)return''}catch(e){return''}
-  return h('a',{class:'upd',href:APK},h('div',{},h('b',{},'📲 New app version'),'Meeting alarms, selfie camera and WhatsApp sharing.'),h('span',{class:'btn'},'Update'))}
+function updBanner(){try{if(!window.AndroidApp||!AndroidApp.version)return'';if(+AndroidApp.version()>=6)return''}catch(e){return''}
+  return h('a',{class:'upd',href:APK},h('div',{},h('b',{},'📲 Update the app'),'Opens the camera for selfie & photos, asks camera + location permission, meeting alarms.'),h('span',{class:'btn'},'Update'))}
 function quoteLine(){var qs=(U.C().quotes)||[];if(!qs.length)return'';return h('div',{class:'qline'},h('small',{},'Ratan Roy says'),qs[U.dayIdx()%qs.length])}
 /* Guide, don't collect.
    FRONT SCREEN: for each doctor / chemist / wholesaler on today's list, tell them what to hand over, then report in Ventasys.
