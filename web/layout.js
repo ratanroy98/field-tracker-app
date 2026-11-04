@@ -242,5 +242,26 @@ var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(doc
     if(isMgr()&&r==='perf'&&!app.querySelector('.salestop')){var s1=app.querySelector('.score'),c1=(U.salesTop||salesTop)();if(s1)s1.before(c1);else app.append(c1)}
     viewBar(app)}catch(e){try{console.log('layout',e)}catch(_){}}};
 var pt=U.tabOfX||{};['sell','approve','meet','hof'].forEach(function(k){pt[k]=k});U.tabOfX=pt;
+
+/* ---------- deep links: tapping a notification opens the app at #<target> and jumps to the screen to fill/upload ---------- */
+function openCheckin(){try{go('home');setTimeout(function(){var c=document.querySelector('.hero .ci');if(c)c.click()},90)}catch(e){}}
+var DEEP={
+  home:function(){go('home')},
+  carry:function(){go('carry')},
+  pick:function(){go('pick')},
+  pulse:function(){go('pulse')},
+  samples:function(){go('samples')},
+  task:function(){go('home');setTimeout(function(){U.taskSheet&&U.taskSheet()},90)},
+  selfie:openCheckin, checkin:openCheckin, brick:openCheckin,
+  photo:function(){go('carry')}
+};
+U.deepGo=function(t){t=(''+(t||'')).toLowerCase().replace(/[^a-z]/g,'');if(DEEP[t]){try{DEEP[t]()}catch(e){}return true}return false};
+function deepTarget(){try{var hs=(location.hash||'').replace(/^#\/?/,'').toLowerCase();if(DEEP[hs])return hs;
+  var m=(location.search||'').match(/[?&](?:go|open|a)=([a-z]+)/i);if(m&&DEEP[m[1].toLowerCase()])return m[1].toLowerCase();
+  if(window.AndroidApp&&AndroidApp.openTarget){var x=(''+AndroidApp.openTarget()).toLowerCase();if(DEEP[x])return x}}catch(e){}return''}
+function runDeep(){var t=deepTarget();if(!t)return;try{if(location.hash)history.replaceState(null,'',location.pathname+location.search)}catch(e){}U.deepGo(t)}
+window.addEventListener('hashchange',function(){runDeep()});
+(function initDeep(){var n=0,iv=setInterval(function(){n++;try{if(typeof S!=='undefined'&&S&&S.ready){clearInterval(iv);runDeep()}else if(n>40)clearInterval(iv)}catch(e){clearInterval(iv)}},150)})();
+
 try{if(S.ready)render()}catch(e){}
 })();
