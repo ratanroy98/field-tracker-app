@@ -343,19 +343,15 @@ function vInc(app,DA){
     return;}
   app.append(scopeChips(DA));var hq=DA.scope,oh=DA.onhold(hq)||{q3:0,sept:0},tot=(oh.q3||0)+(oh.sept||0);
   var R2=DA.rows('ALL'),o=agg(R2,9),oa=P(o[2],o[1]),octOpen=oa!=null&&oa>=100,gapOct=Math.max(0,o[1]-o[2]),octClosed=(o[1]>0||o[2]>0),lost=(octClosed&&!octOpen)?tot:0;
-  if(octOpen){
-    app.append(h('div',{class:'money'},h('div',{class:'k'},tot>0?'💰 Released · Q3 + September':'💰 October secured'),h('h2',{},tot>0?R(tot):pf(oa)),
-      h('p',{},tot>0?('October target met ('+pf(oa)+') — '+R(tot)+' is yours. This is what winning pays. Now stack the next one.'):('October '+pf(oa)+' ✓ — you kept the chain alive and you\'re earning fresh. Keep every brand climbing.'))));
-    app.append(h('div',{class:'push'},h('b',{},'Keep the chain alive'),'Earned money only lands when the next month is 100% too. Stay above the line in November and nothing can be taken back.'));
-  } else if(lost>0){
-    app.append(h('div',{class:'loss'},h('div',{class:'k'},'💔 Slipped away this cycle'),h('h2',{},R(lost)),
-      h('p',{},'You earned '+R(lost)+' across Q3 and September. The rule is hard — no 100% October, no release — and October closed at '+pf(oa)+'. This one hurts. Let it be the last time it ever happens.')));
-    app.append(h('div',{class:'push hot'},h('b',{},'You were only '+L(gapOct)+' away'),'That thin line — a couple more strong days — is all that stood between keeping '+R(lost)+' and losing it. Next month you close that gap in the first week and never give it back.'));
-  } else {
-    app.append(h('div',{class:'money'},h('div',{class:'k'},'💰 Your earning engine'),h('h2',{},octClosed?pf(oa):'Ready'),
-      h('p',{},octClosed?('October '+pf(oa)+' — '+(oa>=97?'you\'re earning fresh this month. ':'')+'The real money is in the months ahead, and the ceiling this year is huge. See the bigger picture below.'):'Cross your targets and real money starts stacking here.')));
-    app.append(h('div',{class:'push'},h('b',{},'New month, fresh money'),'November resets everything — a 100% month earns from day one, Q4 and the +25% impact bonus are fully open, and the year\'s big prizes are still on the table.'));
-  }
+  // BIG CARROT — what they can earn this month, front and centre
+  var pot=novPot(o);
+  if(pot)app.append(h('div',{class:'money'},h('div',{class:'k'},'💰 Earn this November'),h('h2',{},'up to '+R(pot.p110)),
+    h('p',{},R(pot.p100)+' at 100% · '+R(pot.p110)+' at 110% — hit your target and it is yours, plus Q4 and the +25% impact bonus on top.')));
+  // state line (short)
+  if(octOpen){app.append(h('div',{class:'push'},h('b',{},'✓ October secured — '+pf(oa)),tot>0?(R(tot)+' from Q3 + September is released — well earned. Keep the chain alive: stay 100% in November.'):'You kept the chain alive and you are earning fresh. Keep every brand climbing.'));}
+  else if(lost>0){app.append(h('div',{class:'loss'},h('div',{class:'k'},'💔 Slipped away in October'),h('h2',{},R(lost)),
+    h('p',{},'Earned across Q3 + September, but October closed at '+pf(oa)+' (needed 100%) — you were only '+L(gapOct)+' short. Win it back from day one of November.')));}
+  else {app.append(h('div',{class:'push hot'},h('b',{},'November is your fresh start'),'October '+pf(oa)+'. A 100% month earns from day one, Q4 and the +25% impact bonus are open, and the year\'s big prizes are still on the table.'));}
   // results / estimates
   var me=earnOf(o,'m'),q4=earnOf(agg(R2,'Q4'),'q'),q3=earnOf(agg(R2,'Q3'),'q');
   app.append(h('div',{class:'earn'},
@@ -440,14 +436,14 @@ U.csoPerf=function(app){var DA=mkDA(true);if(!DA){app.append(h('div',{class:'geo
 U.geoReady=function(){return !!G};U.geoReset=function(){if(window.__GEO)return;G=null;state='idle'};
 
 /* earnings snapshot for the dashboard (CSO home) */
+function novPot(o){var t=o&&o[1]||0;if(t<=0)return null;var p100=t*1e5*RATE_M[slabIdx(t)][1]/100,n=1.1*t,p110=n*1e5*RATE_M[slabIdx(n)][2]/100;return{p100:p100,p110:p110}}
 U.earnCard=function(){try{var DA=mkDA(true);if(!DA)return'';var oh=DA.onhold()||{q3:0,sept:0},tot=(oh.q3||0)+(oh.sept||0);
-  var o=agg(DA.rows('ALL'),9),oa=P(o[2],o[1]),open=oa!=null&&oa>=100,closed=(o[1]>0||o[2]>0),lost=(closed&&!open&&tot>0)?tot:0;
-  var cls='neu',icon='💰',lbl='Earned so far',st='tap ›';
-  if(lost>0){cls='lost';icon='💔';lbl='Slipped away';st='Oct '+pf(oa)+' · tap ›'}
-  else if(open&&tot>0){cls='won';lbl='Earned · payable';st='Oct '+pf(oa)+' ✓ ›'}
-  else if(open){cls='won';lbl='October '+pf(oa)+' ✓';st='earning fresh ›'}
-  else {st='cross targets ›'}
-  return h('div',{class:'geo'},h('div',{class:'estrip '+cls,onclick:function(){try{S.tab.perf='brands';S.tab.geo_T='inc';go('perf')}catch(e){}}},
-    h('span',{style:'font-size:20px'},icon),h('div',{style:'min-width:0'},h('div',{class:'lbl'},lbl),h('div',{class:'amt'},R(tot))),h('span',{class:'st'},st)));
+  var o=agg(DA.rows('ALL'),9),oa=P(o[2],o[1]),open=oa!=null&&oa>=100,closed=(o[1]>0||o[2]>0),lost=(closed&&!open&&tot>0)?tot:0,pot=novPot(o);
+  var go2=function(){try{S.tab.perf='brands';S.tab.geo_T='inc';go('perf')}catch(e){}};
+  if(!pot)return h('div',{class:'geo'},h('div',{class:'estrip neu',onclick:go2},h('span',{style:'font-size:20px'},'💰'),h('div',{},h('div',{class:'lbl'},'Incentive'),h('div',{class:'amt'},'Tap to see')),h('span',{class:'st'},'›')));
+  var tag=lost>0?('₹'+Math.round(lost).toLocaleString('en-IN')+' slipped in Oct — win it back'):(open&&tot>0?(R(tot)+' from Oct is released ✓'):(open?'October '+pf(oa)+' ✓ — keep it going':'A strong month starts the money'));
+  return h('div',{class:'geo'},h('div',{class:'money',style:'margin:0;cursor:pointer',onclick:go2},
+    h('div',{class:'k'},'💰 Earn this November'),h('h2',{},'up to '+R(pot.p110)),
+    h('p',{},R(pot.p100)+' at 100% · '+R(pot.p110)+' at 110% — plus Q4 & the 25% impact bonus. '+tag+'. Tap ›')));
 }catch(e){return''}};
 })();

@@ -1,4 +1,4 @@
-window.FT_BUILD='20261104060327';
+window.FT_BUILD='20261104062024';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -2478,6 +2478,9 @@ var st=document.createElement('style');st.textContent=`
 .nowc .tips{margin:0;padding:0;list-style:none}
 .nowc .tips li{padding:4px 0 4px 20px;position:relative;font-size:13px;line-height:1.4}
 .nowc .tips li:before{content:'→';position:absolute;left:0;color:var(--accent,#0F5257);font-weight:800}
+.nowc .pend{background:#FFF3E0;border:1px solid #F3C88A;border-radius:12px;padding:10px 12px;margin:0 0 10px;font-size:13px;line-height:1.4;color:#6b4e00}
+.nowc .pend b{display:block;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#B45309;margin-bottom:4px}
+.nowc .pend .pl{padding:3px 0}
 .nowc .morebtn{margin:9px 0 0;border:1px dashed var(--line,#dfe7e4);background:transparent;color:var(--accent,#0F5257);border-radius:10px;padding:8px;width:100%;font-weight:700;font-size:12.5px;min-height:auto}
 .nowc .push{margin:10px 0 0;font-weight:700;color:#13684A;font-size:13.5px}
 .nowc .vent{margin:9px 0 0;font-size:12px;color:var(--muted);border-top:1px dashed var(--line,#e5ece9);padding-top:8px}
@@ -2491,6 +2494,13 @@ var st=document.createElement('style');st.textContent=`
 function custByType(brick,t){try{if(!window.D||!D.cust)return[];return D.cust.filter(function(c){return c[2]===brick&&c[3]===t}).map(function(c){return{name:c[4],spec:c[6]||''}})}catch(e){return[]}}
 function names(a,n){n=n||4;if(!a.length)return'';return a.slice(0,n).map(function(x){return x.name}).join(', ')+(a.length>n?' +'+(a.length-n)+' more':'')}
 function offerLine(){try{var R=U.REF&&U.REF();if(R&&R.offers&&R.offers.length){var o=R.offers[(U.dayIdx?U.dayIdx():0)%R.offers.length];return o.t+(o.say?' — “'+o.say+'”':'')}}catch(e){}return''}
+// What is STILL LEFT with the CSO (issued but not yet reported), from inbal_<HQ>. We guide handover + Ventasys report, never "carry".
+function pendingLines(c){try{var k=Object.keys(S.feeds||{}).filter(function(z){return z.indexOf('inbal_')===0})[0],f=k?S.feeds[k]:null;if(!f||!(f.items||[]).length)return[];
+  var byBrand={};(f.items||[]).forEach(function(it){var b=it.brand||'';if(!b)return;var e=byBrand[b]=byBrand[b]||{inp:0,smp:0};if((it.kind||'input')==='sample')e.smp+=(+it.qty||0);else e.inp+=(+it.qty||0)});
+  var out=[];Object.keys(byBrand).forEach(function(b){var e=byBrand[b];if(e.inp<=0&&e.smp<=0)return;
+    var what=[];if(e.inp>0)what.push(e.inp+' input'+(e.inp>1?'s':''));if(e.smp>0)what.push(e.smp+' sample'+(e.smp>1?'s':''));
+    out.push(what.join(' + ')+' of '+b+' — hand to today’s listed '+b+' doctors / chemists and report it in Ventasys.')});
+  return out;}catch(e){return[]}}
 
 var PUSH=['You are the doctor’s trusted rep — walk in sure of yourself.','Every “yes” today is money in your pocket at month-end.','One more quality call than yesterday — that is how toppers are built.','Slow is smooth, smooth is fast. Finish the brick, win the day.','Numbers follow effort. Put in the calls and the ₹ will come.','They remember the rep who shows up with a plan. That is you today.'];
 function push(){return PUSH[(U.dayIdx?U.dayIdx():new Date().getDate())%PUSH.length]}
@@ -2501,7 +2511,7 @@ function phases(){return [
   {k:'prep',from:0,to:9,icon:'🧭',title:'Get set for the day',build:function(c){return{
     who:'Today: '+(c.brick||'your beat')+' · '+c.docs.length+' doctors · '+c.rets.length+' chemists · '+c.whs.length+' wholesalers',
     say:[['Your opening plan','Call your wholesaler first to secure stock, then doctors through the late morning, chemists and new products in the afternoon.']],
-    tips:['Carry Deca, R-Loc, Skinlite Cream + Facewash/Day Care samples and today’s gifts for the list doctors.','Check your POB target for today before you step out.']}}},
+    tips:['Check your POB target for today before you step out.','Ventasys captures your calls, POB, inputs and Rx — the app just guides you; report each in Ventasys the same day.']}}},
   {k:'ws',from:9,to:10,icon:'🏬',title:'Start with wholesalers & stockists',build:function(c){return{
     who:c.whs.length?'Meet: '+names(c.whs):'Cover your area wholesaler / stockist first',
     say:[['Say','“Bhaiya, book the Dexona lot and R-Loc 150 today — they are moving fast this month and chemists downstream need them. Place it now so no one runs dry.”']],
@@ -2542,6 +2552,7 @@ function render(ph,c){var d=ph.build(c)||{};
   var now=new Date(),hr=now.getHours(),mm=now.getMinutes();
   box.append(h('div',{class:'top'},h('div',{class:'clock'},'⏰ Right now · '+(hr%12||12)+(mm<10?':0':':')+mm+(hr<12?' AM':' PM')),h('h3',{},ph.icon+' '+ph.title),h('div',{class:'sub'},'Your digital Ratan Roy, with you all day')));
   var bd=h('div',{class:'bd'});
+  var pend=pendingLines(c);if(pend.length)bd.append(h('div',{class:'pend'},h('b',{},'📦 Still left with you — hand over & report'),pend.map(function(t){return h('div',{class:'pl'},'• '+t)})));
   if(d.who)bd.append(h('div',{class:'who'},d.who));
   var says=d.say||[],more=!!(S.tab&&S.tab.nowmore),extra=(says.length>1)||d.profit||(d.tips&&d.tips.length);
   if(says[0])bd.append(h('div',{class:'say'},h('b',{},says[0][0]),says[0][1]));
@@ -2992,19 +3003,15 @@ function vInc(app,DA){
     return;}
   app.append(scopeChips(DA));var hq=DA.scope,oh=DA.onhold(hq)||{q3:0,sept:0},tot=(oh.q3||0)+(oh.sept||0);
   var R2=DA.rows('ALL'),o=agg(R2,9),oa=P(o[2],o[1]),octOpen=oa!=null&&oa>=100,gapOct=Math.max(0,o[1]-o[2]),octClosed=(o[1]>0||o[2]>0),lost=(octClosed&&!octOpen)?tot:0;
-  if(octOpen){
-    app.append(h('div',{class:'money'},h('div',{class:'k'},tot>0?'💰 Released · Q3 + September':'💰 October secured'),h('h2',{},tot>0?R(tot):pf(oa)),
-      h('p',{},tot>0?('October target met ('+pf(oa)+') — '+R(tot)+' is yours. This is what winning pays. Now stack the next one.'):('October '+pf(oa)+' ✓ — you kept the chain alive and you\'re earning fresh. Keep every brand climbing.'))));
-    app.append(h('div',{class:'push'},h('b',{},'Keep the chain alive'),'Earned money only lands when the next month is 100% too. Stay above the line in November and nothing can be taken back.'));
-  } else if(lost>0){
-    app.append(h('div',{class:'loss'},h('div',{class:'k'},'💔 Slipped away this cycle'),h('h2',{},R(lost)),
-      h('p',{},'You earned '+R(lost)+' across Q3 and September. The rule is hard — no 100% October, no release — and October closed at '+pf(oa)+'. This one hurts. Let it be the last time it ever happens.')));
-    app.append(h('div',{class:'push hot'},h('b',{},'You were only '+L(gapOct)+' away'),'That thin line — a couple more strong days — is all that stood between keeping '+R(lost)+' and losing it. Next month you close that gap in the first week and never give it back.'));
-  } else {
-    app.append(h('div',{class:'money'},h('div',{class:'k'},'💰 Your earning engine'),h('h2',{},octClosed?pf(oa):'Ready'),
-      h('p',{},octClosed?('October '+pf(oa)+' — '+(oa>=97?'you\'re earning fresh this month. ':'')+'The real money is in the months ahead, and the ceiling this year is huge. See the bigger picture below.'):'Cross your targets and real money starts stacking here.')));
-    app.append(h('div',{class:'push'},h('b',{},'New month, fresh money'),'November resets everything — a 100% month earns from day one, Q4 and the +25% impact bonus are fully open, and the year\'s big prizes are still on the table.'));
-  }
+  // BIG CARROT — what they can earn this month, front and centre
+  var pot=novPot(o);
+  if(pot)app.append(h('div',{class:'money'},h('div',{class:'k'},'💰 Earn this November'),h('h2',{},'up to '+R(pot.p110)),
+    h('p',{},R(pot.p100)+' at 100% · '+R(pot.p110)+' at 110% — hit your target and it is yours, plus Q4 and the +25% impact bonus on top.')));
+  // state line (short)
+  if(octOpen){app.append(h('div',{class:'push'},h('b',{},'✓ October secured — '+pf(oa)),tot>0?(R(tot)+' from Q3 + September is released — well earned. Keep the chain alive: stay 100% in November.'):'You kept the chain alive and you are earning fresh. Keep every brand climbing.'));}
+  else if(lost>0){app.append(h('div',{class:'loss'},h('div',{class:'k'},'💔 Slipped away in October'),h('h2',{},R(lost)),
+    h('p',{},'Earned across Q3 + September, but October closed at '+pf(oa)+' (needed 100%) — you were only '+L(gapOct)+' short. Win it back from day one of November.')));}
+  else {app.append(h('div',{class:'push hot'},h('b',{},'November is your fresh start'),'October '+pf(oa)+'. A 100% month earns from day one, Q4 and the +25% impact bonus are open, and the year\'s big prizes are still on the table.'));}
   // results / estimates
   var me=earnOf(o,'m'),q4=earnOf(agg(R2,'Q4'),'q'),q3=earnOf(agg(R2,'Q3'),'q');
   app.append(h('div',{class:'earn'},
@@ -3089,15 +3096,15 @@ U.csoPerf=function(app){var DA=mkDA(true);if(!DA){app.append(h('div',{class:'geo
 U.geoReady=function(){return !!G};U.geoReset=function(){if(window.__GEO)return;G=null;state='idle'};
 
 /* earnings snapshot for the dashboard (CSO home) */
+function novPot(o){var t=o&&o[1]||0;if(t<=0)return null;var p100=t*1e5*RATE_M[slabIdx(t)][1]/100,n=1.1*t,p110=n*1e5*RATE_M[slabIdx(n)][2]/100;return{p100:p100,p110:p110}}
 U.earnCard=function(){try{var DA=mkDA(true);if(!DA)return'';var oh=DA.onhold()||{q3:0,sept:0},tot=(oh.q3||0)+(oh.sept||0);
-  var o=agg(DA.rows('ALL'),9),oa=P(o[2],o[1]),open=oa!=null&&oa>=100,closed=(o[1]>0||o[2]>0),lost=(closed&&!open&&tot>0)?tot:0;
-  var cls='neu',icon='💰',lbl='Earned so far',st='tap ›';
-  if(lost>0){cls='lost';icon='💔';lbl='Slipped away';st='Oct '+pf(oa)+' · tap ›'}
-  else if(open&&tot>0){cls='won';lbl='Earned · payable';st='Oct '+pf(oa)+' ✓ ›'}
-  else if(open){cls='won';lbl='October '+pf(oa)+' ✓';st='earning fresh ›'}
-  else {st='cross targets ›'}
-  return h('div',{class:'geo'},h('div',{class:'estrip '+cls,onclick:function(){try{S.tab.perf='brands';S.tab.geo_T='inc';go('perf')}catch(e){}}},
-    h('span',{style:'font-size:20px'},icon),h('div',{style:'min-width:0'},h('div',{class:'lbl'},lbl),h('div',{class:'amt'},R(tot))),h('span',{class:'st'},st)));
+  var o=agg(DA.rows('ALL'),9),oa=P(o[2],o[1]),open=oa!=null&&oa>=100,closed=(o[1]>0||o[2]>0),lost=(closed&&!open&&tot>0)?tot:0,pot=novPot(o);
+  var go2=function(){try{S.tab.perf='brands';S.tab.geo_T='inc';go('perf')}catch(e){}};
+  if(!pot)return h('div',{class:'geo'},h('div',{class:'estrip neu',onclick:go2},h('span',{style:'font-size:20px'},'💰'),h('div',{},h('div',{class:'lbl'},'Incentive'),h('div',{class:'amt'},'Tap to see')),h('span',{class:'st'},'›')));
+  var tag=lost>0?('₹'+Math.round(lost).toLocaleString('en-IN')+' slipped in Oct — win it back'):(open&&tot>0?(R(tot)+' from Oct is released ✓'):(open?'October '+pf(oa)+' ✓ — keep it going':'A strong month starts the money'));
+  return h('div',{class:'geo'},h('div',{class:'money',style:'margin:0;cursor:pointer',onclick:go2},
+    h('div',{class:'k'},'💰 Earn this November'),h('h2',{},'up to '+R(pot.p110)),
+    h('p',{},R(pot.p100)+' at 100% · '+R(pot.p110)+' at 110% — plus Q4 & the 25% impact bonus. '+tag+'. Tap ›')));
 }catch(e){return''}};
 })();
 /* Field Tracker – Review mail (manager, best on a laptop): the evening review laid out as an email,

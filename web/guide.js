@@ -26,6 +26,9 @@ var st=document.createElement('style');st.textContent=`
 .nowc .tips{margin:0;padding:0;list-style:none}
 .nowc .tips li{padding:4px 0 4px 20px;position:relative;font-size:13px;line-height:1.4}
 .nowc .tips li:before{content:'→';position:absolute;left:0;color:var(--accent,#0F5257);font-weight:800}
+.nowc .pend{background:#FFF3E0;border:1px solid #F3C88A;border-radius:12px;padding:10px 12px;margin:0 0 10px;font-size:13px;line-height:1.4;color:#6b4e00}
+.nowc .pend b{display:block;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#B45309;margin-bottom:4px}
+.nowc .pend .pl{padding:3px 0}
 .nowc .morebtn{margin:9px 0 0;border:1px dashed var(--line,#dfe7e4);background:transparent;color:var(--accent,#0F5257);border-radius:10px;padding:8px;width:100%;font-weight:700;font-size:12.5px;min-height:auto}
 .nowc .push{margin:10px 0 0;font-weight:700;color:#13684A;font-size:13.5px}
 .nowc .vent{margin:9px 0 0;font-size:12px;color:var(--muted);border-top:1px dashed var(--line,#e5ece9);padding-top:8px}
@@ -39,6 +42,13 @@ var st=document.createElement('style');st.textContent=`
 function custByType(brick,t){try{if(!window.D||!D.cust)return[];return D.cust.filter(function(c){return c[2]===brick&&c[3]===t}).map(function(c){return{name:c[4],spec:c[6]||''}})}catch(e){return[]}}
 function names(a,n){n=n||4;if(!a.length)return'';return a.slice(0,n).map(function(x){return x.name}).join(', ')+(a.length>n?' +'+(a.length-n)+' more':'')}
 function offerLine(){try{var R=U.REF&&U.REF();if(R&&R.offers&&R.offers.length){var o=R.offers[(U.dayIdx?U.dayIdx():0)%R.offers.length];return o.t+(o.say?' — “'+o.say+'”':'')}}catch(e){}return''}
+// What is STILL LEFT with the CSO (issued but not yet reported), from inbal_<HQ>. We guide handover + Ventasys report, never "carry".
+function pendingLines(c){try{var k=Object.keys(S.feeds||{}).filter(function(z){return z.indexOf('inbal_')===0})[0],f=k?S.feeds[k]:null;if(!f||!(f.items||[]).length)return[];
+  var byBrand={};(f.items||[]).forEach(function(it){var b=it.brand||'';if(!b)return;var e=byBrand[b]=byBrand[b]||{inp:0,smp:0};if((it.kind||'input')==='sample')e.smp+=(+it.qty||0);else e.inp+=(+it.qty||0)});
+  var out=[];Object.keys(byBrand).forEach(function(b){var e=byBrand[b];if(e.inp<=0&&e.smp<=0)return;
+    var what=[];if(e.inp>0)what.push(e.inp+' input'+(e.inp>1?'s':''));if(e.smp>0)what.push(e.smp+' sample'+(e.smp>1?'s':''));
+    out.push(what.join(' + ')+' of '+b+' — hand to today’s listed '+b+' doctors / chemists and report it in Ventasys.')});
+  return out;}catch(e){return[]}}
 
 var PUSH=['You are the doctor’s trusted rep — walk in sure of yourself.','Every “yes” today is money in your pocket at month-end.','One more quality call than yesterday — that is how toppers are built.','Slow is smooth, smooth is fast. Finish the brick, win the day.','Numbers follow effort. Put in the calls and the ₹ will come.','They remember the rep who shows up with a plan. That is you today.'];
 function push(){return PUSH[(U.dayIdx?U.dayIdx():new Date().getDate())%PUSH.length]}
@@ -49,7 +59,7 @@ function phases(){return [
   {k:'prep',from:0,to:9,icon:'🧭',title:'Get set for the day',build:function(c){return{
     who:'Today: '+(c.brick||'your beat')+' · '+c.docs.length+' doctors · '+c.rets.length+' chemists · '+c.whs.length+' wholesalers',
     say:[['Your opening plan','Call your wholesaler first to secure stock, then doctors through the late morning, chemists and new products in the afternoon.']],
-    tips:['Carry Deca, R-Loc, Skinlite Cream + Facewash/Day Care samples and today’s gifts for the list doctors.','Check your POB target for today before you step out.']}}},
+    tips:['Check your POB target for today before you step out.','Ventasys captures your calls, POB, inputs and Rx — the app just guides you; report each in Ventasys the same day.']}}},
   {k:'ws',from:9,to:10,icon:'🏬',title:'Start with wholesalers & stockists',build:function(c){return{
     who:c.whs.length?'Meet: '+names(c.whs):'Cover your area wholesaler / stockist first',
     say:[['Say','“Bhaiya, book the Dexona lot and R-Loc 150 today — they are moving fast this month and chemists downstream need them. Place it now so no one runs dry.”']],
@@ -90,6 +100,7 @@ function render(ph,c){var d=ph.build(c)||{};
   var now=new Date(),hr=now.getHours(),mm=now.getMinutes();
   box.append(h('div',{class:'top'},h('div',{class:'clock'},'⏰ Right now · '+(hr%12||12)+(mm<10?':0':':')+mm+(hr<12?' AM':' PM')),h('h3',{},ph.icon+' '+ph.title),h('div',{class:'sub'},'Your digital Ratan Roy, with you all day')));
   var bd=h('div',{class:'bd'});
+  var pend=pendingLines(c);if(pend.length)bd.append(h('div',{class:'pend'},h('b',{},'📦 Still left with you — hand over & report'),pend.map(function(t){return h('div',{class:'pl'},'• '+t)})));
   if(d.who)bd.append(h('div',{class:'who'},d.who));
   var says=d.say||[],more=!!(S.tab&&S.tab.nowmore),extra=(says.length>1)||d.profit||(d.tips&&d.tips.length);
   if(says[0])bd.append(h('div',{class:'say'},h('b',{},says[0][0]),says[0][1]));
