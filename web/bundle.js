@@ -1,4 +1,4 @@
-window.FT_BUILD='20261104062024';
+window.FT_BUILD='20261104062840';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -2394,10 +2394,25 @@ function brandInputs(brand){try{if(isMgr())return'';
 }catch(e){return''}}
 U.handoverCard=handoverCard;U.brandInputs=brandInputs;
 
+/* WORK tab, brand pages: nothing to FILL here (Ventasys already collects it and we pull it in).
+   We only SHOW the status — listed doctors, given to date, what is lying — and point to Ventasys. */
+function workStatus(app,r){
+  var BM={raft:'Rloc Raft',deca:'Deca Durabolin',rloc:'Rloc Tablets',skin:'Skinlite',dexona:'Dexona'},
+      LM={raft:'Raft',deca:'Deca',rloc:'R-Loc',skin:'Skinlite',dexona:'Dexona'},
+      brand=BM[r]||r,label=LM[r]||r,brick=(typeof brickToday==='function'&&brickToday())||'';
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📋 '+label+' — nothing to fill here'),h('p',{},'Ventasys already records your '+label+' calls, inputs, Rx and orders, and we pull them into this app. So there is nothing to enter here — this screen only shows where you stand and who to finish with.')));
+  var inb=brandInputs(brand);if(inb)app.append(inb);
+  try{if(typeof drListFor==='function'){var L=drListFor(brand);if(L&&L.status==='approved'){var all=L.doctors||[],inBrick=(typeof brickNames==='function')?brickNames(all,brick):[];
+    app.append(h('div',{class:'coachc'},h('div',{class:'k'},'👨‍⚕️ Your listed '+label+' doctors'),h('p',{},(inBrick.length?'In '+brick+' today: '+nameList(inBrick)+'. ':'')+'Total listed: '+all.length+' doctor'+(all.length===1?'':'s')+'. Hand '+label+' to them and report the Rx in Ventasys.')))}}}catch(e){}
+  app.append(h('div',{class:'coachc',style:'background:linear-gradient(135deg,#E8F6EE,#D6F0E0);border-color:#9FD9B6'},h('div',{class:'k',style:'color:#13684A'},'✅ Finish '+label+' brand-wise'),h('p',{style:'color:#1b6b4a'},'Give the remaining '+label+' inputs and samples to the doctors and chemists above, then report each in Ventasys the same day.')));
+}
+U.workStatus=workStatus;
+['raft','deca','rloc','skin','dexona'].forEach(function(k){U.routes[k]=function(app){workStatus(app,k)}});
+
 function todayCSO(app){var keep=[app.querySelector('.fthead')],hero=app.querySelector('.hero'),meets=[].slice.call(app.querySelectorAll('.meet')),hof=app.querySelector('.hof'),ob=[].slice.call(app.querySelectorAll('.note')).filter(function(n){return /saved on your phone/.test(n.textContent)})[0],nav0=app.querySelector('.bnav');
   var pend=U.nagList().length;
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
-  var u=updBanner(),list=[u,(U.highlightCard&&U.highlightCard())||"",(U.nextMoveCard&&U.nextMoveCard())||"",(U.earnCard&&U.earnCard())||"",nextCard(app),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
+  var u=updBanner(),list=[u,(U.highlightCard&&U.highlightCard())||"",(U.nextMoveCard&&U.nextMoveCard())||"",(U.earnCard&&U.earnCard())||"",nextCard(app),handoverCard(),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
   [].concat.apply([],list).forEach(function(n){if(n)app.append(n)})}
 function todayMgr(app){var keep=[app.querySelector('.fthead')];var team=U.teamPanel?U.teamPanel():null,share=[].slice.call(app.querySelectorAll('.tdone'))[0],hof=app.querySelector('.hof');
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
@@ -2439,10 +2454,7 @@ var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(doc
     if(r==='home'){if(isMgr())todayMgr(app);else todayCSO(app)}
     // replace the old sub-tab row on Work screens
     if(t==='work'){U.lsSet('ft_work',r);var old=app.querySelector('.fthead~.subtabs');if(old&&old.textContent.indexOf('Raft')>=0&&!old.classList.contains('l2'))old.remove();var rows=workTabs(r);var after=hd;rows.forEach(function(x){after.after(x);after=x});
-      if(!isMgr()&&WORKR.indexOf(r)>=0&&!app.querySelector('.optnote')){
-        var BM={raft:'Rloc Raft',deca:'Deca Durabolin',rloc:'Rloc Tablets',skin:'Skinlite',dexona:'Dexona'};
-        var cc=brandInputs(BM[r]);if(cc){after.after(cc);after=cc}
-        var on=h('div',{class:'qline optnote'},h('small',{},'The app guides — Ventasys collects'),'When you meet a doctor or chemist, report the input, Rx or order in Ventasys. You don\'t have to fill the lists below — they are only here to show you who to meet and what to carry.');after.after(on)}}
+      }
     if(t==='me'){var mt=meTabs(r);hd.after(mt);if(r==='perf')app.querySelectorAll('.hof').forEach(function(x){x.remove()})}
     var nb=app.querySelector('.bnav');if(nb)nb.replaceWith(nav(r));else app.append(nav(r));
     if(isMgr()&&r==='perf'&&!app.querySelector('.salestop')){var s1=app.querySelector('.score'),c1=(U.salesTop||salesTop)();if(s1)s1.before(c1);else app.append(c1)}
