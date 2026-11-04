@@ -42,7 +42,7 @@ var st=document.createElement('style');st.textContent=`
 `;document.head.appendChild(st);
 
 /* ---------- which tab each screen belongs to ---------- */
-var WORKR=['raft','deca','rloc','skin','dexona','stockists','stock','beat','tp'];
+var WORKR=['raft','deca','rloc','skin','dexona','samples','stockists','stock','beat','tp'];
 function tabFor(r){if(isMgr()){if(r==='home'||r==='mgr')return'team';if(r==='approve')return'approve';if(r==='meet')return'meet';if(r==='geo'||r==='perf'||r==='mail')return'reports';if(r==='msgs'||r==='hof')return'me';if(r==='sell')return'sell';return'team'}
   if(r==='home')return'today';if(r==='sell')return'sell';if(r==='learn')return'learn';if(r==='perf'||r==='msgs'||r==='hof')return'me';return'work'}
 function NAV(){return isMgr()?[['team','👥','Team',function(){go('home')}],['approve','✅','Approvals',function(){go('approve')}],['meet','📅','Meetings',function(){go('meet')}],['reports','📈','Reports',function(){go('geo')}],['me','👤','Me',function(){go(U.lsGet('ft_me','msgs'))}]]
@@ -55,7 +55,7 @@ function nav(r){var cur=tabFor(r),pend=0,appr=0;
 function tabs(list,cur,cls){return h('div',{class:'subtabs'+(cls?' '+cls:'')},list.map(function(x){return h('button',{class:x[0]===cur?'on':'',onclick:x[2]},x[1])}))}
 function workTabs(r){var grp=r==='stockists'?'cust':(r==='tp'||r==='beat')?'tp':'ent';
   var top=tabs([['ent','Entries',function(){go(U.lsGet('ft_went','raft'))}],['cust','Customers',function(){go('stockists')}],['tp','TP & Brick',function(){go('tp')}],['req','Stock request',function(){U.stockSheet&&U.stockSheet()}]],grp);
-  if(grp==='ent'){U.lsSet('ft_went',r);return[top,tabs([['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['stock','Stock statement']].map(function(x){return[x[0],x[1],function(){go(x[0])}]}),r,'l2')]}
+  if(grp==='ent'){if(r!=='samples')U.lsSet('ft_went',r);return[top,tabs([['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['samples','💉 All samples'],['stock','Stock statement']].map(function(x){return[x[0],x[1],function(){go(x[0])}]}),r,'l2')]}
   if(grp==='tp')return[top,tabs([['tp','TP calendar',function(){go('tp')}],['beat','Change brick',function(){go('beat')}]],r,'l2')];
   return[top]}
 function meTabs(r){var L=isMgr()?[['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']]:[['perf','Progress'],['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']];
@@ -125,6 +125,43 @@ function brandInputs(brand){try{if(isMgr())return'';
 }catch(e){return''}}
 U.handoverCard=handoverCard;U.brandInputs=brandInputs;
 
+/* Inputs & samples: SHOW only (never fill — Ventasys records it). Who it was given to, what, and what is still lying. From the InputTracking feed. */
+function inputsFeed(){try{var k=Object.keys(S.feeds||{}).filter(function(z){return z.indexOf('inputs_')===0})[0];return k?S.feeds[k]:null}catch(e){return null}}
+var FEEDBRAND={raft:'R-Loc',deca:'Deca Durabolin',rloc:'R-Loc',skin:'Skinlite',dexona:'Dexona'};
+function qlist(arr,withTo){return arr.map(function(x){return (withTo&&x.to?x.to+' — ':'')+x.it+' ×'+x.q}).join(' · ')}
+function inputProgress(routeOrBrand){try{if(isMgr())return'';
+  var f=inputsFeed(),brand=FEEDBRAND[routeOrBrand]||routeOrBrand;
+  if(!f||!f.brands)return brandInputs(brand);
+  var b=f.brands[brand];
+  if(!b||(!b.gi.length&&!b.gs.length&&!b.li.length&&!b.ls.length))
+    return h('div',{class:'coachc',style:'background:linear-gradient(135deg,#E8F6EE,#D6F0E0);border-color:#9FD9B6'},h('div',{class:'k',style:'color:#13684A'},'✅ '+brand+' — nothing lying with you'),h('p',{style:'color:#1b6b4a'},'No '+brand+' inputs or samples pending with you.'));
+  var out=h('div',{class:'coachc'},h('div',{class:'k'},'📦 '+brand+' — given & what\'s left'+(f.asOf?' · as of '+f.asOf:'')));
+  if(b.li.length)out.append(h('p',{},h('b',{},'Still with you: '),qlist(b.li,false),'. Hand over to your listed doctors/chemists — Ventasys records it.'));
+  if(b.gi.length)out.append(h('p',{style:'color:var(--muted)'},'Given: '+qlist(b.gi,true)));
+  if(!b.li.length&&!b.gi.length)out.append(h('p',{},'No '+brand+' inputs lying with you. (Samples are in the All samples tab.)'));
+  return out;
+}catch(e){return brandInputs(routeOrBrand)}}
+function inputsTop(){try{if(isMgr())return'';var f=inputsFeed();if(!f||!f.brands)return'';
+  var pend=[];Object.keys(f.brands).forEach(function(b){if(b==='General')return;var x=f.brands[b];var n=(x.li||[]).reduce(function(a,y){return a+(y.q||0)},0);if(n)pend.push({b:b,n:n})});
+  if(!pend.length)return'';pend.sort(function(a,b){return b.n-a.n});
+  return h('div',{class:'coachc'},h('div',{class:'k'},'📦 Inputs still to hand over — brand-wise'),h('p',{},pend.map(function(p){return p.b+' ('+p.n+')'}).join(' · ')+'. Give to your listed doctors & chemists — it records in Ventasys. Nothing to type here.'));
+}catch(e){return''}}
+/* All samples in one place (not brand-split): to whom given + what is pending. Read-only. */
+function allSamples(app){try{var f=inputsFeed();
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'💉 All samples'+(f&&f.asOf?' · as of '+f.asOf:'')),h('p',{},'To whom given and what is pending. Nothing to fill here — Ventasys records samples.')));
+  if(!f||!f.brands){app.append(h('div',{class:'coachc'},h('p',{},'Sample details appear after a Sync.')));return}
+  var given=[],pend={};
+  Object.keys(f.brands).forEach(function(b){var x=f.brands[b];
+    (x.gs||[]).forEach(function(g){given.push(g)});
+    (x.ls||[]).forEach(function(l){pend[l.it]=(pend[l.it]||0)+l.q})});
+  var pk=Object.keys(pend);
+  if(pk.length)app.append(h('div',{class:'coachc'},h('div',{class:'k'},'⏳ Pending with you'),h('p',{},pk.map(function(k){return k+' ×'+pend[k]}).join(' · '))));
+  var withTo=given.filter(function(g){return g.to&&g.to!=='Not recorded'});
+  if(withTo.length){var box=h('div',{class:'coachc'},h('div',{class:'k'},'✅ Given so far'));withTo.forEach(function(g){box.append(h('p',{style:'margin:3px 0'},h('b',{},g.to),' — '+g.it+' ×'+g.q))});app.append(box)}
+  if(!pk.length&&!withTo.length)app.append(h('div',{class:'coachc',style:'background:linear-gradient(135deg,#E8F6EE,#D6F0E0);border-color:#9FD9B6'},h('p',{style:'color:#1b6b4a'},'No samples pending with you.')));
+}catch(e){app.append(h('div',{class:'note'},'Could not load samples: '+e.message))}}
+U.inputProgress=inputProgress;U.inputsTop=inputsTop;U.allSamples=allSamples;U.routes.samples=function(app){allSamples(app)};
+
 /* WORK tab, brand pages: nothing to FILL here (Ventasys already collects it and we pull it in).
    We only SHOW the status — listed doctors, given to date, what is lying — and point to Ventasys. */
 function workStatus(app,r){
@@ -132,7 +169,7 @@ function workStatus(app,r){
       LM={raft:'Raft',deca:'Deca',rloc:'R-Loc',skin:'Skinlite',dexona:'Dexona'},
       brand=BM[r]||r,label=LM[r]||r,brick=(typeof brickToday==='function'&&brickToday())||'';
   app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📋 '+label+' — nothing to fill here'),h('p',{},'Ventasys already records your '+label+' calls, inputs, Rx and orders, and we pull them into this app. So there is nothing to enter here — this screen only shows where you stand and who to finish with.')));
-  var inb=brandInputs(brand);if(inb)app.append(inb);
+  var inb=inputProgress(r);if(inb)app.append(inb);
   try{if(typeof drListFor==='function'){var L=drListFor(brand);if(L&&L.status==='approved'){var all=L.doctors||[],inBrick=(typeof brickNames==='function')?brickNames(all,brick):[];
     app.append(h('div',{class:'coachc'},h('div',{class:'k'},'👨‍⚕️ Your listed '+label+' doctors'),h('p',{},(inBrick.length?'In '+brick+' today: '+nameList(inBrick)+'. ':'')+'Total listed: '+all.length+' doctor'+(all.length===1?'':'s')+'. Hand '+label+' to them and report the Rx in Ventasys.')))}}}catch(e){}
   app.append(h('div',{class:'coachc',style:'background:linear-gradient(135deg,#E8F6EE,#D6F0E0);border-color:#9FD9B6'},h('div',{class:'k',style:'color:#13684A'},'✅ Finish '+label+' brand-wise'),h('p',{style:'color:#1b6b4a'},'Give the remaining '+label+' inputs and samples to the doctors and chemists above, then report each in Ventasys the same day.')));
@@ -143,7 +180,7 @@ U.workStatus=workStatus;
 function todayCSO(app){var keep=[app.querySelector('.fthead')],hero=app.querySelector('.hero'),meets=[].slice.call(app.querySelectorAll('.meet')),hof=app.querySelector('.hof'),ob=[].slice.call(app.querySelectorAll('.note')).filter(function(n){return /saved on your phone/.test(n.textContent)})[0],nav0=app.querySelector('.bnav');
   var pend=U.nagList().length;
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
-  var u=updBanner(),list=[u,(U.nextMoveCard&&U.nextMoveCard())||"",(U.earnCard&&U.earnCard())||"",(U.teamCard&&U.teamCard())||"",nextCard(app),handoverCard(),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
+  var u=updBanner(),list=[u,(U.inputsTop&&U.inputsTop())||"",(U.nextMoveCard&&U.nextMoveCard())||"",(U.earnCard&&U.earnCard())||"",(U.teamCard&&U.teamCard())||"",nextCard(app),handoverCard(),meets,hero,ob,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_went','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',hof,quoteLine()];
   [].concat.apply([],list).forEach(function(n){if(n)app.append(n)})}
 function todayMgr(app){var keep=[app.querySelector('.fthead')];var team=U.teamPanel?U.teamPanel():null,share=[].slice.call(app.querySelectorAll('.tdone'))[0],hof=app.querySelector('.hof');
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
