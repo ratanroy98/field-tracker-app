@@ -1,4 +1,4 @@
-window.FT_BUILD='20261104055520';
+window.FT_BUILD='20261104055754';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -1555,7 +1555,7 @@ function doCheckin(btn){if(checkinToday()){toast(w('checked'));return}if(isMgr()
 function doCheckin2(btn,extra){
   if(btn){btn.textContent='📍 '+w('locating');btn.disabled=true}
   getLoc(function(l){var tm=new Date().toTimeString().slice(0,5);var f=Object.assign({time:tm,brick:(typeof brickToday==='function'&&brickToday())||''},extra||{});if(l){f.lat=l.lat;f.lng=l.lng;f.acc=l.acc}
-    save('checkin',f).then(function(ok){if(ok){U.confetti(30);render()}else if(btn){btn.disabled=false;btn.textContent='📍 '+w('checkin')}})})}
+    save('checkin',f).then(function(ok){if(ok){if(l){U.confetti(30)}else{toast('⚠️ Location was off — your check-in has no GPS tag. Turn on Location (GPS) and check in from the market so your selfie is geo-tagged.')}render()}else if(btn){btn.disabled=false;btn.textContent='📍 '+w('checkin')}})})}
 
 /* ---------- share ---------- */
 function sharePlan(){var m=todayMsg();if(!m){toast(w('noplan'));return}var txt='*'+me().Name+' – '+TODAY+'*\n'+m.text+'\n\n— Ratan Roy, Guwahati Area';
