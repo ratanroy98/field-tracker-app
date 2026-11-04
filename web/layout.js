@@ -73,11 +73,11 @@ setInterval(function(){paintSync()},1500);
 /* ---------- Today: one "Next step" card ---------- */
 function field(){try{var tp=tpFor(myEmail(),TODAY);return !tp||/Field|Joint/.test(tp.DayType||'')}catch(e){return true}}
 function steps(app){var S0=U.syncState?U.syncState():{opened:true,unsent:false},L=[];
-  var ci=!!(U.checkinToday&&U.checkinToday());var pend=U.nagList();
+  var ci=!!(U.checkinToday&&U.checkinToday());var pend=U.nagList();var fieldDay=field();
   pend.sort(function(a,b){return (a.s.level==='bad'?0:1)-(b.s.level==='bad'?0:1)});
   L.push({done:S0.opened,cls:'',t:'Sync to get today\'s latest',p:'Your plan, targets, meetings and messages from Ratan Roy.',b:'🔄 Sync now',f:function(){U.sync()}});
-  L.push({done:!U.taskDue||!U.taskDue(),cls:'wa',t:'Read today\'s task and share it',p:'Share it to WhatsApp "Guwahati CSM Team" to confirm you have gone through the full task.',b:'Read & share',f:function(){U.taskSheet()}});
-  if(field())L.push({done:ci,cls:'',t:'Start my day',p:'Confirm today\'s brick and take your selfie – one tap.',b:'📍 Start my day',f:function(){var c=app.querySelector('.hero .ci');if(c)c.click()}});
+  if(fieldDay)L.push({done:ci,cls:'',t:'Confirm today\'s brick',p:'Tap “Start my day” — keep today\'s brick or change it. Your task opens after this.',b:'📍 Start my day',f:function(){var c=app.querySelector('.hero .ci');if(c)c.click()}});
+  if(!fieldDay||ci)L.push({done:!U.taskDue||!U.taskDue(),cls:'wa',t:'Share today\'s task on WhatsApp',p:'Your task for the brick — share it to the “Guwahati CSM Team” group to confirm you\'ve gone through it.',b:'Read & share',f:function(){U.taskSheet()}});
   if(pend.length){var top=pend[0];L.push({done:false,cls:'',t:top.k.t,p:(top.s.why||'')+(pend.length>1?' · '+(pend.length-1)+' more after this':''),b:'Open',f:function(){go(top.k.k)},lnk:pend.length>1?['See all '+pend.length+' tasks',function(){go(U.lsGet('ft_went','raft'))}]:null});}
   L.push({done:!U.lessonDoneToday||U.lessonDoneToday(),cls:'',t:'Today\'s 3-minute lesson',p:(U.nextLesson&&U.nextLesson())||'From Ratan Roy',b:'🎓 Start lesson',f:function(){S.tab.learn='today';go('learn')}});
   return L}
