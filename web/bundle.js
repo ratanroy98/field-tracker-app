@@ -1,4 +1,4 @@
-window.FT_BUILD='20261104141421';
+window.FT_BUILD='20261104141840';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -2323,7 +2323,7 @@ html,body{max-width:100vw;overflow-x:hidden}
 `;document.head.appendChild(st);
 
 /* ---------- which tab each screen belongs to ---------- */
-var WORKR=['raft','deca','rloc','skin','dexona','pulse','pick','carry','photo','samples','stockists','stock','stockup','beat','tp'];
+var WORKR=['raft','deca','rloc','skin','dexona','pulse','pick','carry','photo','samples','stockists','stock','beat','tp'];
 function tabFor(r){if(isMgr()){if(r==='home'||r==='mgr')return'team';if(r==='approve')return'approve';if(r==='meet')return'meet';if(r==='geo'||r==='perf'||r==='mail')return'reports';if(r==='msgs'||r==='hof')return'me';if(r==='sell')return'sell';return'team'}
   if(r==='home')return'today';if(r==='sell')return'sell';if(r==='learn')return'learn';if(r==='perf'||r==='msgs'||r==='hof')return'me';return'work'}
 function NAV(){return isMgr()?[['team','👥','Team',function(){go('home')}],['approve','✅','Approvals',function(){go('approve')}],['meet','📅','Meetings',function(){go('meet')}],['reports','📈','Reports',function(){go('geo')}],['me','👤','Me',function(){go(U.lsGet('ft_me','msgs'))}]]
@@ -2336,7 +2336,7 @@ function nav(r){var cur=tabFor(r),pend=0,appr=0;
 function tabs(list,cur,cls){return h('div',{class:'subtabs'+(cls?' '+cls:'')},list.map(function(x){return h('button',{class:x[0]===cur?'on':'',onclick:x[2]},x[1])}))}
 function workTabs(r){var grp=r==='stockists'?'cust':(r==='tp'||r==='beat')?'tp':'ent';
   var top=tabs([['ent','Entries',function(){go(U.lsGet('ft_went','raft'))}],['cust','Customers',function(){go('stockists')}],['tp','TP & Brick',function(){go('tp')}],['req','Stock request',function(){U.stockSheet&&U.stockSheet()}]],grp);
-  if(grp==='ent'){if(r!=='samples'&&r!=='pulse'&&r!=='pick'&&r!=='carry'&&r!=='stockup'&&r!=='photo')U.lsSet('ft_went',r);return[top,tabs([['carry','🎒 Carry'],['pick','👨‍⚕️ Pick Drs'],['photo','📷 Photo'],['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['pulse','💉 Pulse'],['stockup','📄 Statement'],['samples','💉 All samples'],['stock','Stock statement']].map(function(x){return[x[0],x[1],function(){go(x[0])}]}),r,'l2')]}
+  if(grp==='ent'){if(r!=='samples'&&r!=='pulse'&&r!=='pick'&&r!=='carry'&&r!=='stock'&&r!=='photo')U.lsSet('ft_went',r);return[top,tabs([['carry','🎒 Carry'],['pick','👨‍⚕️ Pick Drs'],['photo','📷 Photo'],['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['pulse','💉 Pulse'],['samples','💉 All samples'],['stock','📄 Stock statement']].map(function(x){return[x[0],x[1],function(){go(x[0])}]}),r,'l2')]}
   if(grp==='tp')return[top,tabs([['tp','TP calendar',function(){go('tp')}],['beat','Change brick',function(){go('beat')}]],r,'l2')];
   return[top]}
 function meTabs(r){var L=isMgr()?[['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']]:[['perf','Progress'],['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']];
@@ -2535,7 +2535,7 @@ var DEEP={
   pick:function(){go('pick')},
   pulse:function(){go('pulse')},
   samples:function(){go('samples')},
-  stock:function(){go('stockup')},
+  stock:function(){go('stock')},
   task:function(){go('home');setTimeout(function(){U.taskSheet&&U.taskSheet()},90)},
   checkin:openCheckin, brick:openCheckin,
   selfie:function(){go('home');setTimeout(function(){U.doSelfie&&U.doSelfie()},120)},
@@ -3490,7 +3490,7 @@ function stmtScreen(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Stoc
   var prev=stmtEntries();
   if(prev.length){var box=h('div',{class:'coachc'},h('div',{class:'k'},'Uploaded'));prev.slice(0,10).forEach(function(e){box.append(h('p',{style:'margin:3px 0'},'📄 '+(e.name||'statement')+(e.date?' · '+e.date:'')))});app.append(box)}
 }catch(e){app.append(h('div',{class:'note'},'Could not open statement upload: '+e.message))}}
-U.stmtScreen=stmtScreen;U.routes.stockup=function(app){stmtScreen(app)};
+U.stmtScreen=stmtScreen;U.routes.stock=function(app){stmtScreen(app)};
 
 /* ---------- field photo: take, tag the dr/retailer, submit (reaches Ratan to share) ---------- */
 function photoScreen(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Photos are uploaded by the CSO.'));return}

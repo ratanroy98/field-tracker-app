@@ -156,7 +156,7 @@ function stmtScreen(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Stoc
   var prev=stmtEntries();
   if(prev.length){var box=h('div',{class:'coachc'},h('div',{class:'k'},'Uploaded'));prev.slice(0,10).forEach(function(e){box.append(h('p',{style:'margin:3px 0'},'📄 '+(e.name||'statement')+(e.date?' · '+e.date:'')))});app.append(box)}
 }catch(e){app.append(h('div',{class:'note'},'Could not open statement upload: '+e.message))}}
-U.stmtScreen=stmtScreen;U.routes.stockup=function(app){stmtScreen(app)};
+U.stmtScreen=stmtScreen;U.routes.stock=function(app){stmtScreen(app)};
 
 /* ---------- field photo: take, tag the dr/retailer, submit (reaches Ratan to share) ---------- */
 function photoScreen(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Photos are uploaded by the CSO.'));return}
