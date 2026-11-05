@@ -39,10 +39,21 @@ var TITLE=/^(dr|prof|mr|mrs|ms|md|smt|sri|shri)\.?$/;
 function toks(s){return String(s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(function(w){return w.length>=3&&!TITLE.test(w);});}
 function nameEq(a,b){var ta=toks(a),tb=toks(b);if(!ta.length||!tb.length)return false;return ta.some(function(w){return tb.indexOf(w)>=0;});}
 
-/* register (already approved) for this HQ — the doctors + retailers the CSO covers */
-function kindOf(c){var ty=String(c.type||c.ty||'').toUpperCase();if(/RETAIL|CHEMIST|^R$|PHARMACY|STORE/.test(ty))return 'R';if(/HCP|DOCTOR|^DR|GP|RMP|PHYS/.test(ty)||/physician|mbbs|md\b/i.test(c.spec||''))return 'D';if(/WHOLE|^W$|DISTRIB|STOCKIST/.test(ty))return '';return ty?'':'D';}
+/* classify a customer: 'D' doctor, 'R' retailer/chemist, '' wholesaler/stockist/unknown-not-a-doctor.
+   Uses type AND the name (the master often leaves type blank, and chemist names are obvious). */
+function kindOf(c){
+  var ty=String(c.type||c.ty||'').toUpperCase();
+  var nm=String(c.name||'').toLowerCase();
+  var sp=String(c.spec||'').toLowerCase();
+  if(/^W$|WHOLE|DISTRIB|STOCKIST/.test(ty)||/wholesale|distributor|stockist/.test(nm))return '';
+  if(/^R$|RETAIL|CHEMIST|PHARMAC|STORE/.test(ty)||/medico|pharmac|chemist|\bmedical|\bdrug|\bstore|agenc|enterprise|\btraders?\b|surgical|\bhall\b|\bsales\b|medi\s?care|distributor/.test(nm))return 'R';
+  if(/HCP|DOCTOR|^DR|GP|RMP|PHYS/.test(ty)||/physician|mbbs|\bmd\b|bams|bhms|\bdgo\b|\bms\b|\bbds\b|clinic/.test(sp)||/^dr\.?\s/.test(nm))return 'D';
+  /* no clear signal: a person-looking name with no shop words is taken as a doctor; otherwise skip */
+  return (/^dr\.?\s/.test(nm)||sp)?'D':'D';
+}
+/* doctor roster (already approved) for this HQ — the doctors the CSO covers for inputs */
 function roster(){try{if(typeof CUST==='undefined'||!CUST)return[];var hq=myHQ3(),out=[];
-  Object.keys(CUST).forEach(function(code){var c=CUST[code];if(!c)return;if(hq&&hqName(c.hq)&&hqName(c.hq)!==hq)return;var k=kindOf(c);if(k!=='D'&&k!=='R')return;out.push({dr:c.name||String(code),brick:c.brick||'',kind:k});});
+  Object.keys(CUST).forEach(function(code){var c=CUST[code];if(!c)return;if(hq&&hqName(c.hq)&&hqName(c.hq)!==hq)return;if(kindOf(c)!=='D')return;out.push({dr:c.name||String(code),brick:c.brick||'',kind:'D'});});
   return out;}catch(e){return[];}}
 /* doctors already GIVEN inputs/samples (from the synced inputs_<HQ> feed) — these are approved · Yes */
 function givenNames(){try{var hq=myHQ3();var f=(S.feeds||{})['inputs_'+hq];if(!f||!f.brands)return[];var out={};
