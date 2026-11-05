@@ -127,15 +127,53 @@ U.updatesCard=function(){try{if(!isCSO())return'';
   return card;
 }catch(e){return''}};
 
-/* ---------- Yesterday's best field work (manager-curated spotlight) ---------- */
+/* ---------- Best field work: manager pick → feed → the app picks it itself from the team data ---------- */
 function myHQ3(){try{if(S.viewAs&&S.viewAs.HQ)return S.viewAs.HQ;if(S.me&&S.me.HQ)return S.me.HQ;var k=Object.keys(S.feeds||{}).filter(function(z){return z.indexOf('perf_')===0})[0];return k?k.slice(5):''}catch(e){return''}}
-U.bestCard=function(){try{if(!isCSO())return'';var F=S.feeds||{},hq=myHQ3();var sf=F['spotlight_'+hq]||F.spotlight;
-  if(!sf)return h('div',{class:'dcard'},h('div',{class:'dh'},h('b',{},'🌟 Yesterday\'s best field work')),h('p',{class:'dhint'},'After tonight\'s reports, Ratan highlights the best field work of the day here — it could be you tomorrow.'));
-  var card=h('div',{class:'dcard bestc',onclick:function(){}});
+function money(v){v=Math.round(+v||0);return (v<0?'–₹':'₹')+Math.abs(v).toLocaleString('en-IN')}
+function teamRows(){try{var F=S.feeds||{},hq=myHQ3();var tf=F['teamperf_'+hq]||F.teamperf;return (tf&&tf.rows)||[]}catch(e){return[]}}
+/* score every teammate by achievement (primary) + POB, so the app can choose the best on its own */
+function scoreRows(){return teamRows().map(function(r){var ach=(r.ach==null?r.mtd:r.ach),pob=(r.pob==null?null:r.pob);return{r:r,ach:ach,pob:pob,s:(ach==null?-1:ach)+(pob==null?0:pob*0.3)}}).sort(function(a,b){return b.s-a.s})}
+function winsOf(r,ach){var w=[];if(ach!=null)w.push(Math.round(ach)+'% of target');if(r.pobv!=null)w.push(money(r.pobv)+' POB');else if(r.pob!=null)w.push('POB '+Math.round(r.pob)+'%');if(r.close!=null)w.push('Closing '+money(r.close));return w.slice(0,3)}
+function autoBest(){var sc=scoreRows();if(!sc.length)return null;var t=sc[0],r=t.r;
+  return {name:r.name||'Top performer',hq:r.hq,title:'Leading the team'+(t.ach!=null?' at '+Math.round(t.ach)+'%':''),wins:winsOf(r,t.ach),cta:'Match '+String(r.name||'').split(' ')[0]+'\'s pace today',auto:true}}
+function mgrSpot(){try{var sp=(S.entries||[]).filter(function(e){return e.type==='spotlight'&&!e.cancelled});if(!sp.length)return null;sp.sort(function(a,b){return (b.ts||0)-(a.ts||0)});var s=sp[0];return{name:s.name,hq:s.hq,title:s.title,wins:s.wins||[],cta:s.cta,photo:s.photo,by:s.by}}catch(e){return null}}
+function feedSpot(){try{var F=S.feeds||{},hq=myHQ3();return F['spotlight_'+hq]||F.spotlight||null}catch(e){return null}}
+U.bestCard=function(){try{if(!isCSO())return'';var sf=mgrSpot()||feedSpot()||autoBest();
+  if(!sf)return h('div',{class:'dcard'},h('div',{class:'dh'},h('b',{},'🌟 Yesterday\'s best field work')),h('p',{class:'dhint'},'Appears right after a Sync — the app highlights the top field work of the team on its own, or Ratan picks one.'));
+  var card=h('div',{class:'dcard bestc'});
   card.append(h('div',{class:'dh'},h('b',{},'🌟 Yesterday\'s best field work')));
   var av=sf.photo?h('img',{class:'av',src:sf.photo}):h('div',{class:'avn'},(sf.name||'?').slice(0,1));
   var win1=(sf.wins&&sf.wins[0])||sf.cta||'';
   card.append(h('div',{class:'top'},av,h('div',{},h('div',{class:'nm'},sf.name||'Top performer'),h('div',{class:'ti'},sf.title||'Did it right yesterday'),win1?h('div',{class:'w1'},'• '+win1):'')));
+  if(sf.auto)card.append(h('div',{class:'autotag'},'⚙️ Chosen by the app from today\'s team standings'));
   return card;
 }catch(e){return''}};
+
+/* ---------- Manager: pick who to highlight (one tap). If untouched, the app shows the top performer itself. ---------- */
+function setBest(r,ach){try{var payload={type:'spotlight',by:'Ratan Roy',ts:Date.now(),date:TODAY,hq:r.hq,name:r.name,title:'Best field work'+(r.hq?' · '+r.hq:''),wins:winsOf(r,ach),cta:'Match '+String(r.name||'').split(' ')[0]+'\'s work today'};
+  var cs=((window.D&&D.users)||[]).filter(function(u){return u.Role==='CSO'&&u.Status==='Active'});
+  var emails=cs.map(function(u){return u.Email});if(emails.indexOf('ratanroy98@gmail.com')<0)emails.push('ratanroy98@gmail.com');
+  Promise.all(emails.map(function(e){return S.db.collection('entries').add(Object.assign({email:e},payload))})).then(function(){try{window.toast&&toast('🌟 '+r.name+' is now the team highlight')}catch(_){}try{render&&render()}catch(_){}});
+}catch(e){try{window.toast&&toast('Could not set: '+e.message)}catch(_){}}}
+U.bestPanel=function(){try{if(isCSO())return'';var sc=scoreRows();if(!sc.length)return'';var cur=mgrSpot();
+  var box=h('div',{class:'dcard bestpanel'},h('div',{class:'dh'},h('b',{},'🌟 Best field work — who to highlight')));
+  box.append(h('p',{class:'dhint'},cur?('Showing '+cur.name+' to the whole team now. Tap another to change it.'):('If you don\'t pick, the app shows '+sc[0].r.name+' automatically. Tap one to set it for the team.')));
+  sc.slice(0,5).forEach(function(x,i){var r=x.r,picked=cur&&cur.name===r.name;
+    box.append(h('div',{class:'bpk'+(i===0?' top':'')+(picked?' on':''),onclick:function(){setBest(r,x.ach)}},
+      h('div',{class:'bav'},(r.name||'?').slice(0,1)),
+      h('div',{class:'tx'},h('b',{},r.name||'—'),h('small',{},(x.ach!=null?Math.round(x.ach)+'% target':'')+(r.pobv!=null?' · '+money(r.pobv)+' POB':'')+(i===0&&!cur?' · app\'s pick':''))),
+      h('span',{class:'set'},picked?'✓ Shown':'Set')));});
+  return box;
+}catch(e){return''}};
+
+var st2=document.createElement('style');st2.textContent=`
+.bestc .autotag{position:relative;margin-top:9px;font-size:11px;opacity:.85;background:rgba(0,0,0,.18);border-radius:10px;padding:5px 9px;display:inline-block}
+.bestpanel .bpk{display:flex;align-items:center;gap:11px;margin:8px 0 0;padding:9px 11px;border-radius:13px;border:1px solid var(--line,#e7edeb);background:var(--card,#fff);cursor:pointer}
+.bestpanel .bpk.top{border-color:#F0C94B;background:linear-gradient(135deg,#FFFaed,#fff)}
+.bestpanel .bpk.on{border-color:#1B8A5A;background:#EEF8F1}
+.bestpanel .bpk .bav{width:40px;height:40px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;background:linear-gradient(135deg,#5B2E8C,#1FA79A)}
+.bestpanel .bpk .tx{flex:1;min-width:0}.bestpanel .bpk .tx b{font-size:14px}.bestpanel .bpk .tx small{display:block;color:var(--muted);font-size:11.5px}
+.bestpanel .bpk .set{flex:0 0 auto;background:#5B2E8C;color:#fff;border-radius:10px;padding:7px 13px;font-size:12.5px;font-weight:800}
+.bestpanel .bpk.on .set{background:#1B8A5A}
+`;document.head.appendChild(st2);
 })();

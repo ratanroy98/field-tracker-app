@@ -211,7 +211,7 @@ function startStrip(){if(isMgr()||!field()||(U.checkinToday&&U.checkinToday()))r
   return h('div',{style:'display:flex;align-items:center;gap:11px;border-radius:16px;padding:13px 15px;margin:4px 0 12px;color:#2B2000;background:linear-gradient(135deg,#F6D776,#F5C451);box-shadow:0 8px 20px rgba(245,196,81,.35);cursor:pointer;animation:rise .3s ease both',onclick:function(){U.doCheckin&&U.doCheckin()}},h('span',{style:'font-size:20px'},'📍'),h('div',{style:'flex:1'},h('b',{style:'font-size:15px'},'Start my day'),h('small',{style:'display:block;opacity:.82'},'Confirm today\'s brick & selfie')),h('span',{style:'font-weight:800'},'›'))}
 function todayMgr(app){var keep=[app.querySelector('.fthead')];var team=U.teamPanel?U.teamPanel():null,share=[].slice.call(app.querySelectorAll('.tdone'))[0];
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
-  [team,(U.relayPanel&&U.relayPanel())||null,share,quoteLine()].forEach(function(n){if(n)app.append(n)})}
+  [team,(U.bestPanel&&U.bestPanel())||null,(U.relayPanel&&U.relayPanel())||null,share,quoteLine()].forEach(function(n){if(n)app.append(n)})}
 
 /* ---------- manager routes ---------- */
 U.routes.approve=function(app){var p=U.pendingPlans?U.pendingPlans():null;var ca=U.campaignApprovals?U.campaignApprovals():null;var any=(p&&p.children.length)||ca;if(p&&p.children.length)app.append(p);if(ca)app.append(ca);if(!any)app.append(h('div',{class:'note'},'✅ Nothing waiting for your approval.'));
