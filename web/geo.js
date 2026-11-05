@@ -540,20 +540,27 @@ U.routes.inc=function(app){try{if(S.mgr&&!S.viewAs){app.append(h('div',{class:'n
   app.append(h('div',{class:'seg3'},tabs.map(function(x){return h('button',{class:x[0]===incTab()?'on':'',onclick:function(){S.tab=S.tab||{};S.tab.inc=x[0];render()}},x[1])})));
   var t=incTab();
   if(t==='m'){var o=agg(R0,'tm'),pot=novPot(o),e=earnOf(o,'m'),nb=nextBand(o,'m'),ach=(mp&&mp.total&&mp.total.tgt)?P(mp.total.ach,mp.total.tgt):e.ach;
+    var ms=(e.pcpm>=10?6000:4000);
     app.append(incHero('This month',ach,pot?'up to '+R(pot.p110):'—'));
-    app.append(h('div',{class:'inccard'},h('h4',{},'What you can earn'),pot?h('p',{},R(pot.p100)+' at 100% · '+R(pot.p110)+' at 110%'):h('p',{},'Set once your target is loaded.'),
-      h('h4',{},'Keep these to qualify'),critList([['Achievement ≥ 97% of target',ach!=null&&ach>=97],['Positive growth vs last year',e.g>0],['Saleable returns ≤ 3%',true],['All 4 Impact brands on track',true]]),
+    app.append(h('div',{class:'inccard'},h('h4',{},'What you can earn'),pot?h('p',{},R(pot.p100)+' at 100% · '+R(pot.p110)+' at 110% (on net sales, by your PCPM slab)'):h('p',{},'Set once your target is loaded.'),
+      h('p',{style:'margin-top:4px'},'➕ Milestone bonus '+R(ms)+' — on reaching 40% by the 2nd milestone, once you cross 100%.'),
+      h('h4',{},'Keep these to qualify'),critList([['Achievement ≥ 97% of target',ach!=null&&ach>=97],['Positive growth vs last year',e.g>0],['Saleable returns ≤ 3%',true],['Outlet coverage ≥ 90% · HCP ≥ 95%',true],['Next month ≥ 95%',true]]),
       h('h4',{},'To reach it'),h('p',{class:'todo'},nb?('Add about '+R(nb.need)+' more net sale to hit '+nb.at+'%.'):'You are at the top band — hold it to month-end.')));
   } else if(t==='q'){var q=agg(R0,'Q4'),eq=earnOf(q,'q'),nbq=nextBand(q,'q'),qa=P(q[2],q[1]);
-    app.append(incHero('The quarter (Q4)',qa,eq.locked?'Locked — '+eq.why:R(eq.amt)));
+    app.append(incHero('The quarter',qa,eq.locked?'Locked — '+eq.why:R(eq.amt)));
     app.append(h('div',{class:'inccard'},h('h4',{},'Quarter incentive'),h('p',{},eq.locked?'Unlocks at ≥97% achievement with positive growth.':'At '+pf(qa)+' and rate '+eq.rate+'%, you earn '+R(eq.amt)+' this quarter.'),
-      h('h4',{},'Keep these to qualify'),critList([['Quarter achievement ≥ 97%',qa!=null&&qa>=97],['Positive growth vs last year',eq.g>0],['Saleable returns ≤ 3%',true]]),
+      h('h4',{},'Keep these to qualify'),critList([['Quarter achievement ≥ 97%',qa!=null&&qa>=97],['Positive quarterly growth vs last year',eq.g>0],['Next month ≥ 95%',true],['No payment outstanding over 30 days',true]]),
       h('h4',{},'To reach it'),h('p',{class:'todo'},nbq?('Add about '+R(nbq.need)+' more net sale to hit '+nbq.at+'% for the quarter.'):'You are at the top quarterly band — protect it.')));
-  } else {var gate=impactGate(DA,'tm');
-    app.append(incHero('Special · Impact +25%',gate.comb,gate.ok?'On track ✓':'Not yet'));
-    app.append(h('div',{class:'inccard'},h('h4',{},'The +25% Impact bonus'),h('p',{},'A 25% top-up on your incentive when all four Impact brands are healthy together this month.'),
-      h('h4',{},'Where you stand'),h('p',{},'Combined Impact achievement '+pf(gate.comb)+'.'),
-      gate.weak.length?h('div',{},h('h4',{},'Close these gaps'),critList(gate.weak.map(function(w){return [w.b+' — add '+L(w.gap)+' to reach 90%',false]}))):h('p',{class:'todo'},'All Impact brands are at/above the mark — keep them there to lock the bonus.')));
+  } else {
+    var qa2=agg(R0,'Q4'),overall=P(qa2[2],qa2[1]),ct=0,cs=0,weak=[],allOk=true;
+    DA.impact.forEach(function(b){var a=agg(DA.rows(b),'Q4');if(!a)return;ct+=a[1];cs+=a[2];var ap=P(a[2],a[1]);if(ap==null||ap<90){allOk=false;weak.push({b:b,gap:Math.max(0,a[1]*0.9-a[2])})}});
+    var comb=P(cs,ct),qInc=earnOf(qa2,'q').amt,pct=(overall!=null&&overall>=100&&allOk)?(comb>=105?25:comb>=100?20:comb>=97?15:0):0,award=qInc*pct/100;
+    app.append(incHero('Impact brand award',comb,pct?('+'+pct+'% = '+R(award)):'Not yet'));
+    app.append(h('div',{class:'inccard'},h('h4',{},'The Impact brand award'),h('p',{},'A top-up on your quarterly incentive when the 4 Impact brands (Deca Durabolin, Dexona, Skinlite, R-Loc) perform together: combined ≥105% → +25%, ≥100% → +20%, ≥97% → +15%.'),
+      h('h4',{},'Gates'),critList([['Overall quarter achievement ≥ 100%',overall!=null&&overall>=100],['Each Impact brand ≥ 90%',allOk],['Combined Impact ≥ 97%',comb!=null&&comb>=97]]),
+      h('h4',{},'Where you stand'),h('p',{},'Combined Impact '+pf(comb)+' · overall '+pf(overall)+(pct?(' → +'+pct+'% ('+R(award)+')'):'')+'.'),
+      weak.length?h('div',{},h('h4',{},'Close these gaps'),critList(weak.map(function(w){return [w.b+' — add '+L(w.gap)+' to reach 90%',false]}))):''));
   }
+  app.append(h('p',{style:'font-size:11px;color:var(--muted);text-align:center;margin-top:4px'},'Also running: Half-yearly, New-joiner, Productivity & Star Awards. Yearly cap ₹12,00,000.'));
 }catch(e){app.append(h('div',{class:'note'},'Could not open incentive: '+e.message))}};
 })();
