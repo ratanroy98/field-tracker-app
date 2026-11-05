@@ -312,8 +312,12 @@ function brandView(app,route){try{if(isMgr()){app.append(h('div',{class:'note'},
   var items=brandItems(brand);
   if(!items.length){app.append(h('div',{class:'coachc'},h('p',{},'No '+brand+' inputs tracked yet — they appear after a Sync.')));return}
   S.tab=S.tab||{};var key='binput_'+route;if(!S.tab[key]||items.indexOf(S.tab[key])<0)S.tab[key]=items[0];
-  app.append(h('div',{class:'subtabs l2'},items.map(function(it){return h('button',{class:it===S.tab[key]?'on':'',onclick:function(){S.tab[key]=it;try{render()}catch(e){}}},shortItem(it))})));
-  renderInput(app,brand,S.tab[key],route);
+  // The input you tap stays open and highlighted — switching is done in place (no full redraw), so the row never jumps back to the first input.
+  var detail=h('div');
+  var btns=items.map(function(it){var btn=h('button',{class:it===S.tab[key]?'on':'',onclick:function(){S.tab[key]=it;btns.forEach(function(bb,ii){bb.classList.toggle('on',items[ii]===it)});detail.innerHTML='';renderInput(detail,brand,it,route);try{btn.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}}},shortItem(it));return btn});
+  app.append(h('div',{class:'subtabs l2'},btns));
+  app.append(detail);
+  renderInput(detail,brand,S.tab[key],route);
 }catch(e){app.append(h('div',{class:'note'},'Could not open brand: '+e.message))}}
 U.brandView=brandView;U._itemCamp=itemCamp;U._pickCands=pickCands;
 ['raft','deca','rloc','skin','dexona'].forEach(function(k){U.routes[k]=function(app){brandView(app,k)}});

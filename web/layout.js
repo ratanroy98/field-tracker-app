@@ -253,6 +253,7 @@ var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(doc
     // replace the old sub-tab row on Work screens
     if(t==='work'&&BRANDR[r]){U.lsSet('ft_work',r);var old=app.querySelector('.fthead~.subtabs');if(old&&old.textContent.indexOf('Raft')>=0&&!old.classList.contains('l2'))old.remove();
       var rows=workTabs(r),after=hd;rows.forEach(function(x){after.after(x);after=x});
+      setTimeout(function(){try{var on=app.querySelector('.subtabs:not(.l2) .on');if(on)on.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}},0);
       var ss=startStrip();if(ss)after.after(ss);
       // Morning: auto-pop the brick confirmation once per day when the CSO opens Work (field day, not yet confirmed).
       try{if(field()&&U.checkinToday&&!U.checkinToday()){var kd='ft_brickpop_'+TODAY;if(U.lsGet&&U.lsGet(kd,'')!=='1'){U.lsSet(kd,'1');setTimeout(function(){try{U.doCheckin&&U.doCheckin()}catch(e){}},450)}}}catch(e){}
