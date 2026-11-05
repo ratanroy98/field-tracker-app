@@ -51,7 +51,7 @@ html,body{max-width:100vw;overflow-x:hidden}
 /* ---------- which tab each screen belongs to ---------- */
 var WORKR=['raft','deca','rloc','skin','dexona','pulse','pick','carry','photo','samples','stockists','stock','beat','tp'];
 function tabFor(r){if(isMgr()){if(r==='home'||r==='mgr')return'team';if(r==='approve')return'approve';if(r==='meet')return'meet';if(r==='geo'||r==='perf'||r==='mail')return'reports';if(r==='msgs'||r==='hof')return'me';if(r==='sell')return'sell';return'team'}
-  if(r==='home')return'today';if(r==='sell')return'sell';if(r==='learn')return'learn';if(r==='perf'||r==='msgs'||r==='hof')return'me';return'work'}
+  if(r==='home'||r==='inc'||r==='progress')return'today';if(r==='sell')return'sell';if(r==='learn')return'learn';if(r==='perf'||r==='msgs'||r==='hof')return'me';return'work'}
 function NAV(){return isMgr()?[['team','👥','Team',function(){go('home')}],['approve','✅','Approvals',function(){go('approve')}],['meet','📅','Meetings',function(){go('meet')}],['reports','📈','Reports',function(){go('geo')}],['me','👤','Me',function(){go(U.lsGet('ft_me','msgs'))}]]
   :[['today','🏠','Today',function(){go('home')}],['work','💼','Work',function(){go(U.lsGet('ft_work','raft'))}],['sell','🛒','Sell',function(){go('sell')}],['learn','🎓','Learn',function(){go('learn')}],['me','👤','Me',function(){go(U.lsGet('ft_me','perf'))}]]}
 function nav(r){var cur=tabFor(r),pend=0,appr=0;
@@ -64,7 +64,7 @@ function tabs(list,cur,cls){return h('div',{class:'subtabs'+(cls?' '+cls:'')},li
 function workTabs(r){var B=[['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['pulse','💉 Pulse']];
   return[tabs(B.map(function(x){return[x[0],x[1],function(){go(x[0])}]}),r)]}
 var BRANDR={raft:1,deca:1,rloc:1,skin:1,dexona:1,pulse:1};
-function meTabs(r){var L=isMgr()?[['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']]:[['perf','Progress'],['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']];
+function meTabs(r){var L=isMgr()?[['msgs','Messages'],['set','Settings']]:[['perf','Progress'],['msgs','Messages'],['set','Settings']];
   return tabs(L.map(function(x){return[x[0],x[1],function(){if(x[0]==='set'){U.settings&&U.settings();return}U.lsSet('ft_me',x[0]);go(x[0])}]}),r)}
 
 /* ---------- top bar: name · Sync · Messages · Settings ---------- */
@@ -200,16 +200,19 @@ function workStatus(app,r){
 U.workStatus=workStatus;
 ['raft','deca','rloc','skin','dexona'].forEach(function(k){U.routes[k]=function(app){workStatus(app,k)}});
 
-function todayCSO(app){var keep=[app.querySelector('.fthead')],hero=app.querySelector('.hero'),meets=[].slice.call(app.querySelectorAll('.meet')),hof=app.querySelector('.hof'),ob=[].slice.call(app.querySelectorAll('.note')).filter(function(n){return /saved on your phone/.test(n.textContent)})[0],nav0=app.querySelector('.bnav');
-  var pend=U.nagList().length;
+/* CSO dashboard — one clean, non-scrolling screen: Updates (meeting/manager info + daily quote) · Yesterday's best field work · Incentive · Progress.
+   The daily brick confirmation is an auto-popping sheet (not a dashboard card); a slim "Start my day" strip stays until it's done. */
+function todayCSO(app){var keep=[app.querySelector('.fthead')];
+  var field0=field(),ci=!!(U.checkinToday&&U.checkinToday());
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
-  var u=updBanner(),list=[u,hof,(U.progressCard&&U.progressCard())||"",nextCard(app),hero,(U.carryCard&&U.carryCard())||"",(U.earnCard&&U.earnCard())||"",meets,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_work','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',quoteLine()];
-  [].concat.apply([],list).forEach(function(n){if(n)app.append(n)});
-  // Morning: greet the CSO with the brick confirmation on open (field day, not yet confirmed, once per day).
-  try{if(field()&&U.checkinToday&&!U.checkinToday()){var kd='ft_brickpop_'+TODAY;if(U.lsGet&&U.lsGet(kd,'')!=='1'){U.lsSet(kd,'1');setTimeout(function(){try{var c=app.querySelector('.hero .ci');if(c)c.click()}catch(e){}},350)}}}catch(e){}}
-function todayMgr(app){var keep=[app.querySelector('.fthead')];var team=U.teamPanel?U.teamPanel():null,share=[].slice.call(app.querySelectorAll('.tdone'))[0],hof=app.querySelector('.hof');
+  var strip=(field0&&!ci)?h('div',{style:'display:flex;align-items:center;gap:11px;border-radius:16px;padding:13px 15px;margin:0 0 11px;color:#2B2000;background:linear-gradient(135deg,#F6D776,#F5C451);box-shadow:0 8px 20px rgba(245,196,81,.35);cursor:pointer;animation:rise .3s ease both',onclick:function(){U.doCheckin&&U.doCheckin()}},h('span',{style:'font-size:20px'},'📍'),h('div',{style:'flex:1'},h('b',{style:'font-size:15px'},'Start my day'),h('small',{style:'display:block;opacity:.82'},'Confirm today\'s brick & selfie')),h('span',{style:'font-weight:800'},'›')):'';
+  var list=[strip,(U.updatesCard&&U.updatesCard())||'',(U.bestCard&&U.bestCard())||'',(U.incCard&&U.incCard())||'',(U.progressCard&&U.progressCard())||''];
+  list.forEach(function(n){if(n)app.append(n)});
+  // Morning: auto-pop the brick confirmation once per day on open (field day, not yet confirmed).
+  try{if(field0&&!ci){var kd='ft_brickpop_'+TODAY;if(U.lsGet&&U.lsGet(kd,'')!=='1'){U.lsSet(kd,'1');setTimeout(function(){try{U.doCheckin&&U.doCheckin()}catch(e){}},450)}}}catch(e){}}
+function todayMgr(app){var keep=[app.querySelector('.fthead')];var team=U.teamPanel?U.teamPanel():null,share=[].slice.call(app.querySelectorAll('.tdone'))[0];
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
-  [team,(U.relayPanel&&U.relayPanel())||null,share,hof,quoteLine()].forEach(function(n){if(n)app.append(n)})}
+  [team,(U.relayPanel&&U.relayPanel())||null,share,quoteLine()].forEach(function(n){if(n)app.append(n)})}
 
 /* ---------- manager routes ---------- */
 U.routes.approve=function(app){var p=U.pendingPlans?U.pendingPlans():null;var ca=U.campaignApprovals?U.campaignApprovals():null;var any=(p&&p.children.length)||ca;if(p&&p.children.length)app.append(p);if(ca)app.append(ca);if(!any)app.append(h('div',{class:'note'},'✅ Nothing waiting for your approval.'));
@@ -263,6 +266,8 @@ var DEEP={
   brands:function(){go('brands')},
   primary:function(){go('primary')},
   shakti:function(){go('shakti')},
+  inc:function(){go('inc')},
+  progress:function(){go('progress')},
   pulse:function(){go('pulse')},
   samples:function(){go('samples')},
   stock:function(){go('stock')},

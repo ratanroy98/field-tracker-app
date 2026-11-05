@@ -1,4 +1,4 @@
-window.FT_BUILD='20261104152054';
+window.FT_BUILD='20261105102118';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -1556,6 +1556,7 @@ function getLoc(cb){var doneF=false;function fin(v){if(doneF)return;doneF=true;c
   if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(p){fin({lat:p.coords.latitude,lng:p.coords.longitude,acc:Math.round(p.coords.accuracy)})},function(){fin(null)},{enableHighAccuracy:true,timeout:9000,maximumAge:60000});setTimeout(function(){fin(null)},10000)}else fin(null)}
 function doCheckin(btn){if(checkinToday()){toast(w('checked'));return}if(isMgr()){toast('Pick a CSO with "View as" first.');return}
   if(U.beforeCheckin&&!(btn&&btn.__go)){U.beforeCheckin(function(extra){if(btn)btn.__go=1;doCheckin2(btn,extra||{})});return}doCheckin2(btn,{})}
+U.doCheckin=function(){doCheckin(null)};
 function doCheckin2(btn,extra){
   if(btn){btn.textContent='📍 '+w('locating');btn.disabled=true}
   getLoc(function(l){var tm=new Date().toTimeString().slice(0,5);var f=Object.assign({time:tm,brick:(typeof brickToday==='function'&&brickToday())||''},extra||{});if(l){f.lat=l.lat;f.lng=l.lng;f.acc=l.acc}
@@ -2325,7 +2326,7 @@ html,body{max-width:100vw;overflow-x:hidden}
 /* ---------- which tab each screen belongs to ---------- */
 var WORKR=['raft','deca','rloc','skin','dexona','pulse','pick','carry','photo','samples','stockists','stock','beat','tp'];
 function tabFor(r){if(isMgr()){if(r==='home'||r==='mgr')return'team';if(r==='approve')return'approve';if(r==='meet')return'meet';if(r==='geo'||r==='perf'||r==='mail')return'reports';if(r==='msgs'||r==='hof')return'me';if(r==='sell')return'sell';return'team'}
-  if(r==='home')return'today';if(r==='sell')return'sell';if(r==='learn')return'learn';if(r==='perf'||r==='msgs'||r==='hof')return'me';return'work'}
+  if(r==='home'||r==='inc'||r==='progress')return'today';if(r==='sell')return'sell';if(r==='learn')return'learn';if(r==='perf'||r==='msgs'||r==='hof')return'me';return'work'}
 function NAV(){return isMgr()?[['team','👥','Team',function(){go('home')}],['approve','✅','Approvals',function(){go('approve')}],['meet','📅','Meetings',function(){go('meet')}],['reports','📈','Reports',function(){go('geo')}],['me','👤','Me',function(){go(U.lsGet('ft_me','msgs'))}]]
   :[['today','🏠','Today',function(){go('home')}],['work','💼','Work',function(){go(U.lsGet('ft_work','raft'))}],['sell','🛒','Sell',function(){go('sell')}],['learn','🎓','Learn',function(){go('learn')}],['me','👤','Me',function(){go(U.lsGet('ft_me','perf'))}]]}
 function nav(r){var cur=tabFor(r),pend=0,appr=0;
@@ -2338,7 +2339,7 @@ function tabs(list,cur,cls){return h('div',{class:'subtabs'+(cls?' '+cls:'')},li
 function workTabs(r){var B=[['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['pulse','💉 Pulse']];
   return[tabs(B.map(function(x){return[x[0],x[1],function(){go(x[0])}]}),r)]}
 var BRANDR={raft:1,deca:1,rloc:1,skin:1,dexona:1,pulse:1};
-function meTabs(r){var L=isMgr()?[['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']]:[['perf','Progress'],['msgs','Messages'],['hof','Hall of Fame'],['set','Settings']];
+function meTabs(r){var L=isMgr()?[['msgs','Messages'],['set','Settings']]:[['perf','Progress'],['msgs','Messages'],['set','Settings']];
   return tabs(L.map(function(x){return[x[0],x[1],function(){if(x[0]==='set'){U.settings&&U.settings();return}U.lsSet('ft_me',x[0]);go(x[0])}]}),r)}
 
 /* ---------- top bar: name · Sync · Messages · Settings ---------- */
@@ -2474,16 +2475,19 @@ function workStatus(app,r){
 U.workStatus=workStatus;
 ['raft','deca','rloc','skin','dexona'].forEach(function(k){U.routes[k]=function(app){workStatus(app,k)}});
 
-function todayCSO(app){var keep=[app.querySelector('.fthead')],hero=app.querySelector('.hero'),meets=[].slice.call(app.querySelectorAll('.meet')),hof=app.querySelector('.hof'),ob=[].slice.call(app.querySelectorAll('.note')).filter(function(n){return /saved on your phone/.test(n.textContent)})[0],nav0=app.querySelector('.bnav');
-  var pend=U.nagList().length;
+/* CSO dashboard — one clean, non-scrolling screen: Updates (meeting/manager info + daily quote) · Yesterday's best field work · Incentive · Progress.
+   The daily brick confirmation is an auto-popping sheet (not a dashboard card); a slim "Start my day" strip stays until it's done. */
+function todayCSO(app){var keep=[app.querySelector('.fthead')];
+  var field0=field(),ci=!!(U.checkinToday&&U.checkinToday());
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
-  var u=updBanner(),list=[u,hof,(U.progressCard&&U.progressCard())||"",nextCard(app),hero,(U.carryCard&&U.carryCard())||"",(U.earnCard&&U.earnCard())||"",meets,pend?h('div',{class:'tline',onclick:function(){go(U.lsGet('ft_work','raft'))}},'📋',h('div',{},h('b',{},pend+' task'+(pend>1?'s':'')+' pending'),h('small',{style:'display:block;color:var(--muted)'},'Open Work to finish them')),h('span',{class:'go'},'›')):'',quoteLine()];
-  [].concat.apply([],list).forEach(function(n){if(n)app.append(n)});
-  // Morning: greet the CSO with the brick confirmation on open (field day, not yet confirmed, once per day).
-  try{if(field()&&U.checkinToday&&!U.checkinToday()){var kd='ft_brickpop_'+TODAY;if(U.lsGet&&U.lsGet(kd,'')!=='1'){U.lsSet(kd,'1');setTimeout(function(){try{var c=app.querySelector('.hero .ci');if(c)c.click()}catch(e){}},350)}}}catch(e){}}
-function todayMgr(app){var keep=[app.querySelector('.fthead')];var team=U.teamPanel?U.teamPanel():null,share=[].slice.call(app.querySelectorAll('.tdone'))[0],hof=app.querySelector('.hof');
+  var strip=(field0&&!ci)?h('div',{style:'display:flex;align-items:center;gap:11px;border-radius:16px;padding:13px 15px;margin:0 0 11px;color:#2B2000;background:linear-gradient(135deg,#F6D776,#F5C451);box-shadow:0 8px 20px rgba(245,196,81,.35);cursor:pointer;animation:rise .3s ease both',onclick:function(){U.doCheckin&&U.doCheckin()}},h('span',{style:'font-size:20px'},'📍'),h('div',{style:'flex:1'},h('b',{style:'font-size:15px'},'Start my day'),h('small',{style:'display:block;opacity:.82'},'Confirm today\'s brick & selfie')),h('span',{style:'font-weight:800'},'›')):'';
+  var list=[strip,(U.updatesCard&&U.updatesCard())||'',(U.bestCard&&U.bestCard())||'',(U.incCard&&U.incCard())||'',(U.progressCard&&U.progressCard())||''];
+  list.forEach(function(n){if(n)app.append(n)});
+  // Morning: auto-pop the brick confirmation once per day on open (field day, not yet confirmed).
+  try{if(field0&&!ci){var kd='ft_brickpop_'+TODAY;if(U.lsGet&&U.lsGet(kd,'')!=='1'){U.lsSet(kd,'1');setTimeout(function(){try{U.doCheckin&&U.doCheckin()}catch(e){}},450)}}}catch(e){}}
+function todayMgr(app){var keep=[app.querySelector('.fthead')];var team=U.teamPanel?U.teamPanel():null,share=[].slice.call(app.querySelectorAll('.tdone'))[0];
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
-  [team,(U.relayPanel&&U.relayPanel())||null,share,hof,quoteLine()].forEach(function(n){if(n)app.append(n)})}
+  [team,(U.relayPanel&&U.relayPanel())||null,share,quoteLine()].forEach(function(n){if(n)app.append(n)})}
 
 /* ---------- manager routes ---------- */
 U.routes.approve=function(app){var p=U.pendingPlans?U.pendingPlans():null;var ca=U.campaignApprovals?U.campaignApprovals():null;var any=(p&&p.children.length)||ca;if(p&&p.children.length)app.append(p);if(ca)app.append(ca);if(!any)app.append(h('div',{class:'note'},'✅ Nothing waiting for your approval.'));
@@ -2537,6 +2541,8 @@ var DEEP={
   brands:function(){go('brands')},
   primary:function(){go('primary')},
   shakti:function(){go('shakti')},
+  inc:function(){go('inc')},
+  progress:function(){go('progress')},
   pulse:function(){go('pulse')},
   samples:function(){go('samples')},
   stock:function(){go('stock')},
@@ -3336,21 +3342,84 @@ U.earnCard=function(){try{var DA=mkDA(true);if(!DA)return'';var oh=DA.onhold()||
     h('p',{},R(pot.p100)+' at 100% · '+R(pot.p110)+' at 110% — plus Q4 & the 25% impact bonus. '+tag+'. Tap ›')));
 }catch(e){return''}};
 
-/* Progress card for the CSO dashboard: Impact brands, then NPDs, then Others clubbed — Target + Closing stock (closing from Ratan's backend upload) */
-function pLak(v){return v==null?'—':'₹'+(v/1e5).toFixed(2)+'L'}
-U.progressCard=function(){try{if(S.mgr&&!S.viewAs)return'';var hq=csoHQ();if(!hq)return'';var mp=(S.feeds||{})['mprog_'+hq];
-  var open=function(){try{S.tab=S.tab||{};S.tab.perf='brands';S.tab.geo_T='mp'}catch(e){}go('perf')};
-  if(!mp)return h('div',{class:'coachc',style:'cursor:pointer',onclick:open},h('div',{class:'k'},'📈 Progress'),h('p',{},'Your month progress — Impact brands, NPDs and others with target and closing stock — appears right after a Sync. Tap to open.'));
-  var box=h('div',{class:'coachc',style:'cursor:pointer',onclick:open},h('div',{class:'k'},'📈 Progress · '+(mp.month||'')+(mp.asOf?' · '+mp.asOf:'')));
-  (mp.groups||[]).forEach(function(g){var nm=(g.name||'').toLowerCase();
-    if(nm.indexOf('other')>=0){var tg=0,cl=0,hascl=false;(g.rows||[]).forEach(function(r){tg+=(r.tgt||0);if(r.cl!=null){cl+=r.cl;hascl=true}});
-      box.append(h('p',{style:'margin:7px 0 0;font-size:13px'},h('b',{},'Others'),' — Tgt '+pLak(tg)+' · Closing '+(hascl?pLak(cl):'—')));
-    }else{box.append(h('p',{style:'margin:8px 0 2px;font-weight:800;color:var(--accent,#0F5257);font-size:12px;letter-spacing:.3px'},(g.name||'').toUpperCase()));
-      (g.rows||[]).forEach(function(r){box.append(h('p',{style:'margin:2px 0;font-size:13px'},r.b+' — Tgt '+pLak(r.tgt)+' · Closing '+(r.cl!=null?pLak(r.cl):'—')))});}
-  });
-  box.append(h('p',{style:'margin-top:8px;font-size:11.5px;color:var(--muted)'},'Closing stock is loaded from the backend. Tap for full month progress.'));
-  return box;
+/* ============================ CSO DASHBOARD: Progress + Incentive ============================ */
+function pLak(v){return v==null?'—':(v<0?'–₹':'₹')+(Math.abs(v)/1e5).toFixed(2)+'L'}
+function perfCls(p){return p==null?'':p>=100?'g':p>=90?'a':'r'}
+function mprog(){try{var hq=csoHQ();return hq?(S.feeds||{})['mprog_'+hq]:null}catch(e){return null}}
+/* order groups Impact → NPD → Others, and flatten rows with their group */
+function mpGroups(mp){var out={impact:[],npd:[],other:[]};(mp.groups||[]).forEach(function(g){var nm=(g.name||'').toLowerCase();var k=nm.indexOf('impact')>=0?'impact':nm.indexOf('npd')>=0?'npd':'other';(g.rows||[]).forEach(function(r){out[k].push(r)})});return out}
+
+/* Dashboard Progress card — overall strip (Target/Closing/POB/Ach + %) + a compact per-brand performance bar for every Impact brand, every NPD and Others. Full Target/Close/POB/Ach table is one tap away. */
+U.progressCard=function(){try{if(S.mgr&&!S.viewAs)return'';var mp=mprog();
+  var open=function(){go('progress')};
+  if(!mp)return h('div',{class:'dcard prog',onclick:open},h('div',{class:'dh'},h('b',{},'📈 Progress'),h('span',{class:'arr'},'›')),h('p',{class:'dhint'},'Your brand-wise progress — Target, Closing, POB, Achievement and Performance — appears right after a Sync.'));
+  var G=mpGroups(mp),T=mp.total||{},tp=T.perf!=null?T.perf:P(T.ach,T.tgt);
+  var card=h('div',{class:'dcard prog',onclick:open},h('div',{class:'dh'},h('b',{},'📈 Progress'),h('span',{class:'sub'},(mp.month||'')+(mp.asOf?' · '+mp.asOf:'')),h('span',{class:'arr'},'›')));
+  card.append(h('div',{class:'ovr'},h('div',{class:'op '+perfCls(tp)},pf(tp)),
+    h('div',{class:'ogrid'},h('span',{},'Tgt ',h('b',{},pLak(T.tgt))),h('span',{},'Close ',h('b',{},pLak(T.cl))),h('span',{},'POB ',h('b',{},pLak(T.pob))),h('span',{},'Ach ',h('b',{},pLak(T.ach))))));
+  function line(label,r){var perf=r.perf!=null?r.perf:P(r.ach,r.tgt);
+    card.append(h('div',{class:'pln'},h('span',{class:'nm'},label),h('span',{class:'ba'},h('i',{class:perfCls(perf),style:'width:'+Math.max(2,Math.min(100,perf||0))+'%'})),h('span',{class:'pc '+perfCls(perf)},pf(perf))))}
+  if(G.impact.length){card.append(h('div',{class:'glbl'},'IMPACT'));G.impact.forEach(function(r){line(r.b,r)})}
+  if(G.npd.length){card.append(h('div',{class:'glbl'},'NPD'));G.npd.forEach(function(r){line(r.b,r)})}
+  if(G.other.length){var t={tgt:0,cl:null,pob:null,ach:null};G.other.forEach(function(r){t.tgt+=r.tgt||0;if(r.cl!=null)t.cl=(t.cl||0)+r.cl;if(r.pob!=null)t.pob=(t.pob||0)+r.pob;if(r.ach!=null)t.ach=(t.ach||0)+r.ach});card.append(h('div',{class:'glbl'},'OTHERS'));line('Others',t)}
+  card.append(h('div',{class:'tapfull'},'Tap for Target · Closing · POB · Balance per brand ›'));
+  return card;
 }catch(e){return''}};
+
+/* Full Progress screen — one beautiful card per brand with Target / Closing / POB / Ach + Balance / Performance */
+U.routes.progress=function(app){try{if(S.mgr&&!S.viewAs){app.append(h('div',{class:'note'},'Progress is the CSO\'s screen.'));return}
+  var mp=mprog();
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📈 Month progress'+(mp&&mp.month?' · '+mp.month:'')),h('p',{},'Target & achievement are brand-wise from frontline, POB from Ventasys, and closing stock is computed from your stock statements — it falls as POB rises.')));
+  if(!mp){app.append(h('div',{class:'coachc',style:'background:var(--soft,#F2F5F4);border-color:var(--line,#e5ece9)'},h('p',{style:'margin:0'},'Your month progress appears here right after a Sync.')));return}
+  var G=mpGroups(mp);
+  function brandCard(r){var perf=r.perf!=null?r.perf:P(r.ach,r.tgt),bal=(r.tgt!=null&&r.ach!=null)?(r.tgt-r.ach):null;
+    var rows=[['Target',pLak(r.tgt),''],['Closing',pLak(r.cl),'muted'],['POB',pLak(r.pob),'pob'],['Ach',pLak(r.ach),'ach']];
+    var card=h('div',{class:'brcard'},h('div',{class:'bh'},h('b',{},r.b),h('span',{class:'bp '+perfCls(perf)},pf(perf))));
+    rows.forEach(function(x){card.append(h('div',{class:'brl'},h('span',{},x[0]),h('b',{class:x[2]},x[1])))});
+    if(bal!=null)card.append(h('div',{class:'brl bal'},h('span',{},'Balance to do'),h('b',{class:bal>0?'r':'g'},bal>0?pLak(bal):'Done ✓')));
+    card.append(h('div',{class:'pbar'},h('i',{class:perfCls(perf),style:'width:'+Math.max(2,Math.min(100,perf||0))+'%'})));
+    return card}
+  function section(title,arr){if(!arr.length)return;app.append(h('div',{class:'psec'},title));arr.forEach(function(r){app.append(brandCard(r))})}
+  section('IMPACT BRANDS',G.impact);
+  section('NPD',G.npd);
+  if(G.other.length){var t={b:'Others (clubbed)',tgt:0,cl:null,pob:null,ach:null};G.other.forEach(function(r){t.tgt+=r.tgt||0;if(r.cl!=null)t.cl=(t.cl||0)+r.cl;if(r.pob!=null)t.pob=(t.pob||0)+r.pob;if(r.ach!=null)t.ach=(t.ach||0)+r.ach});app.append(h('div',{class:'psec'},'OTHERS'));app.append(brandCard(t))}
+}catch(e){app.append(h('div',{class:'note'},'Could not open progress: '+e.message))}};
+
+/* ---------- Incentive: compact dashboard card + 3-tab screen (This month / The quarter / Special) ---------- */
+function novPotLocal(o){return novPot(o)}
+U.incCard=function(){try{if(S.mgr&&!S.viewAs)return'';var DA=mkDA(true);if(!DA)return h('div',{class:'dcard inc',onclick:function(){go('inc')}},h('div',{class:'dh'},h('b',{},'💰 Incentive'),h('span',{class:'arr'},'›')),h('p',{class:'dhint'},'Appears after a Sync.'));
+  var R=DA.rows('ALL'),o=agg(R,'tm'),pot=novPot(o),mp=mprog(),ach=(mp&&mp.total&&mp.total.tgt)?P(mp.total.ach,mp.total.tgt):P(o[2],o[1]);
+  return h('div',{class:'dcard inc',onclick:function(){go('inc')}},
+    h('div',{class:'dh'},h('b',{},'💰 Incentive'),h('span',{class:'arr'},'›')),
+    h('div',{class:'incrow'},h('div',{},h('small',{},'You can earn'),h('div',{class:'amt'},pot?'up to '+R2(pot.p110):'—')),h('div',{class:'r'},h('small',{},'This month'),h('div',{class:'ap '+perfCls(ach)},pf(ach)))));
+}catch(e){return''}};
+function R2(v){return R(v)}
+function incTab(){return (S.tab&&S.tab.inc)||'m'}
+function critList(items){return h('ul',{class:'crit'},items.map(function(x){return h('li',{class:x[1]?'ok':'no'},x[0])}))}
+function incHero(label,ach,earn){return h('div',{class:'inchero'},ring(ach==null?0:ach,78),h('div',{},h('small',{},label),h('div',{class:'amt'},earn),h('small',{class:'ap '+perfCls(ach)},'Achievement '+pf(ach))))}
+U.routes.inc=function(app){try{if(S.mgr&&!S.viewAs){app.append(h('div',{class:'note'},'Incentive is the CSO\'s screen.'));return}
+  var DA=mkDA(true);if(!DA){app.append(h('div',{class:'coachc'},h('p',{},'Your incentive details appear right after a Sync.')));return}
+  var R0=DA.rows('ALL'),mp=mprog();
+  var tabs=[['m','This month'],['q','The quarter'],['sp','Special']];
+  app.append(h('div',{class:'seg3'},tabs.map(function(x){return h('button',{class:x[0]===incTab()?'on':'',onclick:function(){S.tab=S.tab||{};S.tab.inc=x[0];render()}},x[1])})));
+  var t=incTab();
+  if(t==='m'){var o=agg(R0,'tm'),pot=novPot(o),e=earnOf(o,'m'),nb=nextBand(o,'m'),ach=(mp&&mp.total&&mp.total.tgt)?P(mp.total.ach,mp.total.tgt):e.ach;
+    app.append(incHero('This month',ach,pot?'up to '+R(pot.p110):'—'));
+    app.append(h('div',{class:'inccard'},h('h4',{},'What you can earn'),pot?h('p',{},R(pot.p100)+' at 100% · '+R(pot.p110)+' at 110%'):h('p',{},'Set once your target is loaded.'),
+      h('h4',{},'Keep these to qualify'),critList([['Achievement ≥ 97% of target',ach!=null&&ach>=97],['Positive growth vs last year',e.g>0],['Saleable returns ≤ 3%',true],['All 4 Impact brands on track',true]]),
+      h('h4',{},'To reach it'),h('p',{class:'todo'},nb?('Add about '+R(nb.need)+' more net sale to hit '+nb.at+'%.'):'You are at the top band — hold it to month-end.')));
+  } else if(t==='q'){var q=agg(R0,'Q4'),eq=earnOf(q,'q'),nbq=nextBand(q,'q'),qa=P(q[2],q[1]);
+    app.append(incHero('The quarter (Q4)',qa,eq.locked?'Locked — '+eq.why:R(eq.amt)));
+    app.append(h('div',{class:'inccard'},h('h4',{},'Quarter incentive'),h('p',{},eq.locked?'Unlocks at ≥97% achievement with positive growth.':'At '+pf(qa)+' and rate '+eq.rate+'%, you earn '+R(eq.amt)+' this quarter.'),
+      h('h4',{},'Keep these to qualify'),critList([['Quarter achievement ≥ 97%',qa!=null&&qa>=97],['Positive growth vs last year',eq.g>0],['Saleable returns ≤ 3%',true]]),
+      h('h4',{},'To reach it'),h('p',{class:'todo'},nbq?('Add about '+R(nbq.need)+' more net sale to hit '+nbq.at+'% for the quarter.'):'You are at the top quarterly band — protect it.')));
+  } else {var gate=impactGate(DA,'tm');
+    app.append(incHero('Special · Impact +25%',gate.comb,gate.ok?'On track ✓':'Not yet'));
+    app.append(h('div',{class:'inccard'},h('h4',{},'The +25% Impact bonus'),h('p',{},'A 25% top-up on your incentive when all four Impact brands are healthy together this month.'),
+      h('h4',{},'Where you stand'),h('p',{},'Combined Impact achievement '+pf(gate.comb)+'.'),
+      gate.weak.length?h('div',{},h('h4',{},'Close these gaps'),critList(gate.weak.map(function(w){return [w.b+' — add '+L(w.gap)+' to reach 90%',false]}))):h('p',{class:'todo'},'All Impact brands are at/above the mark — keep them there to lock the bonus.')));
+  }
+}catch(e){app.append(h('div',{class:'note'},'Could not open incentive: '+e.message))}};
 })();
 /* Field Tracker — campaign doctor selection, done brick-by-brick.
    As the CSO covers a brick, he tags that brick's doctors into campaigns (Deca injection, Deca core, R-Loc, Raft),
@@ -3821,4 +3890,145 @@ U.routes.primary=function(app){if(isMgr()){app.append(h('div',{class:'note'},'Pr
     box.append(h('div',{class:'tbl'},t));app.append(box);
   }else{app.append(h('div',{class:'coachc',style:'background:var(--soft,#F2F5F4);border-color:var(--line,#e5ece9)'},h('p',{style:'margin:0'},'Your stockist-wise primary plan appears here once Ratan uploads it. For now, work the three milestones above with each stockist.')));}
 };
+})();
+/* Field Tracker — CSO dashboard cards: Updates (meeting + manager info + daily quote, colours on new info),
+   Yesterday's best field work, and the styling for the Incentive & Progress cards. Loaded last. */
+(function(){
+'use strict';
+var U=window.FTUI;if(!U||!U.t)return;
+function isCSO(){return !(S.mgr&&!S.viewAs)}
+function myEmail2(){try{return (typeof myEmail==='function')?myEmail():((S.viewAs&&S.viewAs.Email)||(S.me&&S.me.Email)||'')}catch(e){return''}}
+
+var st=document.createElement('style');st.textContent=`
+/* shared dashboard card */
+.dcard{border-radius:18px;padding:14px;margin:0 0 11px;background:var(--card,#fff);border:1px solid var(--line,#e7edeb);box-shadow:0 6px 18px rgba(16,40,38,.06);animation:drise .34s ease both;cursor:pointer}
+@keyframes drise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.dcard .dh{display:flex;align-items:center;gap:8px}
+.dcard .dh b{font-size:15px}
+.dcard .dh .sub{font-size:11px;color:var(--muted);font-weight:600}
+.dcard .dh .arr{margin-left:auto;color:var(--muted);font-size:20px;line-height:1}
+.dcard .dhint{margin:7px 0 0;font-size:12.5px;color:var(--muted);line-height:1.45}
+/* Updates */
+.updc{background:linear-gradient(135deg,#F3F7FF,#FFFFFF);border-color:#DCE7FB}
+.updc.hasnew{border-color:#2F56C9;box-shadow:0 0 0 3px rgba(47,86,201,.14),0 8px 22px rgba(30,58,138,.12);animation:updpulse 1.8s ease-in-out infinite}
+@keyframes updpulse{50%{box-shadow:0 0 0 6px rgba(47,86,201,.08),0 8px 22px rgba(30,58,138,.12)}}
+.updc .nb{margin-left:auto;background:#E5484D;color:#fff;font-size:10px;font-weight:800;letter-spacing:.5px;border-radius:20px;padding:3px 9px;animation:updpulse 1.8s infinite}
+.updc .mgrmsg{margin:9px 0 0;padding:10px 12px;border-radius:12px;background:#Eef3ff;color:#1E3A8A;font-size:13px;line-height:1.5}
+.updc .mgrmsg b{display:block;font-size:11px;letter-spacing:.6px;text-transform:uppercase;margin-bottom:2px}
+.updc .meet{margin:10px 0 0}
+.updc .qline,.updc .qline2{margin:10px 0 0}
+.quoteln{margin:10px 0 0;padding:10px 12px;border-radius:12px;background:var(--soft,#F2F5F4);font-size:13px;line-height:1.5;font-style:italic;color:var(--fg,#214)}
+.quoteln small{font-style:normal;display:block;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--accent,#0F5257);font-weight:700;margin-bottom:3px}
+.updc .none{margin:8px 0 0;font-size:13px;color:#2b6a4a}
+.updc .updrow{display:flex;align-items:center;gap:10px;margin:9px 0 0;padding:9px 10px;border-radius:12px;background:#fff;border:1px solid #DCE7FB}
+.updc .updrow.msg{background:#F6F9FF}
+.updc .updrow .ic{font-size:18px;flex:0 0 auto}
+.updc .updrow .tx{flex:1;min-width:0}
+.updc .updrow .tx b{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.updc .updrow .tx small{display:block;font-size:11.5px;color:#5a6b86;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.updc .updrow .join{flex:0 0 auto;background:#2F56C9;color:#fff;border-radius:10px;padding:7px 12px;font-size:12.5px;font-weight:800}
+.updc .updrow .join.gh{background:#E7EEFC;color:#2F56C9}
+.bestc .w1{font-size:12px;opacity:.92;margin-top:3px}
+/* Yesterday's best */
+.bestc{background:linear-gradient(135deg,#3B1F5C,#5B2E8C 48%,#1FA79A);color:#fff;border:0;position:relative;overflow:hidden}
+.bestc:before{content:'';position:absolute;inset:-40%;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.05) 0 8deg,transparent 8deg 16deg);animation:spin 42s linear infinite}
+.bestc>*{position:relative}
+.bestc .dh b{color:#F6D776}
+.bestc .top{display:flex;align-items:center;gap:12px;margin-top:9px}
+.bestc .av,.bestc .avn{width:54px;height:54px;border-radius:50%;flex:0 0 auto;object-fit:cover;object-position:top;border:3px solid #F6D776;box-shadow:0 0 0 4px rgba(246,215,118,.22);background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#F6D776}
+.bestc .nm{font-size:16px;font-weight:800}.bestc .ti{font-size:12.5px;opacity:.9}
+.bestc ul{margin:9px 0 0;padding-left:18px;font-size:13px;line-height:1.5}
+.bestc .cta{margin-top:9px;background:rgba(0,0,0,.18);border-radius:12px;padding:8px 11px;font-size:12.5px}
+/* Incentive card + screen */
+.dcard.inc .incrow{display:flex;align-items:flex-end;justify-content:space-between;margin-top:9px}
+.dcard.inc .incrow small{font-size:11px;color:var(--muted)}
+.dcard.inc .amt{font-size:20px;font-weight:800;color:var(--accent,#0F5257)}
+.dcard.inc .incrow .r{text-align:right}
+.dcard.inc .ap{font-size:20px;font-weight:800}
+.ap.g,.perf.g,.bp.g{color:#1B8A5A}.ap.a,.perf.a,.bp.a{color:#C77D16}.ap.r,.perf.r,.bp.r{color:#E5484D}
+.seg3{display:flex;gap:6px;margin:0 0 12px;background:var(--soft,#EEF2F1);border-radius:14px;padding:4px}
+.seg3 button{flex:1;border:0;background:none;border-radius:11px;padding:10px 6px;font-weight:800;font-size:13px;color:var(--muted);min-height:auto}
+.seg3 button.on{background:var(--card,#fff);color:var(--accent,#0F5257);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.inchero{display:flex;align-items:center;gap:14px;border-radius:18px;padding:15px;margin:0 0 12px;background:linear-gradient(135deg,var(--h1,#0F5257),var(--h3,#1B7F79));color:#fff}
+.inchero .amt{font-size:22px;font-weight:800;margin:3px 0}
+.inchero small{font-size:12px;opacity:.92}
+.inccard{border-radius:16px;border:1px solid var(--line,#e7edeb);background:var(--card,#fff);padding:14px;margin:0 0 12px}
+.inccard h4{margin:12px 0 5px;font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--accent,#0F5257)}
+.inccard h4:first-child{margin-top:0}
+.inccard p{margin:0;font-size:13.5px;line-height:1.5}.inccard p.todo{background:#FFF7E6;border-left:3px solid #F5C451;padding:8px 10px;border-radius:8px}
+.crit{list-style:none;margin:0;padding:0}
+.crit li{font-size:13px;padding:5px 0 5px 24px;position:relative;line-height:1.4}
+.crit li:before{position:absolute;left:0;top:4px;font-weight:800}
+.crit li.ok:before{content:'✓';color:#1B8A5A}.crit li.no:before{content:'•';color:#C77D16;font-size:18px;top:1px}
+/* Progress dashboard: overall strip + per-brand bars */
+.dcard.prog .ovr{display:flex;align-items:center;gap:12px;margin:9px 0 4px}
+.dcard.prog .ovr .op{font-size:26px;font-weight:800;min-width:58px}
+.dcard.prog .ogrid{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;font-size:11.5px;color:var(--muted)}
+.dcard.prog .ogrid b{color:var(--fg,#14302E)}
+.dcard.prog .glbl{font-size:9.5px;letter-spacing:.6px;font-weight:800;color:var(--accent,#0F5257);margin:7px 0 2px}
+.dcard.prog .pln{display:flex;align-items:center;gap:8px;margin:3px 0}
+.dcard.prog .pln .nm{flex:0 0 38%;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dcard.prog .pln .ba{flex:1;height:7px;border-radius:5px;background:var(--soft,#EEF2F1);overflow:hidden}
+.dcard.prog .pln .ba i{display:block;height:100%;border-radius:5px;background:#1B8A5A}
+.dcard.prog .pln .ba i.a{background:#E0A82E}.dcard.prog .pln .ba i.r{background:#E5484D}
+.dcard.prog .pln .pc{flex:0 0 38px;text-align:right;font-size:12px;font-weight:800}
+.dcard.prog .tapfull{margin-top:8px;font-size:11px;color:var(--muted);text-align:center}
+.dcard.prog .ptblwrap{margin-top:8px;overflow-x:auto}
+.ptbl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.ptbl th{font-size:10px;letter-spacing:.3px;text-transform:uppercase;color:var(--muted);font-weight:700;padding:3px 4px;text-align:left}
+.ptbl th.r,.ptbl td.r{text-align:right}
+.ptbl td{font-size:12px;padding:5px 4px;border-top:1px solid var(--line,#eef2f1)}
+.ptbl td .bal{display:block;font-size:9.5px;color:#C77D16;font-weight:700}
+.ptbl td.perf{font-weight:800}
+.ptbl tr.grp td{background:var(--soft,#F2F5F4);font-size:9.5px;letter-spacing:.6px;font-weight:800;color:var(--accent,#0F5257);padding:4px 6px;border:0}
+/* Progress full screen */
+.psec{font-size:11px;letter-spacing:.7px;text-transform:uppercase;color:var(--accent,#0F5257);font-weight:800;margin:4px 0 8px}
+.brcard{border-radius:16px;border:1px solid var(--line,#e7edeb);background:var(--card,#fff);padding:13px 15px;margin:0 0 11px;box-shadow:0 4px 12px rgba(16,40,38,.05)}
+.brcard .bh{display:flex;align-items:center;justify-content:space-between}
+.brcard .bh b{font-size:15px}
+.brcard .bp{font-size:16px;font-weight:800}
+.brcard .brl{display:flex;justify-content:space-between;font-size:13px;margin-top:6px}
+.brcard .brl span{color:var(--muted)}
+.brcard .brl b.muted{color:var(--muted)}.brcard .brl b.pob{color:#2F56C9}.brcard .brl b.ach{color:#0F5257}
+.brcard .brl.bal b.r{color:#E5484D}.brcard .brl.bal b.g{color:#1B8A5A}
+.brcard .pbar{height:8px;border-radius:6px;background:var(--soft,#EEF2F1);overflow:hidden;margin-top:9px}
+.brcard .pbar i{display:block;height:100%;border-radius:6px;background:#1B8A5A;transition:width .6s ease}
+.brcard .pbar i.a{background:#E0A82E}.brcard .pbar i.r{background:#E5484D}
+`;document.head.appendChild(st);
+
+/* latest manager message for today (from the daily-message feed) */
+function mgrMsg(){try{var e=myEmail2();var ms=(S.msgs||[]).filter(function(x){return x.email===e&&x.date===TODAY});if(!ms.length)return null;ms.sort(function(a,b){return (b.ts||0)-(a.ts||0)});return ms[0]}catch(e){return null}}
+
+/* ---------- Updates: meeting + manager info + daily quote (compact, colours when something new arrived) ---------- */
+function quoteBlock(){try{var q=(U.C&&U.C().quotes)||[];if(!q.length)return'';var i=(U.dayIdx?U.dayIdx():new Date().getDate())%q.length;return h('div',{class:'quoteln'},h('small',{},'Ratan Roy says'),q[i])}catch(e){return''}}
+function joinUrl(m){var ph=window.MGR_PHONE||'';return m.how==='phone'?'tel:+'+ph:m.how==='whatsapp'?'https://wa.me/'+ph:(m.link||'')}
+function meetWhen(m){try{var d=new Date(+m.at);var day=(m.date===TODAY)?'Today':d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});return day+' '+d.toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'})}catch(e){return m.time||''}}
+U.updatesCard=function(){try{if(!isCSO())return'';
+  var meets=(U.myMeetings&&U.myMeetings())||[],msg=mgrMsg();
+  var newest=0;meets.forEach(function(m){newest=Math.max(newest,+m.ts||+m.at||0)});if(msg)newest=Math.max(newest,+msg.ts||0);
+  var seen=+(U.lsGet&&U.lsGet('ft_upd_seen','0'))||0,isNew=newest>0&&newest>seen;
+  function markSeen(){try{if(newest>seen){U.lsSet&&U.lsSet('ft_upd_seen',String(newest));render()}}catch(e){}}
+  var card=h('div',{class:'dcard updc'+(isNew?' hasnew':''),onclick:markSeen});
+  card.append(h('div',{class:'dh'},h('b',{},'🔔 Updates'),isNew?h('span',{class:'nb'},'NEW'):''));
+  meets.forEach(function(m){var hw=m.how==='phone'?'📞':m.how==='whatsapp'?'💬':'🎥',url=joinUrl(m),jl=m.how==='phone'?'Call':m.how==='whatsapp'?'WhatsApp':'Join';
+    card.append(h('div',{class:'updrow',onclick:function(ev){ev.stopPropagation();markSeen();if(url){try{if(window.openUrl)openUrl(url);else window.open(url,'_blank')}catch(e){location.href=url}}}},
+      h('span',{class:'ic'},hw),h('div',{class:'tx'},h('b',{},m.title||'Meeting with Ratan Roy'),h('small',{},meetWhen(m)+(m.agenda?' · '+m.agenda:''))),url?h('span',{class:'join'},jl):''));});
+  if(msg){var first=(msg.text||'').split('\n').filter(Boolean)[0]||'';
+    card.append(h('div',{class:'updrow msg',onclick:function(ev){ev.stopPropagation();markSeen();U.lsSet&&U.lsSet('ft_me','msgs');go('msgs')}},h('span',{class:'ic'},'📋'),h('div',{class:'tx'},h('b',{},'From Ratan Roy'),h('small',{},first)),h('span',{class:'join gh'},'Read')));}
+  if(!meets.length&&!msg)card.append(h('div',{class:'none'},'✅ No meeting or new message. Sync anytime to refresh.'));
+  var q=quoteBlock();if(q)card.append(q);
+  return card;
+}catch(e){return''}};
+
+/* ---------- Yesterday's best field work (manager-curated spotlight) ---------- */
+function myHQ3(){try{if(S.viewAs&&S.viewAs.HQ)return S.viewAs.HQ;if(S.me&&S.me.HQ)return S.me.HQ;var k=Object.keys(S.feeds||{}).filter(function(z){return z.indexOf('perf_')===0})[0];return k?k.slice(5):''}catch(e){return''}}
+U.bestCard=function(){try{if(!isCSO())return'';var F=S.feeds||{},hq=myHQ3();var sf=F['spotlight_'+hq]||F.spotlight;
+  if(!sf)return h('div',{class:'dcard'},h('div',{class:'dh'},h('b',{},'🌟 Yesterday\'s best field work')),h('p',{class:'dhint'},'After tonight\'s reports, Ratan highlights the best field work of the day here — it could be you tomorrow.'));
+  var card=h('div',{class:'dcard bestc',onclick:function(){}});
+  card.append(h('div',{class:'dh'},h('b',{},'🌟 Yesterday\'s best field work')));
+  var av=sf.photo?h('img',{class:'av',src:sf.photo}):h('div',{class:'avn'},(sf.name||'?').slice(0,1));
+  var win1=(sf.wins&&sf.wins[0])||sf.cta||'';
+  card.append(h('div',{class:'top'},av,h('div',{},h('div',{class:'nm'},sf.name||'Top performer'),h('div',{class:'ti'},sf.title||'Did it right yesterday'),win1?h('div',{class:'w1'},'• '+win1):'')));
+  return card;
+}catch(e){return''}};
 })();

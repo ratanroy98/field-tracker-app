@@ -476,19 +476,82 @@ U.earnCard=function(){try{var DA=mkDA(true);if(!DA)return'';var oh=DA.onhold()||
     h('p',{},R(pot.p100)+' at 100% · '+R(pot.p110)+' at 110% — plus Q4 & the 25% impact bonus. '+tag+'. Tap ›')));
 }catch(e){return''}};
 
-/* Progress card for the CSO dashboard: Impact brands, then NPDs, then Others clubbed — Target + Closing stock (closing from Ratan's backend upload) */
-function pLak(v){return v==null?'—':'₹'+(v/1e5).toFixed(2)+'L'}
-U.progressCard=function(){try{if(S.mgr&&!S.viewAs)return'';var hq=csoHQ();if(!hq)return'';var mp=(S.feeds||{})['mprog_'+hq];
-  var open=function(){try{S.tab=S.tab||{};S.tab.perf='brands';S.tab.geo_T='mp'}catch(e){}go('perf')};
-  if(!mp)return h('div',{class:'coachc',style:'cursor:pointer',onclick:open},h('div',{class:'k'},'📈 Progress'),h('p',{},'Your month progress — Impact brands, NPDs and others with target and closing stock — appears right after a Sync. Tap to open.'));
-  var box=h('div',{class:'coachc',style:'cursor:pointer',onclick:open},h('div',{class:'k'},'📈 Progress · '+(mp.month||'')+(mp.asOf?' · '+mp.asOf:'')));
-  (mp.groups||[]).forEach(function(g){var nm=(g.name||'').toLowerCase();
-    if(nm.indexOf('other')>=0){var tg=0,cl=0,hascl=false;(g.rows||[]).forEach(function(r){tg+=(r.tgt||0);if(r.cl!=null){cl+=r.cl;hascl=true}});
-      box.append(h('p',{style:'margin:7px 0 0;font-size:13px'},h('b',{},'Others'),' — Tgt '+pLak(tg)+' · Closing '+(hascl?pLak(cl):'—')));
-    }else{box.append(h('p',{style:'margin:8px 0 2px;font-weight:800;color:var(--accent,#0F5257);font-size:12px;letter-spacing:.3px'},(g.name||'').toUpperCase()));
-      (g.rows||[]).forEach(function(r){box.append(h('p',{style:'margin:2px 0;font-size:13px'},r.b+' — Tgt '+pLak(r.tgt)+' · Closing '+(r.cl!=null?pLak(r.cl):'—')))});}
-  });
-  box.append(h('p',{style:'margin-top:8px;font-size:11.5px;color:var(--muted)'},'Closing stock is loaded from the backend. Tap for full month progress.'));
-  return box;
+/* ============================ CSO DASHBOARD: Progress + Incentive ============================ */
+function pLak(v){return v==null?'—':(v<0?'–₹':'₹')+(Math.abs(v)/1e5).toFixed(2)+'L'}
+function perfCls(p){return p==null?'':p>=100?'g':p>=90?'a':'r'}
+function mprog(){try{var hq=csoHQ();return hq?(S.feeds||{})['mprog_'+hq]:null}catch(e){return null}}
+/* order groups Impact → NPD → Others, and flatten rows with their group */
+function mpGroups(mp){var out={impact:[],npd:[],other:[]};(mp.groups||[]).forEach(function(g){var nm=(g.name||'').toLowerCase();var k=nm.indexOf('impact')>=0?'impact':nm.indexOf('npd')>=0?'npd':'other';(g.rows||[]).forEach(function(r){out[k].push(r)})});return out}
+
+/* Dashboard Progress card — overall strip (Target/Closing/POB/Ach + %) + a compact per-brand performance bar for every Impact brand, every NPD and Others. Full Target/Close/POB/Ach table is one tap away. */
+U.progressCard=function(){try{if(S.mgr&&!S.viewAs)return'';var mp=mprog();
+  var open=function(){go('progress')};
+  if(!mp)return h('div',{class:'dcard prog',onclick:open},h('div',{class:'dh'},h('b',{},'📈 Progress'),h('span',{class:'arr'},'›')),h('p',{class:'dhint'},'Your brand-wise progress — Target, Closing, POB, Achievement and Performance — appears right after a Sync.'));
+  var G=mpGroups(mp),T=mp.total||{},tp=T.perf!=null?T.perf:P(T.ach,T.tgt);
+  var card=h('div',{class:'dcard prog',onclick:open},h('div',{class:'dh'},h('b',{},'📈 Progress'),h('span',{class:'sub'},(mp.month||'')+(mp.asOf?' · '+mp.asOf:'')),h('span',{class:'arr'},'›')));
+  card.append(h('div',{class:'ovr'},h('div',{class:'op '+perfCls(tp)},pf(tp)),
+    h('div',{class:'ogrid'},h('span',{},'Tgt ',h('b',{},pLak(T.tgt))),h('span',{},'Close ',h('b',{},pLak(T.cl))),h('span',{},'POB ',h('b',{},pLak(T.pob))),h('span',{},'Ach ',h('b',{},pLak(T.ach))))));
+  function line(label,r){var perf=r.perf!=null?r.perf:P(r.ach,r.tgt);
+    card.append(h('div',{class:'pln'},h('span',{class:'nm'},label),h('span',{class:'ba'},h('i',{class:perfCls(perf),style:'width:'+Math.max(2,Math.min(100,perf||0))+'%'})),h('span',{class:'pc '+perfCls(perf)},pf(perf))))}
+  if(G.impact.length){card.append(h('div',{class:'glbl'},'IMPACT'));G.impact.forEach(function(r){line(r.b,r)})}
+  if(G.npd.length){card.append(h('div',{class:'glbl'},'NPD'));G.npd.forEach(function(r){line(r.b,r)})}
+  if(G.other.length){var t={tgt:0,cl:null,pob:null,ach:null};G.other.forEach(function(r){t.tgt+=r.tgt||0;if(r.cl!=null)t.cl=(t.cl||0)+r.cl;if(r.pob!=null)t.pob=(t.pob||0)+r.pob;if(r.ach!=null)t.ach=(t.ach||0)+r.ach});card.append(h('div',{class:'glbl'},'OTHERS'));line('Others',t)}
+  card.append(h('div',{class:'tapfull'},'Tap for Target · Closing · POB · Balance per brand ›'));
+  return card;
 }catch(e){return''}};
+
+/* Full Progress screen — one beautiful card per brand with Target / Closing / POB / Ach + Balance / Performance */
+U.routes.progress=function(app){try{if(S.mgr&&!S.viewAs){app.append(h('div',{class:'note'},'Progress is the CSO\'s screen.'));return}
+  var mp=mprog();
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📈 Month progress'+(mp&&mp.month?' · '+mp.month:'')),h('p',{},'Target & achievement are brand-wise from frontline, POB from Ventasys, and closing stock is computed from your stock statements — it falls as POB rises.')));
+  if(!mp){app.append(h('div',{class:'coachc',style:'background:var(--soft,#F2F5F4);border-color:var(--line,#e5ece9)'},h('p',{style:'margin:0'},'Your month progress appears here right after a Sync.')));return}
+  var G=mpGroups(mp);
+  function brandCard(r){var perf=r.perf!=null?r.perf:P(r.ach,r.tgt),bal=(r.tgt!=null&&r.ach!=null)?(r.tgt-r.ach):null;
+    var rows=[['Target',pLak(r.tgt),''],['Closing',pLak(r.cl),'muted'],['POB',pLak(r.pob),'pob'],['Ach',pLak(r.ach),'ach']];
+    var card=h('div',{class:'brcard'},h('div',{class:'bh'},h('b',{},r.b),h('span',{class:'bp '+perfCls(perf)},pf(perf))));
+    rows.forEach(function(x){card.append(h('div',{class:'brl'},h('span',{},x[0]),h('b',{class:x[2]},x[1])))});
+    if(bal!=null)card.append(h('div',{class:'brl bal'},h('span',{},'Balance to do'),h('b',{class:bal>0?'r':'g'},bal>0?pLak(bal):'Done ✓')));
+    card.append(h('div',{class:'pbar'},h('i',{class:perfCls(perf),style:'width:'+Math.max(2,Math.min(100,perf||0))+'%'})));
+    return card}
+  function section(title,arr){if(!arr.length)return;app.append(h('div',{class:'psec'},title));arr.forEach(function(r){app.append(brandCard(r))})}
+  section('IMPACT BRANDS',G.impact);
+  section('NPD',G.npd);
+  if(G.other.length){var t={b:'Others (clubbed)',tgt:0,cl:null,pob:null,ach:null};G.other.forEach(function(r){t.tgt+=r.tgt||0;if(r.cl!=null)t.cl=(t.cl||0)+r.cl;if(r.pob!=null)t.pob=(t.pob||0)+r.pob;if(r.ach!=null)t.ach=(t.ach||0)+r.ach});app.append(h('div',{class:'psec'},'OTHERS'));app.append(brandCard(t))}
+}catch(e){app.append(h('div',{class:'note'},'Could not open progress: '+e.message))}};
+
+/* ---------- Incentive: compact dashboard card + 3-tab screen (This month / The quarter / Special) ---------- */
+function novPotLocal(o){return novPot(o)}
+U.incCard=function(){try{if(S.mgr&&!S.viewAs)return'';var DA=mkDA(true);if(!DA)return h('div',{class:'dcard inc',onclick:function(){go('inc')}},h('div',{class:'dh'},h('b',{},'💰 Incentive'),h('span',{class:'arr'},'›')),h('p',{class:'dhint'},'Appears after a Sync.'));
+  var R=DA.rows('ALL'),o=agg(R,'tm'),pot=novPot(o),mp=mprog(),ach=(mp&&mp.total&&mp.total.tgt)?P(mp.total.ach,mp.total.tgt):P(o[2],o[1]);
+  return h('div',{class:'dcard inc',onclick:function(){go('inc')}},
+    h('div',{class:'dh'},h('b',{},'💰 Incentive'),h('span',{class:'arr'},'›')),
+    h('div',{class:'incrow'},h('div',{},h('small',{},'You can earn'),h('div',{class:'amt'},pot?'up to '+R2(pot.p110):'—')),h('div',{class:'r'},h('small',{},'This month'),h('div',{class:'ap '+perfCls(ach)},pf(ach)))));
+}catch(e){return''}};
+function R2(v){return R(v)}
+function incTab(){return (S.tab&&S.tab.inc)||'m'}
+function critList(items){return h('ul',{class:'crit'},items.map(function(x){return h('li',{class:x[1]?'ok':'no'},x[0])}))}
+function incHero(label,ach,earn){return h('div',{class:'inchero'},ring(ach==null?0:ach,78),h('div',{},h('small',{},label),h('div',{class:'amt'},earn),h('small',{class:'ap '+perfCls(ach)},'Achievement '+pf(ach))))}
+U.routes.inc=function(app){try{if(S.mgr&&!S.viewAs){app.append(h('div',{class:'note'},'Incentive is the CSO\'s screen.'));return}
+  var DA=mkDA(true);if(!DA){app.append(h('div',{class:'coachc'},h('p',{},'Your incentive details appear right after a Sync.')));return}
+  var R0=DA.rows('ALL'),mp=mprog();
+  var tabs=[['m','This month'],['q','The quarter'],['sp','Special']];
+  app.append(h('div',{class:'seg3'},tabs.map(function(x){return h('button',{class:x[0]===incTab()?'on':'',onclick:function(){S.tab=S.tab||{};S.tab.inc=x[0];render()}},x[1])})));
+  var t=incTab();
+  if(t==='m'){var o=agg(R0,'tm'),pot=novPot(o),e=earnOf(o,'m'),nb=nextBand(o,'m'),ach=(mp&&mp.total&&mp.total.tgt)?P(mp.total.ach,mp.total.tgt):e.ach;
+    app.append(incHero('This month',ach,pot?'up to '+R(pot.p110):'—'));
+    app.append(h('div',{class:'inccard'},h('h4',{},'What you can earn'),pot?h('p',{},R(pot.p100)+' at 100% · '+R(pot.p110)+' at 110%'):h('p',{},'Set once your target is loaded.'),
+      h('h4',{},'Keep these to qualify'),critList([['Achievement ≥ 97% of target',ach!=null&&ach>=97],['Positive growth vs last year',e.g>0],['Saleable returns ≤ 3%',true],['All 4 Impact brands on track',true]]),
+      h('h4',{},'To reach it'),h('p',{class:'todo'},nb?('Add about '+R(nb.need)+' more net sale to hit '+nb.at+'%.'):'You are at the top band — hold it to month-end.')));
+  } else if(t==='q'){var q=agg(R0,'Q4'),eq=earnOf(q,'q'),nbq=nextBand(q,'q'),qa=P(q[2],q[1]);
+    app.append(incHero('The quarter (Q4)',qa,eq.locked?'Locked — '+eq.why:R(eq.amt)));
+    app.append(h('div',{class:'inccard'},h('h4',{},'Quarter incentive'),h('p',{},eq.locked?'Unlocks at ≥97% achievement with positive growth.':'At '+pf(qa)+' and rate '+eq.rate+'%, you earn '+R(eq.amt)+' this quarter.'),
+      h('h4',{},'Keep these to qualify'),critList([['Quarter achievement ≥ 97%',qa!=null&&qa>=97],['Positive growth vs last year',eq.g>0],['Saleable returns ≤ 3%',true]]),
+      h('h4',{},'To reach it'),h('p',{class:'todo'},nbq?('Add about '+R(nbq.need)+' more net sale to hit '+nbq.at+'% for the quarter.'):'You are at the top quarterly band — protect it.')));
+  } else {var gate=impactGate(DA,'tm');
+    app.append(incHero('Special · Impact +25%',gate.comb,gate.ok?'On track ✓':'Not yet'));
+    app.append(h('div',{class:'inccard'},h('h4',{},'The +25% Impact bonus'),h('p',{},'A 25% top-up on your incentive when all four Impact brands are healthy together this month.'),
+      h('h4',{},'Where you stand'),h('p',{},'Combined Impact achievement '+pf(gate.comb)+'.'),
+      gate.weak.length?h('div',{},h('h4',{},'Close these gaps'),critList(gate.weak.map(function(w){return [w.b+' — add '+L(w.gap)+' to reach 90%',false]}))):h('p',{class:'todo'},'All Impact brands are at/above the mark — keep them there to lock the bonus.')));
+  }
+}catch(e){app.append(h('div',{class:'note'},'Could not open incentive: '+e.message))}};
 })();

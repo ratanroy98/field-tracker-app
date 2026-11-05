@@ -100,6 +100,7 @@ function getLoc(cb){var doneF=false;function fin(v){if(doneF)return;doneF=true;c
   if(navigator.geolocation){navigator.geolocation.getCurrentPosition(function(p){fin({lat:p.coords.latitude,lng:p.coords.longitude,acc:Math.round(p.coords.accuracy)})},function(){fin(null)},{enableHighAccuracy:true,timeout:9000,maximumAge:60000});setTimeout(function(){fin(null)},10000)}else fin(null)}
 function doCheckin(btn){if(checkinToday()){toast(w('checked'));return}if(isMgr()){toast('Pick a CSO with "View as" first.');return}
   if(U.beforeCheckin&&!(btn&&btn.__go)){U.beforeCheckin(function(extra){if(btn)btn.__go=1;doCheckin2(btn,extra||{})});return}doCheckin2(btn,{})}
+U.doCheckin=function(){doCheckin(null)};
 function doCheckin2(btn,extra){
   if(btn){btn.textContent='📍 '+w('locating');btn.disabled=true}
   getLoc(function(l){var tm=new Date().toTimeString().slice(0,5);var f=Object.assign({time:tm,brick:(typeof brickToday==='function'&&brickToday())||''},extra||{});if(l){f.lat=l.lat;f.lng=l.lng;f.acc=l.acc}
