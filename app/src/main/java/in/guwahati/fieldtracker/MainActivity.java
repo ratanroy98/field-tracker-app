@@ -7,7 +7,22 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.pdf.PdfRenderer;
+import android.util.Base64;
+import org.json.JSONObject;
+import java.io.File;
+import java.io.FileOutputStream;
+import com.google.android.gms.tasks.Tasks;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.text.TextRecognition;
+import com.google.mlkit.vision.text.TextRecognizer;
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 import android.view.View;
 import android.view.WindowManager;
 import android.speech.tts.TextToSpeech;
@@ -202,9 +217,46 @@ public class MainActivity extends Activity {
     @JavascriptInterface public boolean ready() { return ttsReady; }
   }
   // Lets the page hand over the sign-in so phone notifications show this CSO's own numbers.
+  String recognize(Bitmap bmp) throws Exception {
+    TextRecognizer rec = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+    try { return Tasks.await(rec.process(InputImage.fromBitmap(bmp, 0))).getText(); }
+    finally { try { rec.close(); } catch (Exception e) {} }
+  }
+  void deliverOcr(String id, String text) {
+    runOnUiThread(() -> { try { web.evaluateJavascript("window.ftOcrResult && window.ftOcrResult(" + JSONObject.quote(id) + "," + JSONObject.quote(text == null ? "" : text) + ")", null); } catch (Exception e) {} });
+  }
+
   class AppBridge {
     @JavascriptInterface public void setAuth(String json) { getSharedPreferences("ft", MODE_PRIVATE).edit().putString("auth", json).apply(); Notify.schedule(MainActivity.this); }
-    @JavascriptInterface public String version() { return "8"; }
+    @JavascriptInterface public String version() { return "9"; }
+    // On-device statement reading (ML Kit, offline). JS sends base64 of a photo or PDF; we OCR it and call window.ftOcrResult(id,text).
+    @JavascriptInterface public void ocrStart(String base64, String mime, String id) {
+      new Thread(() -> {
+        try {
+          byte[] data = Base64.decode(base64, Base64.DEFAULT);
+          StringBuilder sb = new StringBuilder();
+          if (mime != null && mime.contains("pdf")) {
+            File f = File.createTempFile("stmt", ".pdf", getCacheDir());
+            FileOutputStream fos = new FileOutputStream(f); fos.write(data); fos.close();
+            ParcelFileDescriptor pfd = ParcelFileDescriptor.open(f, ParcelFileDescriptor.MODE_READ_ONLY);
+            PdfRenderer r = new PdfRenderer(pfd);
+            int n = Math.min(r.getPageCount(), 4);
+            for (int i = 0; i < n; i++) {
+              PdfRenderer.Page pg = r.openPage(i);
+              Bitmap bmp = Bitmap.createBitmap(pg.getWidth() * 2, pg.getHeight() * 2, Bitmap.Config.ARGB_8888);
+              Canvas c = new Canvas(bmp); c.drawColor(Color.WHITE);
+              pg.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY); pg.close();
+              sb.append(recognize(bmp)).append("\n"); bmp.recycle();
+            }
+            r.close(); pfd.close(); f.delete();
+          } else {
+            Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+            if (bmp != null) sb.append(recognize(bmp));
+          }
+          deliverOcr(id, sb.toString());
+        } catch (Throwable e) { deliverOcr(id, ""); }
+      }).start();
+    }
     // The web deep-link handler polls this; a tapped notification sets the target screen.
     @JavascriptInterface public String openTarget() { String t = pendingTarget; pendingTarget = ""; return t == null ? "" : t; }
     // Join buttons: phone call, WhatsApp, meeting links open in their own apps.

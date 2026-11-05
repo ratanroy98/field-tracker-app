@@ -168,6 +168,7 @@ U.localClosing=function(){try{var es=(S.entries||[]).filter(function(e){return e
 function stmtScreen(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Stock statements are uploaded by the CSO.'));return}
   st();
   app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📄 Stock statement'),h('p',{},'Upload your stockist\'s statement — photo or PDF, any software\'s format. The app reads it and fills in the closing stock brand-wise. Check the figures and Save; it goes into your Progress and falls as POB is booked.')));
+  if(!(window.AndroidApp&&AndroidApp.ocrStart))app.append(h('div',{style:'font-size:12px;color:var(--muted);margin:-4px 0 10px;text-align:center'},'📲 Update the app to auto-read the figures from the photo/PDF. Until then, enter the closing below.'));
   var inp=h('input',{type:'file',accept:'image/*,application/pdf',style:'display:none'});
   var stx=h('div',{style:'text-align:center;color:var(--muted);font-size:13px;min-height:18px;margin-top:6px'});
   var btn=h('button',{style:'width:100%',onclick:function(){inp.click()}},'📄 Read a statement (photo or PDF)');
