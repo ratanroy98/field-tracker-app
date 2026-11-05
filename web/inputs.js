@@ -16,6 +16,9 @@ var st=document.createElement('style');st.id='ftinpcss';st.textContent=`
 .inpst.yes{background:#D6F0E0;color:#13684A}
 .inpst.wait{background:#FBE6C4;color:#8A5A00}
 .inpst.no{background:#F3E7E7;color:#9A3B3B}
+.inpst.red{background:#F6D9D9;color:#A32020}
+.redname{color:#A32020;font-weight:800}
+.redrow{background:#FDF3F3;border-radius:8px}
 .inpst.no button{all:unset;cursor:pointer;color:#0F5257;font-weight:800}
 .chgb{all:unset;cursor:pointer;display:inline-block;margin-left:8px;font-size:11px;font-weight:800;color:var(--accent,#0F5257);border-bottom:1px dotted var(--accent,#0F5257)}
 `;document.head.appendChild(st);

@@ -275,7 +275,7 @@ function normItem(s){return String(s||'').toUpperCase().replace(/\s+/g,' ').trim
 /* inputs under a brand, de-duplicated by normalized name (so "R Loc RAFT Pen" and "R LOC RAFT PEN" are one) */
 function brandItems(brand){var f=ff();if(!f||!f.brands||!f.brands[brand])return[];var b=f.brands[brand],set={},ord=[];['gi','gs','li','ls'].forEach(function(k){(b[k]||[]).forEach(function(x){var key=normItem(x.it);if(!set[key]){set[key]=1;ord.push(x.it)}})});return ord}
 function itemQty(brand,item){var f=ff(),b=(f&&f.brands&&f.brands[brand])||{},used=0,bal=0,key=normItem(item);(b.gi||[]).concat(b.gs||[]).forEach(function(x){if(normItem(x.it)===key)used+=(+x.q||0)});(b.li||[]).concat(b.ls||[]).forEach(function(x){if(normItem(x.it)===key)bal+=(+x.q||0)});return{used:used,bal:bal,alloc:used+bal}}
-function givenFor(brand,item){var f=ff(),b=(f&&f.brands&&f.brands[brand])||{},out=[],key=normItem(item);(b.gi||[]).concat(b.gs||[]).forEach(function(x){if(normItem(x.it)===key&&x.to&&x.to!=='Not recorded')out.push({to:x.to,q:x.q})});return out}
+function givenFor(brand,item){var f=ff(),b=(f&&f.brands&&f.brands[brand])||{},out=[],key=normItem(item);(b.gi||[]).concat(b.gs||[]).forEach(function(x){if(normItem(x.it)===key&&x.to&&x.to!=='Not recorded')out.push({to:x.to,q:x.q,chk:x.chk})});return out}
 /* Ventasys code for a name (reverse lookup in the customer master) */
 function codeForName(nm){try{var hq=myHQ2();for(var code in CUST){var c=CUST[code];if(!c)continue;if(hq&&hqName(c.hq)&&hqName(c.hq)!==hq)continue;if(nameEq(c.name,nm))return code}}catch(e){}return''}
 /* doctors / retailers in a brick (value = Ventasys code) */
@@ -295,7 +295,7 @@ function drow(name,stat){return h('div',{class:'selrow'},h('div',{class:'nm'},na
 function drowA(name,note,brick,kind){var s=(U.drStatus?U.drStatus(name):'no');var right=(s==='yes'||s==='wait')&&U.drChip?U.drChip(name,brick,kind):h('span',{style:'font-size:11.5px;color:var(--muted);white-space:nowrap'},note||'');return h('div',{class:'selrow'},h('div',{class:'nm'},name),right)}
 /* add a doctor/retailer not in the list and send it to Ratan for approval */
 function addApprovalRow(box,brick,kind){try{if(!U.drSend)return;var wrap=h('div',{style:'margin-top:10px;padding-top:9px;border-top:1px dashed var(--line,#e5ece9)'});var nm=h('input',{type:'text',placeholder:'➕ Add a '+(kind==='R'?'retailer':'doctor')+' for approval',style:'width:100%;padding:8px;border:1px solid var(--line,#ddd);border-radius:10px;box-sizing:border-box'});wrap.append(nm,h('button',{style:'width:100%;margin-top:6px',onclick:function(){var v=(nm.value||'').trim();if(v.length<3){toast&&toast('Type the name');return}U.drSend(v,brick,kind)}},'📤 Send for approval'));box.append(wrap)}catch(e){}}
-function inprow(n,code,name,brick,statusNode){return h('div',{class:'inprow'},h('span',{class:'c0'},String(n)),h('span',{class:'c1'},code||'—'),h('span',{class:'c2'},name),h('span',{class:'c3'},brick||'—'),h('span',{class:'c4'},statusNode))}
+function inprow(n,code,name,brick,statusNode,red){return h('div',{class:'inprow'+(red?' redrow':'')},h('span',{class:'c0'},String(n)),h('span',{class:'c1'},code||'—'),h('span',{class:'c2'+(red?' redname':'')},name),h('span',{class:'c3'},brick||'—'),h('span',{class:'c4'},statusNode))}
 /* an empty slot: pick brick → that brick's doctors/retailers list → Ventasys code auto-fills → Save → waiting for approval */
 function emptySlot(n,brand,item,retail){
   var hq=myHQ2(),bricks=(typeof bricksOf==='function'?bricksOf(hq):[])||[];
@@ -317,8 +317,8 @@ function renderInput(app,brand,item,route){
   box.append(h('div',{style:'font-weight:700;margin-bottom:6px'},who2+' · '+givenQty+' given'+(total?(' of '+total):'')+(empty?(' · '+empty+' open'):'')+(waiting?(' · '+waiting+' waiting'):'')));
   box.append(h('div',{class:'inprow hd'},h('span',{class:'c0'},'#'),h('span',{class:'c1'},'Code'),h('span',{class:'c2'},who2.slice(0,-1)),h('span',{class:'c3'},'Brick'),h('span',{class:'c4'},'Status')));
   var sl=0;var GCAP=15;var gshow=given.slice(0,GCAP);
-  gshow.forEach(function(g){sl++;var code=codeForName(g.to),br=(code&&CUST[code]&&CUST[code].brick)||'';
-    box.append(inprow(sl,code,g.to,br,h('span',{},h('span',{class:'inpst yes'},'✅ Approved'),h('button',{class:'chgb',onclick:function(){U.drChange&&U.drChange(g.to,br,retail?'R':'D')}},'Change'))))});
+  gshow.forEach(function(g){sl++;var code=codeForName(g.to),br=(code&&CUST[code]&&CUST[code].brick)||'';var red=g.chk==='red';
+    box.append(inprow(sl,code,g.to,br,h('span',{},h('span',{class:'inpst '+(red?'red':'yes')},red?'⚠ Not in approved list':'✅ Approved'),h('button',{class:'chgb',onclick:function(){U.drChange&&U.drChange(g.to,br,retail?'R':'D')}},'Change')),red))});
   if(given.length>GCAP)box.append(h('div',{style:'font-size:12px;color:var(--muted);padding:6px 2px'},'+'+(given.length-GCAP)+' more '+who2.toLowerCase()+' given (per Ventasys)'));
   var extra=Math.max(0,givenQty-given.length);
   if(extra>0)box.append(h('div',{class:'inprow'},h('span',{class:'c0'},'✓'),h('span',{class:'c1'},'—'),h('span',{class:'c2'},extra+' given (as per Ventasys)'),h('span',{class:'c3'},'—'),h('span',{class:'c4'},h('span',{class:'inpst yes'},'✅ Done'))));
