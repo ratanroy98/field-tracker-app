@@ -1,4 +1,4 @@
-window.FT_BUILD='20261105135426';
+window.FT_BUILD='20261105140854';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -3850,26 +3850,38 @@ var st=document.createElement('style');st.id='ftinpcss';st.textContent=`
 .inpadd button.go{width:100%}
 `;document.head.appendChild(st);
 
-/* approved / known list from the feed (populated from Ratan's Outlook inbox+sent) */
-function feedRows(){try{var hq=myHQ3();var f=(S.feeds||{})['drlist_'+hq];if(!f||!f.rows)return[];
-  return f.rows.map(function(r){return {dr:r.dr||r.name||'',brick:r.brick||r.beat||'',ok:!!r.ok,src:'feed'};}).filter(function(r){return r.dr;});}catch(e){return[];}}
+function nameKey(s){return String(s||'').toLowerCase().replace(/^(dr|prof|mr|mrs|ms|smt|sri|shri)\.?\s*/,'').replace(/[^a-z0-9]/g,'').slice(0,16);}
+/* tolerant name match: share any significant token (surname-first / first-name-first both match) */
+var TITLE=/^(dr|prof|mr|mrs|ms|md|smt|sri|shri)\.?$/;
+function toks(s){return String(s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(function(w){return w.length>=3&&!TITLE.test(w);});}
+function nameEq(a,b){var ta=toks(a),tb=toks(b);if(!ta.length||!tb.length)return false;return ta.some(function(w){return tb.indexOf(w)>=0;});}
+
+/* doctors in the register (already approved) for this HQ — the roster the CSO covers */
+function isDoc(c){var ty=String(c.type||c.ty||'').toUpperCase();return /HCP|DOCTOR|DR|GP|RMP|PHYS/.test(ty)||/physician|mbbs|md\b/i.test(c.spec||'')||!ty;}
+function roster(){try{if(typeof CUST==='undefined'||!CUST)return[];var hq=myHQ3(),out=[];
+  Object.keys(CUST).forEach(function(code){var c=CUST[code];if(!c)return;if(hq&&hqName(c.hq)&&hqName(c.hq)!==hq)return;if(!isDoc(c))return;out.push({dr:c.name||String(code),brick:c.brick||''});});
+  return out;}catch(e){return[];}}
+/* doctors already GIVEN inputs/samples (from the synced inputs_<HQ> feed) — these are approved · Yes */
+function givenNames(){try{var hq=myHQ3();var f=(S.feeds||{})['inputs_'+hq];if(!f||!f.brands)return[];var out={};
+  Object.keys(f.brands).forEach(function(b){var x=f.brands[b];(x.gi||[]).concat(x.gs||[]).forEach(function(g){if(g.to&&g.to!=='Not recorded')out[nameKey(g.to)]=1;});});
+  return out;}catch(e){return{};}}
+/* approved list fed from Ratan's Outlook MCR / Customer-Addition mails (optional top-up) */
+function feedOk(){try{var hq=myHQ3();var f=(S.feeds||{})['drlist_'+hq];if(!f||!f.rows)return{};var out={};f.rows.forEach(function(r){if(r.ok!==false)out[nameKey(r.dr||r.name||'')]=1;});return out;}catch(e){return{};}}
 /* the CSO's own add-and-send entries (pending/approved/returned) */
 function myDrEntries(){try{return (S.entries||[]).filter(function(e){return e.type==='dr_approval'&&(!e.email||e.email===myEmail());});}catch(e){return[];}}
-/* merge feed + own entries into one de-duplicated list, newest status wins */
-function nameKey(s){return String(s||'').toLowerCase().replace(/^(dr|prof|mr|mrs|ms|smt|sri|shri)\.?\s*/,'').replace(/[^a-z0-9]/g,'').slice(0,16);}
-function allRows(){
-  var map={},order=[];
-  feedRows().forEach(function(r){var k=nameKey(r.dr);if(!map[k]){order.push(k);map[k]={dr:r.dr,brick:r.brick,status:r.ok?'yes':'no'};}else if(r.ok)map[k].status='yes';});
-  myDrEntries().forEach(function(e){var k=nameKey(e.dr);var stt=e.status==='approved'?'yes':e.status==='returned'?'no':'wait';
-    if(!map[k]){order.push(k);map[k]={dr:e.dr,brick:e.brick||'',status:stt};}else{map[k].status=stt;if(e.brick)map[k].brick=e.brick;}});
-  return order.map(function(k){return map[k];}).sort(function(a,b){var o={yes:0,wait:1,no:2};return (o[a.status]-o[b.status])||a.dr.localeCompare(b.dr);});
-}
 
-/* doctors in a brick, from the customer master, not already in the list */
-function isDoc(c){var ty=String(c.type||c.ty||'').toUpperCase();return /HCP|DOCTOR|DR|GP|RMP|PHYS/.test(ty)||!ty;}
-function brickDoctors(brick){try{if(typeof CUST==='undefined'||!CUST||!brick)return[];var hq=myHQ3(),out=[];
-  Object.keys(CUST).forEach(function(code){var c=CUST[code];if(!c||c.brick!==brick)return;if(hq&&hqName(c.hq)&&hqName(c.hq)!==hq)return;if(!isDoc(c))return;out.push(c.name||String(code));});
-  out.sort(function(a,b){return a.localeCompare(b);});return out;}catch(e){return[];}}
+/* one flat, de-duplicated list: roster + any sent/approved not in roster; status = yes/wait/no */
+function allRows(){
+  var given=givenNames(),fok=feedOk();
+  var pend={},appr={};
+  myDrEntries().forEach(function(e){var k=nameKey(e.dr);if(e.status==='approved')appr[k]=e;else if(e.status!=='returned')pend[k]=e;});
+  var map={},order=[];
+  function put(dr,brick){var k=nameKey(dr);if(!k)return;if(!map[k]){order.push(k);map[k]={dr:dr,brick:brick||''};}else if(brick&&!map[k].brick)map[k].brick=brick;}
+  roster().forEach(function(r){put(r.dr,r.brick);});
+  myDrEntries().forEach(function(e){put(e.dr,e.brick);});
+  return order.map(function(k){var r=map[k];var status=(given[k]||fok[k]||appr[k])?'yes':pend[k]?'wait':'no';return {dr:r.dr,brick:r.brick,status:status};})
+    .sort(function(a,b){var o={no:0,wait:1,yes:2};return (o[a.status]-o[b.status])||a.dr.localeCompare(b.dr);});
+}
 
 function sendForApproval(dr,brick){
   if(typeof save!=='function'){toast&&toast('Cannot save here.');return;}
@@ -3878,13 +3890,16 @@ function sendForApproval(dr,brick){
 
 function inputsScreen(app){try{
   if(isMgr()){app.append(h('div',{class:'note'},'The Inputs doctor list is the CSO\'s screen. Approvals are on your Approvals tab.'));return;}
-  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'👨‍⚕️ Inputs — doctor approval list'),h('p',{},'Every doctor you give inputs to. ✅ Yes means already approved — keep tracking him. For a new doctor, pick him below and Save — it goes to Ratan Roy for approval automatically.')));
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'👨‍⚕️ Inputs — doctor approval list'),h('p',{},'Every doctor you give inputs to. ✅ Yes means already given / approved — keep tracking him. For a doctor not yet approved, tap Send ▸ (or add a new one below) and it goes to Ratan Roy for approval automatically.')));
   var rows=allRows();
   var yes=rows.filter(function(r){return r.status==='yes';}).length;
+  S.tab=S.tab||{};var flt=S.tab.inpFlt||'todo';
+  app.append(h('div',{class:'seg',style:'margin:0 0 10px'},[['todo','To approve'],['all','All ('+rows.length+')']].map(function(x){return h('button',{class:flt===x[0]?'on':'',onclick:function(){S.tab.inpFlt=x[0];render();}},x[1]);})));
+  var show=flt==='todo'?rows.filter(function(r){return r.status!=='yes';}):rows;
   var card=h('div',{class:'inpc'},h('div',{class:'ih'},'👨‍⚕️ Doctors',h('span',{class:'n'},yes+' / '+rows.length+' approved')));
   var tbl=h('table',{class:'inptbl'},h('tr',{},h('th',{},'#'),h('th',{},'Doctor'),h('th',{},'Brick'),h('th',{},'Approved')));
-  if(!rows.length)tbl.append(h('tr',{},h('td',{class:'sl'},'—'),h('td',{colspan:'3',style:'color:var(--muted)'},'No doctors yet. Add one below and send for approval.')));
-  rows.forEach(function(r,i){
+  if(!show.length)tbl.append(h('tr',{},h('td',{class:'sl'},'—'),h('td',{colspan:'3',style:'color:var(--muted)'},flt==='todo'?(rows.length?'🎉 All doctors approved — nothing to send.':'No doctors synced yet. Add one below, or Sync.'):'No doctors yet. Add one below and send for approval.')));
+  show.forEach(function(r,i){
     var cell;
     if(r.status==='yes')cell=h('span',{class:'inpst yes'},'✅ Yes');
     else if(r.status==='wait')cell=h('span',{class:'inpst wait'},'⏳ Sent');
@@ -3892,18 +3907,13 @@ function inputsScreen(app){try{
     tbl.append(h('tr',{},h('td',{class:'sl'},String(i+1)),h('td',{},r.dr),h('td',{class:'br'},r.brick||'—'),h('td',{},cell)));
   });
   card.append(tbl);
-  /* add a new doctor -> send for approval */
-  S.tab=S.tab||{};
+  /* add a brand-new doctor (not in the register) -> send for approval */
   var bsel=h('select',[h('option',{value:''},'— brick —')].concat(bricksHQ().map(function(b){return h('option',{value:b},b);})));
-  var dsel=h('select',[h('option',{value:''},'— pick a doctor —')]);
-  function fillDocs(){var b=bsel.value;dsel.innerHTML='';dsel.append(h('option',{value:''},b?'— pick a doctor —':'— choose a brick first —'));
-    if(b){var have={};allRows().forEach(function(r){have[nameKey(r.dr)]=1;});brickDoctors(b).forEach(function(nm){if(have[nameKey(nm)])return;dsel.append(h('option',{value:nm},nm));});}}
-  bsel.onchange=fillDocs;
-  var add=h('div',{class:'inpadd'},h('div',{style:'font-weight:800;font-size:12.5px;margin-bottom:7px'},'➕ Add a doctor for approval'),bsel,dsel,
-    h('button',{class:'go',onclick:function(){if(!bsel.value){toast&&toast('Choose a brick');return;}if(!dsel.value){toast&&toast('Pick a doctor');return;}sendForApproval(dsel.value,bsel.value);}},'📤 Save & send to Ratan Roy'));
+  var dname=h('input',{type:'text',placeholder:'New doctor name',style:'width:100%;padding:9px;border:1px solid var(--line,#ddd);border-radius:10px;margin-bottom:7px;box-sizing:border-box'});
+  var add=h('div',{class:'inpadd'},h('div',{style:'font-weight:800;font-size:12.5px;margin-bottom:7px'},'➕ Add a new doctor for approval'),bsel,dname,
+    h('button',{class:'go',onclick:function(){if(!bsel.value){toast&&toast('Choose a brick');return;}var nm=(dname.value||'').trim();if(nm.length<3){toast&&toast('Type the doctor\'s name');return;}sendForApproval(nm,bsel.value);}},'📤 Save & send to Ratan Roy'));
   card.append(add);
   app.append(card);
-  fillDocs();
 }catch(e){app.append(h('div',{class:'note'},'Could not open Inputs: '+e.message));}}
 U.inputsScreen=inputsScreen;U.routes.inputs=function(app){inputsScreen(app);};
 
@@ -4025,6 +4035,90 @@ var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(!is
       var nb=app.querySelector('.bnav');if(nb)[].forEach.call(nb.children,function(b){b.classList.toggle('on',/Reports/.test(b.textContent))})}
     if(r==='home'){var D=dates();if(D.length&&!app.querySelector('.mailready')){var c=h('div',{class:'mailready',onclick:function(){go('mail')}},'📧',h('div',{},h('b',{},'Day review mails ready – '+nice(D[0])),h('small',{},'One mail per CSO, Cc Sudipta – send from Outlook')),h('span',{class:'go'},'›'));var tp=app.querySelector('.phase');if(tp)tp.before(c);else if(hd)hd.after(c)}}}catch(e){}};
 try{if(S.ready)render()}catch(e){}
+})();
+/* Field Tracker — Daily review (manager): one card per CSO per day.
+   Pulls the geo-tagged check-in, selfie, field photos, stock statements, inputs given, POB and lessons
+   that already reach the app, plus whatever Ventasys feeds in (review_<HQ>: calls, coverage, geo in/out).
+   Nothing is typed here — it is a read-only review the manager works through each day. */
+(function(){
+'use strict';
+var U=window.FTUI;if(!U||!U.t)return;
+function isMgr(){return S.mgr&&!S.viewAs;}
+function pc(a,b){return b?Math.round(a/b*100):0;}
+function rs(v){try{return '₹'+Math.round(v||0).toLocaleString('en-IN');}catch(e){return '₹'+(v||0);}}
+
+var st=document.createElement('style');st.id='ftrevcss';st.textContent=`
+.revc{background:var(--card,#fff);border:1px solid var(--line,#e5ece9);border-radius:16px;padding:0;margin:0 0 12px;overflow:hidden}
+.revc .rh{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line,#eef2f1)}
+.revc .rh img,.revc .rh .ph0{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none;border:2px solid var(--gold,#C9A227);background:var(--soft,#eef2f1);display:grid;place-items:center;font-weight:800}
+.revc .rh b{font-size:14.5px}.revc .rh small{display:block;color:var(--muted,#5B716E);font-size:12px}
+.revc .rh .pill{margin-left:auto;font-size:11.5px;font-weight:800;border-radius:999px;padding:4px 10px}
+.revc .pill.in{background:#D6F0E0;color:#13684A}.revc .pill.out{background:#F3E7E7;color:#9A3B3B}.revc .pill.lv{background:#FBE6C4;color:#8A5A00}
+.revgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line,#eef2f1)}
+.revgrid .m{background:var(--card,#fff);padding:10px 6px;text-align:center}
+.revgrid .m b{display:block;font-size:17px;font-weight:800;color:var(--fg,#14302E)}
+.revgrid .m small{font-size:10.5px;color:var(--muted,#5B716E)}
+.revline{padding:9px 14px;border-top:1px solid var(--line,#eef2f1);font-size:12.5px;color:var(--fg,#14302E)}
+.revline b{color:var(--muted,#5B716E);font-weight:700}
+.revline a{color:var(--accent,#0F5257);font-weight:700;text-decoration:none}
+`;document.head.appendChild(st);
+
+function csos(){try{return (D.users||[]).filter(function(u){return u.Role==='CSO'&&u.Status==='Active';});}catch(e){return[];}}
+function ent(type,email,date){try{return (S.entries||[]).filter(function(e){return e.type===type&&e.email===email&&e.date===date;});}catch(e){return[];}}
+function reviewFeed(hq){try{return (S.feeds||{})['review_'+hq]||null;}catch(e){return null;}}
+function reviewRow(hq,email,date){var f=reviewFeed(hq);if(!f||!f.rows||f.date!==date)return null;return f.rows.filter(function(r){return r.email===email;})[0]||null;}
+
+function recentDates(){var set={};(S.entries||[]).forEach(function(e){if(e.date)set[e.date]=1;});
+  var hasToday=set[TODAY];set[TODAY]=1;var ds=Object.keys(set).sort().reverse().slice(0,14);return ds;}
+
+function nice(d){try{return new Date(d+'T00:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short'});}catch(e){return d;}}
+
+function dayCard(u,date){var email=u.Email,hq=u.HQ;
+  var ci=ent('checkin',email,date)[0],lv=ent('leave',email,date)[0],sf=ent('selfie',email,date)[0];
+  var photos=ent('field_photo',email,date),stmts=ent('stock_statement',email,date),les=ent('lesson_done',email,date).length;
+  var rf=reviewRow(hq,email,date);
+  var p=S.feeds['pob_'+hq]||{},pobDay=(p.byDate||{})[date]||0,plan=p.planPerDay||p.dailyNeed||0;
+  var pillCls=ci?'in':lv?'lv':'out',pillTx=ci?('📍 In '+ci.time):lv?'🌴 Leave':'⏳ No check-in';
+  var av=(sf&&sf.url)?h('img',{src:sf.url,alt:''}):(ci&&ci.selfie?h('img',{src:ci.selfie,alt:''}):h('div',{class:'ph0'},(u.Name||'?')[0]));
+  var card=h('div',{class:'revc'},h('div',{class:'rh'},av,h('div',{},h('b',{},u.Name),h('small',{},hq+' HQ'+(ci&&ci.brick?' · '+ci.brick:''))),h('span',{class:'pill '+pillCls},pillTx)));
+  if(lv){card.append(h('div',{class:'revline'},h('b',{},'Leave: '),lv.reason||'—'));return card;}
+  /* metric strip — Ventasys numbers when fed, else the app's own counts */
+  var calls=rf&&rf.calls!=null?rf.calls:(photos.length);
+  var planned=rf&&rf.planned!=null?rf.planned:'';
+  var cov=rf&&rf.cov!=null?rf.cov:(planned?pc(calls,planned):'');
+  var pob=rf&&rf.pob!=null?rf.pob:pobDay;
+  card.append(h('div',{class:'revgrid'},
+    h('div',{class:'m'},h('b',{},String(calls||0)),h('small',{},planned?('/ '+planned+' calls'):'photos/calls')),
+    h('div',{class:'m'},h('b',{},(cov!==''?cov+'%':'—')),h('small',{},'coverage')),
+    h('div',{class:'m'},h('b',{},pob?rs(pob):'—'),h('small',{},'POB'+(plan?(' / '+rs(plan)):''))),
+    h('div',{class:'m'},h('b',{},String(les)),h('small',{},'lessons'))));
+  if(ci&&ci.lat)card.append(h('div',{class:'revline'},h('b',{},'Geo: '),h('a',{href:'https://maps.google.com/?q='+ci.lat+','+ci.lng,target:'_blank',rel:'noopener'},'📍 '+(+ci.lat).toFixed(4)+', '+(+ci.lng).toFixed(4)),ci.acc?(' · ±'+ci.acc+'m'):''));
+  else if(ci)card.append(h('div',{class:'revline'},h('b',{},'Geo: '),'⚠️ check-in had no GPS tag'));
+  if(rf&&(rf.geoIn||rf.geoOut))card.append(h('div',{class:'revline'},h('b',{},'Ventasys geo: '),(rf.geoIn||'—')+(rf.geoOut?' → '+rf.geoOut:'')));
+  if(photos.length){card.append(h('div',{class:'revline'},h('b',{},'Visits: '),photos.map(function(e){return e.toName||'visit';}).slice(0,6).join(', ')+(photos.length>6?' +'+(photos.length-6):'')));}
+  if(stmts.length){card.append(h('div',{class:'revline'},h('b',{},'Stock statements: '),stmts.map(function(e){return e.stockist||'statement';}).join(', ')));}
+  return card;}
+
+U.routes.review=function(app){if(!isMgr()){app.append(h('div',{class:'note'},'The daily review is Ratan Roy\'s screen.'));return;}
+  S.tab=S.tab||{};var dates=recentDates(),date=S.tab.revDate&&dates.indexOf(S.tab.revDate)>=0?S.tab.revDate:dates[0];
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📋 Daily review · '+nice(date)),h('p',{},'Each CSO\'s day — check-in & geo, selfie, calls, coverage, POB and visits. Ventasys numbers fill in once synced; until then it shows what the app has.')));
+  app.append(h('div',{class:'subtabs',style:'margin:0 0 10px'},dates.map(function(d){return h('button',{class:d===date?'on':'',onclick:function(){S.tab.revDate=d;render();}},d===TODAY?'Today':nice(d));})));
+  var L=csos();if(!L.length){app.append(h('div',{class:'note'},'No active CSOs.'));return;}
+  L.forEach(function(u){app.append(dayCard(u,date));});};
+
+/* add a "Daily review" line to the manager Reports sub-tab row + a Team-panel shortcut */
+var pt=U.tabOfX||{};pt.review='review';U.tabOfX=pt;
+var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(!isMgr()||document.getElementById('ftlogin'))return;
+  try{
+    // extend the Reports sub-tab row (added by mail.js) with a Review tab
+    if(r==='geo'||r==='perf'||r==='mail'||r==='review'){var row=app.querySelector('.subtabs.rep');
+      if(row&&!row.querySelector('.revtab')){var b=h('button',{class:'revtab'+(r==='review'?' on':''),onclick:function(){go('review');}},'Daily review');row.append(b);}
+      if(r==='review'){var nb=app.querySelector('.bnav');if(nb)[].forEach.call(nb.children,function(x){x.classList.toggle('on',/Reports/.test(x.textContent));});}
+    }
+    // Team panel shortcut
+    if(r==='home'){var ph=app.querySelector('.phase');if(ph&&!app.querySelector('.revshort')){var c=h('div',{class:'mailready revshort',onclick:function(){go('review');}},'📋',h('div',{},h('b',{},'Daily review'),h('small',{},'Each CSO\'s day — geo, calls, coverage, POB')),h('span',{class:'go'},'›'));ph.before(c);}}
+  }catch(e){}};
+try{if(S.ready)render();}catch(e){}
 })();
 /* Field Tracker — right-side ≡ menu (CSO), plus the Brand Inputs list and Primary plan screens.
    Loaded last: every route it points to (brands/primary/perf/shakti/stock/tp) already exists by now. */
