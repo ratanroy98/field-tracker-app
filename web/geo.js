@@ -490,8 +490,9 @@ U.progressCard=function(){try{if(S.mgr&&!S.viewAs)return'';var mp=mprog();
   var G=mpGroups(mp),T=mp.total||{},tp=T.perf!=null?T.perf:P(T.ach,T.tgt);
   var LC=(U.localClosing&&U.localClosing())||{},lcAny=Object.keys(LC).length,totCl=lcAny?Object.keys(LC).reduce(function(a,k){return a+(+LC[k]||0)},0):T.cl;
   var card=h('div',{class:'dcard prog',onclick:open},h('div',{class:'dh'},h('b',{},'📈 Progress'),h('span',{class:'sub'},(mp.month||'')+(mp.asOf?' · '+mp.asOf:'')),h('span',{class:'arr'},'›')));
-  card.append(h('div',{class:'ovr'},h('div',{class:'op '+perfCls(tp)},pf(tp)),
+  card.append(h('div',{class:'ovr'},h('div',{class:'opw'},h('div',{class:'op '+perfCls(tp)},pf(tp)),h('small',{class:'opc'},'achieved')),
     h('div',{class:'ogrid'},h('span',{},'Tgt ',h('b',{},pLak(T.tgt))),h('span',{},'Close ',h('b',{},pLak(totCl))),h('span',{},'POB ',h('b',{},pLak(T.pob))),h('span',{},'Ach ',h('b',{},pLak(T.ach))))));
+  card.append(h('p',{style:'font-size:11px;color:var(--muted);margin:2px 0 0'},'Achievement = net sales (primary) till date vs target. Tap for the full breakdown.'));
   function line(label,r){var perf=r.perf!=null?r.perf:P(r.ach,r.tgt);
     card.append(h('div',{class:'pln'},h('span',{class:'nm'},label),h('span',{class:'ba'},h('i',{class:perfCls(perf),style:'width:'+Math.max(2,Math.min(100,perf||0))+'%'})),h('span',{class:'pc '+perfCls(perf)},pf(perf))))}
   if(G.impact.length){card.append(h('div',{class:'glbl'},'IMPACT'));G.impact.forEach(function(r){line(r.b,r)})}
@@ -533,28 +534,42 @@ function R2(v){return R(v)}
 function incTab(){return (S.tab&&S.tab.inc)||'m'}
 function critList(items){return h('ul',{class:'crit'},items.map(function(x){return h('li',{class:x[1]?'ok':'no'},x[0])}))}
 function incHero(label,ach,earn){return h('div',{class:'inchero'},ring(ach==null?0:ach,78),h('div',{},h('small',{},label),h('div',{class:'amt'},earn),h('small',{class:'ap '+perfCls(ach)},'Achievement '+pf(ach))))}
+/* November actuals from Frontline/Ventasys feeds (rupees) — used for the live incentive calc */
+function novTotals(){try{var hq=csoHQ(),F=S.feeds||{},s=F['sales_'+hq];
+  if(s&&s.b){var n=0,t=0,ly=0,any=false;Object.keys(s.b).forEach(function(b){var x=s.b[b]||{};n+=+x.n||0;t+=+x.t||0;ly+=+x.ly||0;any=true});if(any)return{net:n,tgt:t,ly:ly,asOf:s.asOf}}
+  var a=F['ach_'+hq];if(a&&a.total!=null){return{net:a.total,tgt:((typeof TGT!=='undefined'&&TGT[hq]&&TGT[hq].Total)||0),ly:null,asOf:a.asOf}}
+  return null}catch(e){return null}}
+function novBrand(brand){try{var s=(S.feeds||{})['sales_'+csoHQ()];if(s&&s.b&&s.b[brand]){var x=s.b[brand];return{net:(+x.n||0),tgt:(+x.t||0),ly:(+x.ly||0)}}}catch(e){}return null}
 U.routes.inc=function(app){try{if(S.mgr&&!S.viewAs){app.append(h('div',{class:'note'},'Incentive is the CSO\'s screen.'));return}
   var DA=mkDA(true);if(!DA){app.append(h('div',{class:'coachc'},h('p',{},'Your incentive details appear right after a Sync.')));return}
   var R0=DA.rows('ALL'),mp=mprog();
   var tabs=[['m','This month'],['q','The quarter'],['sp','Special']];
   app.append(h('div',{class:'seg3'},tabs.map(function(x){return h('button',{class:x[0]===incTab()?'on':'',onclick:function(){S.tab=S.tab||{};S.tab.inc=x[0];render()}},x[1])})));
   var t=incTab();
-  if(t==='m'){var o=agg(R0,'tm'),pot=novPot(o),e=earnOf(o,'m'),nb=nextBand(o,'m'),ach=(mp&&mp.total&&mp.total.tgt)?P(mp.total.ach,mp.total.tgt):e.ach;
-    var ms=(e.pcpm>=10?6000:4000);
-    app.append(incHero('This month',ach,pot?'up to '+R(pot.p110):'—'));
-    app.append(h('div',{class:'inccard'},h('h4',{},'What you can earn'),pot?h('p',{},R(pot.p100)+' at 100% · '+R(pot.p110)+' at 110% (on net sales, by your PCPM slab)'):h('p',{},'Set once your target is loaded.'),
+  var nt=novTotals();
+  if(t==='m'){
+    var netL=nt?nt.net/1e5:agg(R0,'tm')[2],tgtL=nt?nt.tgt/1e5:agg(R0,'tm')[1],lyL=(nt&&nt.ly!=null)?nt.ly/1e5:agg(R0,'tm')[0];
+    var ach=P(netL,tgtL),g=gr(netL,lyL),pcpm=netL,bi=band(ach),si=slabIdx(pcpm),rateNow=bi<0?0:RATE_M[si][bi],earnNow=(bi>=0&&g>0)?netL*1e5*rateNow/100:0;
+    var pot=tgtL>0?{p100:tgtL*1e5*RATE_M[slabIdx(tgtL)][1]/100,p110:1.1*tgtL*1e5*RATE_M[slabIdx(1.1*tgtL)][2]/100}:null;
+    var ms=(pcpm>=10?6000:4000),need=ach==null?null:ach<97?tgtL*0.97-netL:ach<100?tgtL-netL:ach<110?tgtL*1.1-netL:null,at=ach==null?0:ach<97?97:ach<100?100:110;
+    app.append(incHero('This month'+(nt&&nt.asOf?' · '+nt.asOf:''),ach,pot?'up to '+R(pot.p110):'—'));
+    app.append(h('div',{class:'inccard'},h('h4',{},'What you can earn'),
+      h('p',{},'Net sale '+L(netL)+' of '+L(tgtL)+' target.'+(earnNow>0?' At '+pf(ach)+' · rate '+rateNow+'% you earn '+R(earnNow)+' now.':bi<0?' Below 97% — not yet eligible.':g<=0?' Needs positive growth to unlock.':'')),
+      pot?h('p',{},R(pot.p100)+' at 100% · '+R(pot.p110)+' at 110% (by your PCPM slab).'):'',
       h('p',{style:'margin-top:4px'},'➕ Milestone bonus '+R(ms)+' — on reaching 40% by the 2nd milestone, once you cross 100%.'),
-      h('h4',{},'Keep these to qualify'),critList([['Achievement ≥ 97% of target',ach!=null&&ach>=97],['Positive growth vs last year',e.g>0],['Saleable returns ≤ 3%',true],['Outlet coverage ≥ 90% · HCP ≥ 95%',true],['Next month ≥ 95%',true]]),
-      h('h4',{},'To reach it'),h('p',{class:'todo'},nb?('Add about '+R(nb.need)+' more net sale to hit '+nb.at+'%.'):'You are at the top band — hold it to month-end.')));
-  } else if(t==='q'){var q=agg(R0,'Q4'),eq=earnOf(q,'q'),nbq=nextBand(q,'q'),qa=P(q[2],q[1]);
+      h('h4',{},'Keep these to qualify'),critList([['Achievement ≥ 97% of target',ach!=null&&ach>=97],['Positive growth vs last year',g>0],['Saleable returns ≤ 3%',true],['Outlet coverage ≥ 90% · HCP ≥ 95%',true],['Next month ≥ 95%',true]]),
+      h('h4',{},'To reach it'),h('p',{class:'todo'},need&&need>0?('Add about '+L(need)+' more net sale to hit '+at+'%.'):'You are at the top band — hold it to month-end.')));
+  } else if(t==='q'){var q=agg(R0,'Q4').slice();if(nt){q[2]+=nt.net/1e5;q[1]+=nt.tgt/1e5;q[0]+=(nt.ly!=null?nt.ly/1e5:0)}
+    var eq=earnOf(q,'q'),nbq=nextBand(q,'q'),qa=P(q[2],q[1]);
     app.append(incHero('The quarter',qa,eq.locked?'Locked — '+eq.why:R(eq.amt)));
-    app.append(h('div',{class:'inccard'},h('h4',{},'Quarter incentive'),h('p',{},eq.locked?'Unlocks at ≥97% achievement with positive growth.':'At '+pf(qa)+' and rate '+eq.rate+'%, you earn '+R(eq.amt)+' this quarter.'),
+    app.append(h('div',{class:'inccard'},h('h4',{},'Quarter incentive'),h('p',{},'Net '+L(q[2])+' of '+L(q[1])+' (Oct + Nov so far). '+(eq.locked?'Unlocks at ≥97% with positive growth.':'At '+pf(qa)+' · rate '+eq.rate+'% → '+R(eq.amt)+'.')),
       h('h4',{},'Keep these to qualify'),critList([['Quarter achievement ≥ 97%',qa!=null&&qa>=97],['Positive quarterly growth vs last year',eq.g>0],['Next month ≥ 95%',true],['No payment outstanding over 30 days',true]]),
       h('h4',{},'To reach it'),h('p',{class:'todo'},nbq?('Add about '+R(nbq.need)+' more net sale to hit '+nbq.at+'% for the quarter.'):'You are at the top quarterly band — protect it.')));
   } else {
-    var qa2=agg(R0,'Q4'),overall=P(qa2[2],qa2[1]),ct=0,cs=0,weak=[],allOk=true;
-    DA.impact.forEach(function(b){var a=agg(DA.rows(b),'Q4');if(!a)return;ct+=a[1];cs+=a[2];var ap=P(a[2],a[1]);if(ap==null||ap<90){allOk=false;weak.push({b:b,gap:Math.max(0,a[1]*0.9-a[2])})}});
-    var comb=P(cs,ct),qInc=earnOf(qa2,'q').amt,pct=(overall!=null&&overall>=100&&allOk)?(comb>=105?25:comb>=100?20:comb>=97?15:0):0,award=qInc*pct/100;
+    var qa2=agg(R0,'Q4').slice();if(nt){qa2[2]+=nt.net/1e5;qa2[1]+=nt.tgt/1e5}var overall=P(qa2[2],qa2[1]),ct=0,cs=0,weak=[],allOk=true;
+    DA.impact.forEach(function(b){var a=agg(DA.rows(b),'Q4');if(!a)return;var bt=a[1],bn=a[2],nb2=novBrand(b);if(nb2){bt+=nb2.tgt/1e5;bn+=nb2.net/1e5}ct+=bt;cs+=bn;var ap=P(bn,bt);if(ap==null||ap<90){allOk=false;weak.push({b:b,gap:Math.max(0,bt*0.9-bn)})}});
+    var qInc=(function(){var q=agg(R0,'Q4').slice();if(nt){q[2]+=nt.net/1e5;q[1]+=nt.tgt/1e5;q[0]+=(nt.ly!=null?nt.ly/1e5:0)}return earnOf(q,'q').amt})();
+    var comb=P(cs,ct),pct=(overall!=null&&overall>=100&&allOk)?(comb>=105?25:comb>=100?20:comb>=97?15:0):0,award=qInc*pct/100;
     app.append(incHero('Impact brand award',comb,pct?('+'+pct+'% = '+R(award)):'Not yet'));
     app.append(h('div',{class:'inccard'},h('h4',{},'The Impact brand award'),h('p',{},'A top-up on your quarterly incentive when the 4 Impact brands (Deca Durabolin, Dexona, Skinlite, R-Loc) perform together: combined ≥105% → +25%, ≥100% → +20%, ≥97% → +15%.'),
       h('h4',{},'Gates'),critList([['Overall quarter achievement ≥ 100%',overall!=null&&overall>=100],['Each Impact brand ≥ 90%',allOk],['Combined Impact ≥ 97%',comb!=null&&comb>=97]]),

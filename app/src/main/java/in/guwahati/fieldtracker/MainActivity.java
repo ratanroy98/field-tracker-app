@@ -228,7 +228,9 @@ public class MainActivity extends Activity {
 
   class AppBridge {
     @JavascriptInterface public void setAuth(String json) { getSharedPreferences("ft", MODE_PRIVATE).edit().putString("auth", json).apply(); Notify.schedule(MainActivity.this); }
-    @JavascriptInterface public String version() { return "9"; }
+    @JavascriptInterface public String version() { return "10"; }
+    // Send the app to the background (used when Back is pressed at the home screen) instead of closing it.
+    @JavascriptInterface public void minimize() { runOnUiThread(() -> moveTaskToBack(true)); }
     // On-device statement reading (ML Kit, offline). JS sends base64 of a photo or PDF; we OCR it and call window.ftOcrResult(id,text).
     @JavascriptInterface public void ocrStart(String base64, String mime, String id) {
       new Thread(() -> {
@@ -311,5 +313,6 @@ public class MainActivity extends Activity {
   @Override protected void onDestroy() { if (tts != null) tts.shutdown(); super.onDestroy(); }
 
   @Override protected void onSaveInstanceState(Bundle o) { super.onSaveInstanceState(o); web.saveState(o); }
-  @Override public void onBackPressed() { if (web.canGoBack()) web.goBack(); else super.onBackPressed(); }
+  // Back always navigates inside the app (the web layer decides); at the root it goes to the background, never closing the app.
+  @Override public void onBackPressed() { if (web != null) web.evaluateJavascript("window.ftBack && window.ftBack()", null); else super.onBackPressed(); }
 }

@@ -69,7 +69,10 @@ var st=document.createElement('style');st.textContent=`
 .crit li.ok:before{content:'✓';color:#1B8A5A}.crit li.no:before{content:'•';color:#C77D16;font-size:18px;top:1px}
 /* Progress dashboard: overall strip + per-brand bars */
 .dcard.prog .ovr{display:flex;align-items:center;gap:12px;margin:9px 0 4px}
-.dcard.prog .ovr .op{font-size:26px;font-weight:800;min-width:58px}
+.dcard.prog .ovr .opw{min-width:62px;text-align:center}
+.dcard.prog .ovr .op{font-size:26px;font-weight:800;line-height:1}
+.dcard.prog .ovr .opc{display:block;font-size:10px;color:var(--muted);letter-spacing:.3px}
+.fthead .hb.ftbk{font-size:26px;font-weight:700;line-height:1}
 .dcard.prog .ogrid{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;font-size:11.5px;color:var(--muted)}
 .dcard.prog .ogrid b{color:var(--fg,#14302E)}
 .dcard.prog .glbl{font-size:9.5px;letter-spacing:.6px;font-weight:800;color:var(--accent,#0F5257);margin:7px 0 2px}

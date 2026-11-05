@@ -246,6 +246,9 @@ function viewBar(app){if(!S.mgr||!S.viewAs)return;try{if(!history.state||!histor
 /* ---------- apply after every screen is drawn ---------- */
 var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(document.getElementById('ftlogin'))return;
   try{topbar(app,r);var t=tabFor(r),hd=app.querySelector('.fthead');
+    // in-app back stack: remember where we came from so Android/▸ back navigates instead of closing the app
+    try{U._nav=U._nav||['home'];if(!U._navBack){if(U._nav[U._nav.length-1]!==r){U._nav.push(r);if(U._nav.length>40)U._nav.shift()}}U._navBack=false}catch(e){}
+    var hdr=app.querySelector('.fthead .row');if(hdr){var ex=hdr.querySelector('.ftbk');if(r!=='home'){if(!ex){hdr.insertBefore(h('button',{class:'hb ftbk',title:'Back',onclick:function(){U.ftBack&&U.ftBack()}},'‹'),hdr.firstChild)}}else if(ex)ex.remove()}
     if(r==='home'){if(isMgr())todayMgr(app);else todayCSO(app)}
     // replace the old sub-tab row on Work screens
     if(t==='work'&&BRANDR[r]){U.lsSet('ft_work',r);var old=app.querySelector('.fthead~.subtabs');if(old&&old.textContent.indexOf('Raft')>=0&&!old.classList.contains('l2'))old.remove();
@@ -280,6 +283,12 @@ var DEEP={
   photo:function(){go('photo')}
 };
 U.deepGo=function(t){t=(''+(t||'')).toLowerCase().replace(/[^a-z]/g,'');if(DEEP[t]){try{DEEP[t]()}catch(e){}return true}return false};
+/* Back: pop the in-app stack; at the root, send the app to the background (never close it). */
+U.ftBack=function(){try{U._nav=U._nav||['home'];var cur=U._nav[U._nav.length-1];
+  if(U._nav.length>1){U._nav.pop();var prev=U._nav[U._nav.length-1];U._navBack=true;go(prev);return true}
+  if(cur!=='home'){U._navBack=true;go('home');return true}
+  if(window.AndroidApp&&AndroidApp.minimize){AndroidApp.minimize();return true}}catch(e){}return false};
+window.ftBack=function(){return U.ftBack()};
 function deepTarget(){try{var hs=(location.hash||'').replace(/^#\/?/,'').toLowerCase();if(DEEP[hs])return hs;
   var m=(location.search||'').match(/[?&](?:go|open|a)=([a-z]+)/i);if(m&&DEEP[m[1].toLowerCase()])return m[1].toLowerCase();
   if(window.AndroidApp&&AndroidApp.openTarget){var x=(''+AndroidApp.openTarget()).toLowerCase();if(DEEP[x])return x}}catch(e){}return''}
