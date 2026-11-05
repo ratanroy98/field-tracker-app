@@ -316,9 +316,10 @@ function renderInput(app,brand,item,route){
   var box=h('div',{class:'selc'});
   box.append(h('div',{style:'font-weight:700;margin-bottom:6px'},who2+' · '+givenQty+' given'+(total?(' of '+total):'')+(empty?(' · '+empty+' open'):'')+(waiting?(' · '+waiting+' waiting'):'')));
   box.append(h('div',{class:'inprow hd'},h('span',{class:'c0'},'#'),h('span',{class:'c1'},'Code'),h('span',{class:'c2'},who2.slice(0,-1)),h('span',{class:'c3'},'Brick'),h('span',{class:'c4'},'Status')));
-  var sl=0;
-  given.forEach(function(g){sl++;var code=codeForName(g.to),br=(code&&CUST[code]&&CUST[code].brick)||'';
+  var sl=0;var GCAP=15;var gshow=given.slice(0,GCAP);
+  gshow.forEach(function(g){sl++;var code=codeForName(g.to),br=(code&&CUST[code]&&CUST[code].brick)||'';
     box.append(inprow(sl,code,g.to,br,h('span',{},h('span',{class:'inpst yes'},'✅ Approved'),h('button',{class:'chgb',onclick:function(){U.drChange&&U.drChange(g.to,br,retail?'R':'D')}},'Change'))))});
+  if(given.length>GCAP)box.append(h('div',{style:'font-size:12px;color:var(--muted);padding:6px 2px'},'+'+(given.length-GCAP)+' more '+who2.toLowerCase()+' given (per Ventasys)'));
   var extra=Math.max(0,givenQty-given.length);
   if(extra>0)box.append(h('div',{class:'inprow'},h('span',{class:'c0'},'✓'),h('span',{class:'c1'},'—'),h('span',{class:'c2'},extra+' given (as per Ventasys)'),h('span',{class:'c3'},'—'),h('span',{class:'c4'},h('span',{class:'inpst yes'},'✅ Done'))));
   pend.forEach(function(e){sl++;box.append(inprow(sl,e.code||'',e.dr,e.brick||'',h('span',{class:'inpst wait'},'⏳ Waiting')))});
