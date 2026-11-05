@@ -206,6 +206,7 @@ function quickDocs(app,r){if(S.mgr&&!S.viewAs)return;var brand=BR[r];if(!brand||
 /* ---------- hooks ---------- */
 var prevToday=U.today;U.today=function(app,tk,rest){ensureMedia();prevToday&&prevToday(app,tk,rest);var hero=app.querySelector('.hero')||tk;var c=hofCard(true);hero.after(c);dailyFame()};
 U.routes.hof=function(app){ensureMedia();app.append(hofCard(false));var w0=h('div',{class:'phase'},h('div',{class:'ph'},h('b',{},'🏆 Their wins')));FAME.forEach(function(p){w0.append(h('div',{class:'lrow',style:'cursor:default'},h('div',{class:'tx'},h('b',{},p.name),h('small',{},p.items.join(' · ')))))});app.append(w0);var q=U.quote();if(q)app.append(q)};
-var prevAfter=U.after;U.after=function(app,r){ensureMedia();prevAfter&&prevAfter(app,r);try{quickDocs(app,r)}catch(e){}};
+/* "Today's doctors" no longer appears on the brand page — it is carried in the daily Work task instead (see task.js U.todaysDoctors). */
+var prevAfter=U.after;U.after=function(app,r){ensureMedia();prevAfter&&prevAfter(app,r);};
 try{if(S.ready)render()}catch(e){}
 })();

@@ -1,4 +1,4 @@
-window.FT_BUILD='20261105144358';
+window.FT_BUILD='20261105151922';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -1927,7 +1927,8 @@ function quickDocs(app,r){if(S.mgr&&!S.viewAs)return;var brand=BR[r];if(!brand||
 /* ---------- hooks ---------- */
 var prevToday=U.today;U.today=function(app,tk,rest){ensureMedia();prevToday&&prevToday(app,tk,rest);var hero=app.querySelector('.hero')||tk;var c=hofCard(true);hero.after(c);dailyFame()};
 U.routes.hof=function(app){ensureMedia();app.append(hofCard(false));var w0=h('div',{class:'phase'},h('div',{class:'ph'},h('b',{},'🏆 Their wins')));FAME.forEach(function(p){w0.append(h('div',{class:'lrow',style:'cursor:default'},h('div',{class:'tx'},h('b',{},p.name),h('small',{},p.items.join(' · ')))))});app.append(w0);var q=U.quote();if(q)app.append(q)};
-var prevAfter=U.after;U.after=function(app,r){ensureMedia();prevAfter&&prevAfter(app,r);try{quickDocs(app,r)}catch(e){}};
+/* "Today's doctors" no longer appears on the brand page — it is carried in the daily Work task instead (see task.js U.todaysDoctors). */
+var prevAfter=U.after;U.after=function(app,r){ensureMedia();prevAfter&&prevAfter(app,r);};
 try{if(S.ready)render()}catch(e){}
 })();
 /* Field Tracker – approved brick plan (days fixed after Ratan's approval), brick lock on mandatory entries,
@@ -2236,14 +2237,19 @@ function hourIST(){return new Date().getHours()}
 function due(){return !isMgr()&&!sharedToday()&&hourIST()>=7&&new Date().getDay()!==0}
 function rs(v){return '₹'+Math.round(v||0).toString().replace(/(\d)(?=(\d\d)+\d$)/g,'$1,')}
 function planMsg(){try{var w=who();return (S.msgs||[]).filter(function(m){return m.email===w.Email&&m.date===TODAY&&m.slot!=='8pm'}).sort(function(a,b){return b.ts-a.ts})[0]}catch(e){return null}}
-function body(){var m=planMsg();if(m&&m.text)return m.text;
-  // No message from Ratan yet: build today's task from the app's own data.
-  var w=who(),L=[],f=(S.feeds||{})['pob_'+w.HQ];var dt=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short'});
+/* today's doctors to cover, by brand, in today's brick — carried in the task (moved here from the brand page) */
+var TBR={raft:'Rloc Raft',deca:'Deca Durabolin',rloc:'Rloc Tablets'};
+function todaysDoctorLines(){try{var brick=(typeof brickToday==='function'&&brickToday())||'';if(!brick||typeof drListFor!=='function'||typeof CUST==='undefined')return[];
+  var lines=[];Object.keys(TBR).forEach(function(k){var L=drListFor(TBR[k]);if(!L||L.status!=='approved')return;var ds=(L.doctors||[]).filter(function(c){return CUST[c]&&CUST[c].brick===brick}).map(function(c){return CUST[c].name});if(ds.length)lines.push('• '+TBR[k]+': '+ds.join(', '))});
+  return lines.length?['','👨‍⚕️ Doctors to cover today ('+brick+'):'].concat(lines):[]}catch(e){return[]}}
+U.todaysDoctors=todaysDoctorLines;
+function buildAuto(){var w=who(),L=[],f=(S.feeds||{})['pob_'+w.HQ];var dt=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short'});
   L.push('🎯 '+dt+' – '+String(w.HQ).toUpperCase()+(f&&f.dailyNeed?' | POB target '+rs(f.dailyNeed):''));
   try{var b=brickToday();if(b)L.push('📍 Brick: '+b)}catch(e){}
   if(f&&f.target60)L.push('Month: '+rs(f.done)+' of '+rs(f.target60));
   try{(typeof TASKS!=='undefined'?TASKS:[]).forEach(function(t){var s=t.status();if(s.level==='na')return;L.push((s.level==='ok'?'✅ ':'☐ ')+t.t+(s.level!=='ok'&&s.why?' – '+s.why:''))})}catch(e){}
   L.push('⏰ Enter all POB, inputs and reasons by 8 PM.');return L.join('\n')}
+function body(){var m=planMsg();var base=(m&&m.text)?m.text:buildAuto();var dl=todaysDoctorLines();return dl.length?base+'\n'+dl.join('\n'):base}
 function shareText(){var w=who();return '📋 Daily task – '+w.Name+', '+w.HQ+'\n\n'+body()+'\n\n✅ I have read today\'s full task and will complete it.'}
 
 var st=document.createElement('style');st.textContent=`
@@ -3526,6 +3532,17 @@ function st(){ if(document.getElementById('ftselcss'))return; var s=document.cre
 .selrow .cg{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
 .selrow .cg button{border:0;border-radius:999px;padding:6px 9px;font-size:11.5px;font-weight:800;min-height:auto;background:var(--soft2,#eef2f1);color:var(--muted,#5B716E)}
 .selrow .cg button.on{background:linear-gradient(120deg,#0F5257,#1B7F79);color:#fff}
+.inprow{display:grid;grid-template-columns:22px 52px 1fr 64px auto;gap:6px;align-items:center;padding:7px 2px;border-top:1px solid var(--line,#eef2f1);font-size:12.5px}
+.inprow.hd{font-size:9.5px;letter-spacing:.3px;text-transform:uppercase;color:var(--muted,#5B716E);font-weight:800;border-top:0}
+.inprow .c0{text-align:center;color:var(--muted);font-weight:700}
+.inprow .c1{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.inprow .c3{font-size:11px;color:var(--muted)}
+.inprow .c4{text-align:right;white-space:nowrap}
+.inprow.slot{grid-template-columns:22px 1fr;background:var(--soft,#F7FAF9);border-radius:10px;margin-top:4px;padding:8px}
+.inprow .slotf{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.inprow .slotf select{flex:1 1 44%;min-width:0;padding:7px;border:1px solid var(--line,#ddd);border-radius:9px;font-size:12px;background:var(--card,#fff);color:var(--ink)}
+.inprow .slotcode{font-size:11px;color:var(--accent,#0F5257);font-weight:800;min-width:56px}
+.inprow .slotsave{all:unset;cursor:pointer;background:var(--accent,#0F5257);color:#fff;border-radius:9px;padding:7px 13px;font-weight:800;font-size:12px}
 `;document.head.appendChild(s)}
 
 function campShort(id){return {deca_inj:'Inj',deca_core:'Core',rloc:'R-Loc',raft:'Raft',shakti:'Shakti'}[id]||id}
@@ -3737,9 +3754,17 @@ U.relayPanel=function(){try{if(!isMgr())return null;var E=relayList();if(!E.leng
 /* ================= Brand drill-down: brand → input → quantity + doctor/retailer list (pick/approve/photo) ================= */
 var ROUTEB={raft:'R-Loc Raft',deca:'Deca Durabolin',rloc:'R-Loc',skin:'Skinlite',dexona:'Dexona'};
 function ff(){try{var k=Object.keys(S.feeds||{}).filter(function(z){return z.indexOf('inputs_')===0})[0];return k?S.feeds[k]:null}catch(e){return null}}
-function brandItems(brand){var f=ff();if(!f||!f.brands||!f.brands[brand])return[];var b=f.brands[brand],set={},ord=[];['gi','gs','li','ls'].forEach(function(k){(b[k]||[]).forEach(function(x){if(!set[x.it]){set[x.it]=1;ord.push(x.it)}})});return ord}
-function itemQty(brand,item){var f=ff(),b=(f&&f.brands&&f.brands[brand])||{},used=0,bal=0;(b.gi||[]).concat(b.gs||[]).forEach(function(x){if(x.it===item)used+=(+x.q||0)});(b.li||[]).concat(b.ls||[]).forEach(function(x){if(x.it===item)bal+=(+x.q||0)});return{used:used,bal:bal,alloc:used+bal}}
-function givenFor(brand,item){var f=ff(),b=(f&&f.brands&&f.brands[brand])||{},out=[];(b.gi||[]).concat(b.gs||[]).forEach(function(x){if(x.it===item&&x.to&&x.to!=='Not recorded')out.push({to:x.to,q:x.q})});return out}
+function normItem(s){return String(s||'').toUpperCase().replace(/\s+/g,' ').trim()}
+/* inputs under a brand, de-duplicated by normalized name (so "R Loc RAFT Pen" and "R LOC RAFT PEN" are one) */
+function brandItems(brand){var f=ff();if(!f||!f.brands||!f.brands[brand])return[];var b=f.brands[brand],set={},ord=[];['gi','gs','li','ls'].forEach(function(k){(b[k]||[]).forEach(function(x){var key=normItem(x.it);if(!set[key]){set[key]=1;ord.push(x.it)}})});return ord}
+function itemQty(brand,item){var f=ff(),b=(f&&f.brands&&f.brands[brand])||{},used=0,bal=0,key=normItem(item);(b.gi||[]).concat(b.gs||[]).forEach(function(x){if(normItem(x.it)===key)used+=(+x.q||0)});(b.li||[]).concat(b.ls||[]).forEach(function(x){if(normItem(x.it)===key)bal+=(+x.q||0)});return{used:used,bal:bal,alloc:used+bal}}
+function givenFor(brand,item){var f=ff(),b=(f&&f.brands&&f.brands[brand])||{},out=[],key=normItem(item);(b.gi||[]).concat(b.gs||[]).forEach(function(x){if(normItem(x.it)===key&&x.to&&x.to!=='Not recorded')out.push({to:x.to,q:x.q})});return out}
+/* Ventasys code for a name (reverse lookup in the customer master) */
+function codeForName(nm){try{var hq=myHQ2();for(var code in CUST){var c=CUST[code];if(!c)continue;if(hq&&hqName(c.hq)&&hqName(c.hq)!==hq)continue;if(nameEq(c.name,nm))return code}}catch(e){}return''}
+/* doctors / retailers in a brick (value = Ventasys code) */
+function slotCands(brick,retail){try{var all=brickCust(brick)||[];return all.filter(function(c){var doc=isDoctor(c);return retail?!doc:doc})}catch(e){return[]}}
+/* this input's slots waiting for approval (CSO filled, not yet approved) */
+function inputPending(brand,item){var key=normItem(item);try{return (S.entries||[]).filter(function(e){return e.type==='dr_approval'&&e.status==='pending'&&(!e.email||e.email===myEmail())&&e.brand===brand&&normItem(e.item||'')===key})}catch(e){return[]}}
 var BRANDW=/^(deca|durabolin|rloc|loc|raft|skinlite|dexona|oflin|zipcet|tab|tablet|inj|susp|the|and|set|ps|ind|zhl|india)$/;
 function toksB(s){return toks(s).filter(function(w){return !BRANDW.test(w)})}
 function matchCarry(carry,item){var ta=toksB(carry),tb=toksB(item);if(ta.length&&tb.length&&ta.some(function(w){return tb.indexOf(w)>=0}))return true;var c=(''+carry).toLowerCase().replace(/\(.*\)/,'').trim();return c.length>3&&(''+item).toLowerCase().indexOf(c)>=0}
@@ -3753,38 +3778,35 @@ function drow(name,stat){return h('div',{class:'selrow'},h('div',{class:'nm'},na
 function drowA(name,note,brick,kind){var s=(U.drStatus?U.drStatus(name):'no');var right=(s==='yes'||s==='wait')&&U.drChip?U.drChip(name,brick,kind):h('span',{style:'font-size:11.5px;color:var(--muted);white-space:nowrap'},note||'');return h('div',{class:'selrow'},h('div',{class:'nm'},name),right)}
 /* add a doctor/retailer not in the list and send it to Ratan for approval */
 function addApprovalRow(box,brick,kind){try{if(!U.drSend)return;var wrap=h('div',{style:'margin-top:10px;padding-top:9px;border-top:1px dashed var(--line,#e5ece9)'});var nm=h('input',{type:'text',placeholder:'➕ Add a '+(kind==='R'?'retailer':'doctor')+' for approval',style:'width:100%;padding:8px;border:1px solid var(--line,#ddd);border-radius:10px;box-sizing:border-box'});wrap.append(nm,h('button',{style:'width:100%;margin-top:6px',onclick:function(){var v=(nm.value||'').trim();if(v.length<3){toast&&toast('Type the name');return}U.drSend(v,brick,kind)}},'📤 Send for approval'));box.append(wrap)}catch(e){}}
+function inprow(n,code,name,brick,statusNode){return h('div',{class:'inprow'},h('span',{class:'c0'},String(n)),h('span',{class:'c1'},code||'—'),h('span',{class:'c2'},name),h('span',{class:'c3'},brick||'—'),h('span',{class:'c4'},statusNode))}
+/* an empty slot: pick brick → that brick's doctors/retailers list → Ventasys code auto-fills → Save → waiting for approval */
+function emptySlot(n,brand,item,retail){
+  var hq=myHQ2(),bricks=(typeof bricksOf==='function'?bricksOf(hq):[])||[];
+  var bsel=h('select',{},[h('option',{value:''},'— brick —')].concat(bricks.map(function(b){return h('option',{value:b},b)})));
+  var dsel=h('select',{disabled:'disabled'},[h('option',{value:''},'— brick first —')]);
+  var codeBox=h('span',{class:'slotcode'},'');
+  bsel.onchange=function(){dsel.innerHTML='';dsel.disabled=!bsel.value;dsel.append(h('option',{value:''},bsel.value?('— '+(retail?'retailer':'doctor')+' —'):'— brick first —'));if(bsel.value){slotCands(bsel.value,retail).forEach(function(c){dsel.append(h('option',{value:c.code},c.name))})}codeBox.textContent='';};
+  dsel.onchange=function(){codeBox.textContent=dsel.value?('code '+dsel.value):'';};
+  var sv=h('button',{class:'slotsave',onclick:function(){if(!bsel.value){toast&&toast('Pick a brick');return}if(!dsel.value){toast&&toast('Pick a '+(retail?'retailer':'doctor'));return}var nm=(CUST[dsel.value]&&CUST[dsel.value].name)||dsel.value;(typeof save==='function'?save('dr_approval',{brand:brand,item:item,dr:nm,code:dsel.value,brick:bsel.value,kind:retail?'R':'D',status:'pending'}):Promise.resolve(true)).then(function(ok){if(ok){toast&&toast('Saved — waiting for approval');try{render()}catch(e){}}})}},'Save');
+  return h('div',{class:'inprow slot'},h('span',{class:'c0'},String(n)),h('div',{class:'slotf'},bsel,dsel,codeBox,sv));
+}
 function renderInput(app,brand,item,route){
-  var q=itemQty(brand,item),camp=itemCamp(brand,item),retail=(brand==='Skinlite');
+  var q=itemQty(brand,item),retail=(brand==='Skinlite'),who2=retail?'Retailers':'Doctors';
   app.append(h('div',{class:'selc'},h('div',{style:'font-weight:800;margin-bottom:6px'},item),
     h('div',{class:'tot'},h('b',{},'Allocated '+q.alloc),h('b',{},'Used '+q.used),h('b',{class:q.bal>0?'':'ok'},'Balance '+q.bal))));
-  var brick=(typeof brickToday==='function'&&brickToday())||'';
-  var given=givenFor(brand,item),givenNames=given.map(function(g){return g.to});
-  function isGiven(nm){return givenNames.some(function(gn){return nameEq(gn,nm)})}
+  var given=givenFor(brand,item),pend=inputPending(brand,item);
+  var total=q.alloc||0,done=given.length,waiting=pend.length,empty=Math.max(0,total-done-waiting);
   var box=h('div',{class:'selc'});
-  if(retail){ var outs=((window.FT_ROSTERS||{}).skin||{})[myHQ2()]||[],inB=outs.filter(function(o){return brickEq(o.beat,brick)});
-    box.append(h('div',{style:'font-weight:700;margin-bottom:4px'},'Retailers'+(brick?' · '+brick:'')+' ('+inB.length+')'));
-    given.forEach(function(g){box.append(drowA(g.to,'given',brick,'R'))});
-    inB.forEach(function(o){if(isGiven(o.n))return;box.append(drowA(o.n,'to give',brick,'R'))});
-    if(!inB.length&&!given.length)box.append(h('div',{style:'color:var(--muted);font-size:12.5px'},'No Skinlite retailers mapped to this brick.'));
-    addApprovalRow(box,brick,'R');
-  } else if(camp&&camp.src==='pick'&&camp.count){ var picks=curPicks(),status=picksStatus(),roster=picks[camp.id]||[],rosterShown=0;
-    box.append(h('div',{style:'font-weight:700;margin-bottom:4px'},'Doctors · target '+camp.count));
-    given.forEach(function(g){box.append(drowA(g.to,'given',brick,'D'))});
-    roster.forEach(function(code){var nm=custName(code);if(isGiven(nm))return;rosterShown++;box.append(drowA(nm,status==='approved'?'not given yet':status==='pending'?'⏳ waiting approval':'• to save',brick,'D'))});
-    var filled=given.length+rosterShown,blanks=Math.max(0,camp.count-filled);
-    if(blanks>0){var cands=pickCands(brand).filter(function(c){return roster.indexOf(c.code)<0&&!isGiven(c.name)&&!pickedAnywhere(c.code)});
-      var sel=h('select',{style:'width:100%;padding:9px;border:1px solid var(--line,#ddd);border-radius:10px;margin-top:6px'},[h('option',{value:''},'— pick doctor ('+blanks+' to fill) —')].concat(cands.map(function(c){return h('option',{value:c.code},c.name+(c.brick?' · '+c.brick:''))})));
-      var sv=h('button',{style:'width:100%;margin-top:6px',onclick:function(){if(!sel.value){toast&&toast('Pick a name first');return}var p=curPicks();p[camp.id]=p[camp.id]||[];if(p[camp.id].indexOf(sel.value)<0)p[camp.id].push(sel.value);(typeof save==='function'?save('campaign_pick',{picks:p,status:'pending'}):Promise.resolve(true)).then(function(ok){if(ok){toast&&toast('Saved — sent to Ratan Roy for approval');try{render()}catch(e){}}})}},'➕ Save & send for approval');
-      box.append(sel,sv);
-    } else box.append(h('div',{style:'font-size:12px;color:#13684A;margin-top:6px'},'✅ All '+camp.count+' doctors filled'));
-  } else if(camp&&camp.src==='assigned'){ box.append(h('div',{style:'font-weight:700;margin-bottom:4px'},'Doctors · assigned'));
-    given.forEach(function(g){box.append(drowA(g.to,'given',brick,'D'))});
-    assignedRoster(camp).forEach(function(nm){if(isGiven(nm))return;box.append(drowA(nm,'to give',brick,'D'))});
-    addApprovalRow(box,brick,'D');
-  } else { box.append(h('div',{style:'font-weight:700;margin-bottom:4px'},retail?'Retailers':'Doctors'));
-    given.forEach(function(g){box.append(drowA(g.to,'given',brick,'D'))});
-    if(!given.length)box.append(h('div',{style:'color:var(--muted);font-size:12.5px'},'Given-to is recorded in Ventasys and shows here after Sync.'));
-    addApprovalRow(box,brick,'D'); }
+  box.append(h('div',{style:'font-weight:700;margin-bottom:6px'},who2+' · '+done+' approved'+(total?(' of '+total):'')+(waiting?(' · '+waiting+' waiting'):'')));
+  box.append(h('div',{class:'inprow hd'},h('span',{class:'c0'},'#'),h('span',{class:'c1'},'Code'),h('span',{class:'c2'},who2.slice(0,-1)),h('span',{class:'c3'},'Brick'),h('span',{class:'c4'},'Status')));
+  var sl=0;
+  given.forEach(function(g){sl++;var code=codeForName(g.to),br=(code&&CUST[code]&&CUST[code].brick)||'';
+    box.append(inprow(sl,code,g.to,br,h('span',{},h('span',{class:'inpst yes'},'✅ Approved'),h('button',{class:'chgb',onclick:function(){U.drChange&&U.drChange(g.to,br,retail?'R':'D')}},'Change'))))});
+  pend.forEach(function(e){sl++;box.append(inprow(sl,e.code||'',e.dr,e.brick||'',h('span',{class:'inpst wait'},'⏳ Waiting')))});
+  var cap=Math.min(empty,25);
+  for(var i=0;i<cap;i++){sl++;box.append(emptySlot(sl,brand,item,retail))}
+  if(empty>cap)box.append(h('div',{style:'font-size:12px;color:var(--muted);padding:6px 2px'},'+'+(empty-cap)+' more slots — fill these first.'));
+  if(!total&&!done&&!waiting)box.append(h('div',{style:'color:var(--muted);font-size:12.5px;padding:6px 2px'},'No dispatch quantity yet for this input — it appears after Sync.'));
   app.append(box);
   var pinp=h('input',{type:'file',accept:'image/*',style:'display:none'});
   pinp.addEventListener('change',function(){var fl=pinp.files&&pinp.files[0];if(!fl)return;if(typeof uploadPhoto!=='function'){toast&&toast('Upload not ready — Sync.');return}toast&&toast('Uploading…');

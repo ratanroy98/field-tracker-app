@@ -10,14 +10,19 @@ function hourIST(){return new Date().getHours()}
 function due(){return !isMgr()&&!sharedToday()&&hourIST()>=7&&new Date().getDay()!==0}
 function rs(v){return '₹'+Math.round(v||0).toString().replace(/(\d)(?=(\d\d)+\d$)/g,'$1,')}
 function planMsg(){try{var w=who();return (S.msgs||[]).filter(function(m){return m.email===w.Email&&m.date===TODAY&&m.slot!=='8pm'}).sort(function(a,b){return b.ts-a.ts})[0]}catch(e){return null}}
-function body(){var m=planMsg();if(m&&m.text)return m.text;
-  // No message from Ratan yet: build today's task from the app's own data.
-  var w=who(),L=[],f=(S.feeds||{})['pob_'+w.HQ];var dt=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short'});
+/* today's doctors to cover, by brand, in today's brick — carried in the task (moved here from the brand page) */
+var TBR={raft:'Rloc Raft',deca:'Deca Durabolin',rloc:'Rloc Tablets'};
+function todaysDoctorLines(){try{var brick=(typeof brickToday==='function'&&brickToday())||'';if(!brick||typeof drListFor!=='function'||typeof CUST==='undefined')return[];
+  var lines=[];Object.keys(TBR).forEach(function(k){var L=drListFor(TBR[k]);if(!L||L.status!=='approved')return;var ds=(L.doctors||[]).filter(function(c){return CUST[c]&&CUST[c].brick===brick}).map(function(c){return CUST[c].name});if(ds.length)lines.push('• '+TBR[k]+': '+ds.join(', '))});
+  return lines.length?['','👨‍⚕️ Doctors to cover today ('+brick+'):'].concat(lines):[]}catch(e){return[]}}
+U.todaysDoctors=todaysDoctorLines;
+function buildAuto(){var w=who(),L=[],f=(S.feeds||{})['pob_'+w.HQ];var dt=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short'});
   L.push('🎯 '+dt+' – '+String(w.HQ).toUpperCase()+(f&&f.dailyNeed?' | POB target '+rs(f.dailyNeed):''));
   try{var b=brickToday();if(b)L.push('📍 Brick: '+b)}catch(e){}
   if(f&&f.target60)L.push('Month: '+rs(f.done)+' of '+rs(f.target60));
   try{(typeof TASKS!=='undefined'?TASKS:[]).forEach(function(t){var s=t.status();if(s.level==='na')return;L.push((s.level==='ok'?'✅ ':'☐ ')+t.t+(s.level!=='ok'&&s.why?' – '+s.why:''))})}catch(e){}
   L.push('⏰ Enter all POB, inputs and reasons by 8 PM.');return L.join('\n')}
+function body(){var m=planMsg();var base=(m&&m.text)?m.text:buildAuto();var dl=todaysDoctorLines();return dl.length?base+'\n'+dl.join('\n'):base}
 function shareText(){var w=who();return '📋 Daily task – '+w.Name+', '+w.HQ+'\n\n'+body()+'\n\n✅ I have read today\'s full task and will complete it.'}
 
 var st=document.createElement('style');st.textContent=`
