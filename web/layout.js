@@ -61,9 +61,9 @@ function nav(r){var cur=tabFor(r),pend=0,appr=0;
 /* ---------- sub-tab rows ---------- */
 function tabs(list,cur,cls){return h('div',{class:'subtabs'+(cls?' '+cls:'')},list.map(function(x){return h('button',{class:x[0]===cur?'on':'',onclick:x[2]},x[1])}))}
 /* Work = the brand pages only. One clean row of brands; everything else lives in the ≡ menu. */
-function workTabs(r){var B=[['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['pulse','💉 Pulse']];
+function workTabs(r){var B=[['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['gifts','🎁 Gifts'],['pulse','💉 Pulse']];
   return[tabs(B.map(function(x){return[x[0],x[1],function(){go(x[0])}]}),r)]}
-var BRANDR={raft:1,deca:1,rloc:1,skin:1,dexona:1,pulse:1};
+var BRANDR={raft:1,deca:1,rloc:1,skin:1,dexona:1,gifts:1,pulse:1};
 function meTabs(r){var L=isMgr()?[['msgs','Messages'],['set','Settings']]:[['perf','Progress'],['msgs','Messages'],['set','Settings']];
   return tabs(L.map(function(x){return[x[0],x[1],function(){if(x[0]==='set'){U.settings&&U.settings();return}U.lsSet('ft_me',x[0]);go(x[0])}]}),r)}
 

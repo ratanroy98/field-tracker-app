@@ -1,4 +1,4 @@
-window.FT_BUILD='20261105151922';
+window.FT_BUILD='20261105161714';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -2358,9 +2358,9 @@ function nav(r){var cur=tabFor(r),pend=0,appr=0;
 /* ---------- sub-tab rows ---------- */
 function tabs(list,cur,cls){return h('div',{class:'subtabs'+(cls?' '+cls:'')},list.map(function(x){return h('button',{class:x[0]===cur?'on':'',onclick:x[2]},x[1])}))}
 /* Work = the brand pages only. One clean row of brands; everything else lives in the ≡ menu. */
-function workTabs(r){var B=[['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['pulse','💉 Pulse']];
+function workTabs(r){var B=[['raft','Raft'],['deca','Deca'],['rloc','R-Loc'],['skin','Skinlite'],['dexona','Dexona'],['gifts','🎁 Gifts'],['pulse','💉 Pulse']];
   return[tabs(B.map(function(x){return[x[0],x[1],function(){go(x[0])}]}),r)]}
-var BRANDR={raft:1,deca:1,rloc:1,skin:1,dexona:1,pulse:1};
+var BRANDR={raft:1,deca:1,rloc:1,skin:1,dexona:1,gifts:1,pulse:1};
 function meTabs(r){var L=isMgr()?[['msgs','Messages'],['set','Settings']]:[['perf','Progress'],['msgs','Messages'],['set','Settings']];
   return tabs(L.map(function(x){return[x[0],x[1],function(){if(x[0]==='set'){U.settings&&U.settings();return}U.lsSet('ft_me',x[0]);go(x[0])}]}),r)}
 
@@ -3752,7 +3752,7 @@ U.relayPanel=function(){try{if(!isMgr())return null;var E=relayList();if(!E.leng
   return box}catch(e){return null}};
 
 /* ================= Brand drill-down: brand → input → quantity + doctor/retailer list (pick/approve/photo) ================= */
-var ROUTEB={raft:'R-Loc Raft',deca:'Deca Durabolin',rloc:'R-Loc',skin:'Skinlite',dexona:'Dexona'};
+var ROUTEB={raft:'R-Loc Raft',deca:'Deca Durabolin',rloc:'R-Loc',skin:'Skinlite',dexona:'Dexona',gifts:'Gifts & General'};
 function ff(){try{var k=Object.keys(S.feeds||{}).filter(function(z){return z.indexOf('inputs_')===0})[0];return k?S.feeds[k]:null}catch(e){return null}}
 function normItem(s){return String(s||'').toUpperCase().replace(/\s+/g,' ').trim()}
 /* inputs under a brand, de-duplicated by normalized name (so "R Loc RAFT Pen" and "R LOC RAFT PEN" are one) */
@@ -3795,18 +3795,20 @@ function renderInput(app,brand,item,route){
   app.append(h('div',{class:'selc'},h('div',{style:'font-weight:800;margin-bottom:6px'},item),
     h('div',{class:'tot'},h('b',{},'Allocated '+q.alloc),h('b',{},'Used '+q.used),h('b',{class:q.bal>0?'':'ok'},'Balance '+q.bal))));
   var given=givenFor(brand,item),pend=inputPending(brand,item);
-  var total=q.alloc||0,done=given.length,waiting=pend.length,empty=Math.max(0,total-done-waiting);
+  var total=q.alloc||0,givenQty=q.used||0,waiting=pend.length,empty=Math.max(0,(q.bal||0)-waiting);
   var box=h('div',{class:'selc'});
-  box.append(h('div',{style:'font-weight:700;margin-bottom:6px'},who2+' · '+done+' approved'+(total?(' of '+total):'')+(waiting?(' · '+waiting+' waiting'):'')));
+  box.append(h('div',{style:'font-weight:700;margin-bottom:6px'},who2+' · '+givenQty+' given'+(total?(' of '+total):'')+(empty?(' · '+empty+' open'):'')+(waiting?(' · '+waiting+' waiting'):'')));
   box.append(h('div',{class:'inprow hd'},h('span',{class:'c0'},'#'),h('span',{class:'c1'},'Code'),h('span',{class:'c2'},who2.slice(0,-1)),h('span',{class:'c3'},'Brick'),h('span',{class:'c4'},'Status')));
   var sl=0;
   given.forEach(function(g){sl++;var code=codeForName(g.to),br=(code&&CUST[code]&&CUST[code].brick)||'';
     box.append(inprow(sl,code,g.to,br,h('span',{},h('span',{class:'inpst yes'},'✅ Approved'),h('button',{class:'chgb',onclick:function(){U.drChange&&U.drChange(g.to,br,retail?'R':'D')}},'Change'))))});
+  var extra=Math.max(0,givenQty-given.length);
+  if(extra>0)box.append(h('div',{class:'inprow'},h('span',{class:'c0'},'✓'),h('span',{class:'c1'},'—'),h('span',{class:'c2'},extra+' given (as per Ventasys)'),h('span',{class:'c3'},'—'),h('span',{class:'c4'},h('span',{class:'inpst yes'},'✅ Done'))));
   pend.forEach(function(e){sl++;box.append(inprow(sl,e.code||'',e.dr,e.brick||'',h('span',{class:'inpst wait'},'⏳ Waiting')))});
   var cap=Math.min(empty,25);
   for(var i=0;i<cap;i++){sl++;box.append(emptySlot(sl,brand,item,retail))}
-  if(empty>cap)box.append(h('div',{style:'font-size:12px;color:var(--muted);padding:6px 2px'},'+'+(empty-cap)+' more slots — fill these first.'));
-  if(!total&&!done&&!waiting)box.append(h('div',{style:'color:var(--muted);font-size:12.5px;padding:6px 2px'},'No dispatch quantity yet for this input — it appears after Sync.'));
+  if(empty>cap)box.append(h('div',{style:'font-size:12px;color:var(--muted);padding:6px 2px'},'+'+(empty-cap)+' more open slots'));
+  if(!total&&!givenQty&&!waiting)box.append(h('div',{style:'color:var(--muted);font-size:12.5px;padding:6px 2px'},'No dispatch quantity yet for this input — it appears after Sync.'));
   app.append(box);
   var pinp=h('input',{type:'file',accept:'image/*',style:'display:none'});
   pinp.addEventListener('change',function(){var fl=pinp.files&&pinp.files[0];if(!fl)return;if(typeof uploadPhoto!=='function'){toast&&toast('Upload not ready — Sync.');return}toast&&toast('Uploading…');
@@ -3827,7 +3829,7 @@ function brandView(app,route){try{if(isMgr()){app.append(h('div',{class:'note'},
   renderInput(detail,brand,S.tab[key],route);
 }catch(e){app.append(h('div',{class:'note'},'Could not open brand: '+e.message))}}
 U.brandView=brandView;U._itemCamp=itemCamp;U._pickCands=pickCands;
-['raft','deca','rloc','skin','dexona'].forEach(function(k){U.routes[k]=function(app){brandView(app,k)}});
+['raft','deca','rloc','skin','dexona','gifts'].forEach(function(k){U.routes[k]=function(app){brandView(app,k)}});
 
 /* Pulse as an input drill-down: Deca Module allocated/used/balance + assigned doctor list, given Yes/No */
 function pulseView(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Pulse is the CSO\'s list.'));return}
