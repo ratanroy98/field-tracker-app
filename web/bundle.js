@@ -1,4 +1,4 @@
-window.FT_BUILD='20261105103141';
+window.FT_BUILD='20261105110922';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -3574,7 +3574,7 @@ U.carryCard=function(){try{if(isMgr())return'';var brick=(typeof brickToday==='f
 function stmtEntries(){try{return (S.entries||[]).filter(function(e){return e.type==='stock_statement'&&(!e.email||e.email===myEmail())}).sort(function(a,b){return (b.ts||0)-(a.ts||0)})}catch(e){return[]}}
 function stmtScreen(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Stock statements are uploaded by the CSO.'));return}
   st();
-  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📄 Stock statement'),h('p',{},'Upload your stock statement as a photo or a PDF. It goes straight to Ratan Roy — nothing to send on WhatsApp.')));
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📄 Stock statement'),h('p',{},'Upload your stockist\'s stock statement — a photo or a PDF, in whatever format their software gives. The app reads it on its own and works out the closing stock brand-wise; you don\'t type anything. It appears in your Progress and falls as POB is booked.')));
   var inp=h('input',{type:'file',accept:'image/*,application/pdf',style:'display:none'});
   var stx=h('div',{style:'text-align:center;color:var(--muted);font-size:13px;min-height:18px;margin-top:6px'});
   var btn=h('button',{style:'width:100%',onclick:function(){inp.click()}},'📄 Upload statement (photo or PDF)');
