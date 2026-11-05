@@ -49,7 +49,7 @@ html,body{max-width:100vw;overflow-x:hidden}
 `;document.head.appendChild(st);
 
 /* ---------- which tab each screen belongs to ---------- */
-var WORKR=['raft','deca','rloc','skin','dexona','pulse','pick','carry','photo','samples','stockists','stock','beat','tp','inputs'];
+var WORKR=['raft','deca','rloc','skin','dexona','pulse','pick','carry','photo','samples','stockists','stock','beat','tp'];
 function tabFor(r){if(isMgr()){if(r==='home'||r==='mgr')return'team';if(r==='approve')return'approve';if(r==='meet')return'meet';if(r==='geo'||r==='perf'||r==='mail')return'reports';if(r==='msgs'||r==='hof')return'me';if(r==='sell')return'sell';return'team'}
   if(r==='home'||r==='inc'||r==='progress')return'today';if(r==='sell')return'sell';if(r==='learn')return'learn';if(r==='perf'||r==='msgs'||r==='hof')return'me';return'work'}
 function NAV(){return isMgr()?[['team','👥','Team',function(){go('home')}],['approve','✅','Approvals',function(){go('approve')}],['meet','📅','Meetings',function(){go('meet')}],['reports','📈','Reports',function(){go('geo')}],['me','👤','Me',function(){go(U.lsGet('ft_me','msgs'))}]]
@@ -271,7 +271,6 @@ var DEEP={
   carry:function(){go('carry')},
   pick:function(){go('pick')},
   brands:function(){go('brands')},
-  inputs:function(){go('inputs')},
   primary:function(){go('primary')},
   shakti:function(){go('shakti')},
   inc:function(){go('inc')},

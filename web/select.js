@@ -272,22 +272,28 @@ function pickedAnywhere(code){var p=curPicks();return Object.keys(p).some(functi
 function pickCands(brand){var brick=(typeof brickToday==='function'&&brickToday())||'',all=brickCust(brick),retail=(brand==='Skinlite');return all.filter(function(c){var doc=isDoctor(c);return retail?!doc:doc})}
 function shortItem(it){return (''+it).replace(/^(Deca-?|R-?Loc Raft|R-?Loc|Skinlite)\s*/i,'').replace(/\s*\(.*\)$/,'').slice(0,18)||it}
 function drow(name,stat){return h('div',{class:'selrow'},h('div',{class:'nm'},name),h('span',{style:'font-size:11.5px;color:var(--muted);white-space:nowrap'},stat))}
+/* doctor/retailer row with the approval chip: ✅ Yes + Change (given/approved), ⏳ Waiting (pending change), else the plain note */
+function drowA(name,note,brick,kind){var s=(U.drStatus?U.drStatus(name):'no');var right=(s==='yes'||s==='wait')&&U.drChip?U.drChip(name,brick,kind):h('span',{style:'font-size:11.5px;color:var(--muted);white-space:nowrap'},note||'');return h('div',{class:'selrow'},h('div',{class:'nm'},name),right)}
+/* add a doctor/retailer not in the list and send it to Ratan for approval */
+function addApprovalRow(box,brick,kind){try{if(!U.drSend)return;var wrap=h('div',{style:'margin-top:10px;padding-top:9px;border-top:1px dashed var(--line,#e5ece9)'});var nm=h('input',{type:'text',placeholder:'➕ Add a '+(kind==='R'?'retailer':'doctor')+' for approval',style:'width:100%;padding:8px;border:1px solid var(--line,#ddd);border-radius:10px;box-sizing:border-box'});wrap.append(nm,h('button',{style:'width:100%;margin-top:6px',onclick:function(){var v=(nm.value||'').trim();if(v.length<3){toast&&toast('Type the name');return}U.drSend(v,brick,kind)}},'📤 Send for approval'));box.append(wrap)}catch(e){}}
 function renderInput(app,brand,item,route){
   var q=itemQty(brand,item),camp=itemCamp(brand,item),retail=(brand==='Skinlite');
   app.append(h('div',{class:'selc'},h('div',{style:'font-weight:800;margin-bottom:6px'},item),
     h('div',{class:'tot'},h('b',{},'Allocated '+q.alloc),h('b',{},'Used '+q.used),h('b',{class:q.bal>0?'':'ok'},'Balance '+q.bal))));
+  var brick=(typeof brickToday==='function'&&brickToday())||'';
   var given=givenFor(brand,item),givenNames=given.map(function(g){return g.to});
   function isGiven(nm){return givenNames.some(function(gn){return nameEq(gn,nm)})}
   var box=h('div',{class:'selc'});
-  if(retail){ var brick=(typeof brickToday==='function'&&brickToday())||'',outs=((window.FT_ROSTERS||{}).skin||{})[myHQ2()]||[],inB=outs.filter(function(o){return brickEq(o.beat,brick)});
+  if(retail){ var outs=((window.FT_ROSTERS||{}).skin||{})[myHQ2()]||[],inB=outs.filter(function(o){return brickEq(o.beat,brick)});
     box.append(h('div',{style:'font-weight:700;margin-bottom:4px'},'Retailers'+(brick?' · '+brick:'')+' ('+inB.length+')'));
-    given.forEach(function(g){box.append(drow(g.to,'✅ given'))});
-    inB.forEach(function(o){if(isGiven(o.n))return;box.append(drow(o.n,'to give'))});
+    given.forEach(function(g){box.append(drowA(g.to,'given',brick,'R'))});
+    inB.forEach(function(o){if(isGiven(o.n))return;box.append(drowA(o.n,'to give',brick,'R'))});
     if(!inB.length&&!given.length)box.append(h('div',{style:'color:var(--muted);font-size:12.5px'},'No Skinlite retailers mapped to this brick.'));
+    addApprovalRow(box,brick,'R');
   } else if(camp&&camp.src==='pick'&&camp.count){ var picks=curPicks(),status=picksStatus(),roster=picks[camp.id]||[],rosterShown=0;
     box.append(h('div',{style:'font-weight:700;margin-bottom:4px'},'Doctors · target '+camp.count));
-    given.forEach(function(g){box.append(drow(g.to,'✅ given'))});
-    roster.forEach(function(code){var nm=custName(code);if(isGiven(nm))return;rosterShown++;box.append(drow(nm,status==='approved'?'not given yet':status==='pending'?'⏳ waiting approval':'• to save'))});
+    given.forEach(function(g){box.append(drowA(g.to,'given',brick,'D'))});
+    roster.forEach(function(code){var nm=custName(code);if(isGiven(nm))return;rosterShown++;box.append(drowA(nm,status==='approved'?'not given yet':status==='pending'?'⏳ waiting approval':'• to save',brick,'D'))});
     var filled=given.length+rosterShown,blanks=Math.max(0,camp.count-filled);
     if(blanks>0){var cands=pickCands(brand).filter(function(c){return roster.indexOf(c.code)<0&&!isGiven(c.name)&&!pickedAnywhere(c.code)});
       var sel=h('select',{style:'width:100%;padding:9px;border:1px solid var(--line,#ddd);border-radius:10px;margin-top:6px'},[h('option',{value:''},'— pick doctor ('+blanks+' to fill) —')].concat(cands.map(function(c){return h('option',{value:c.code},c.name+(c.brick?' · '+c.brick:''))})));
@@ -295,11 +301,13 @@ function renderInput(app,brand,item,route){
       box.append(sel,sv);
     } else box.append(h('div',{style:'font-size:12px;color:#13684A;margin-top:6px'},'✅ All '+camp.count+' doctors filled'));
   } else if(camp&&camp.src==='assigned'){ box.append(h('div',{style:'font-weight:700;margin-bottom:4px'},'Doctors · assigned'));
-    given.forEach(function(g){box.append(drow(g.to,'✅ given'))});
-    assignedRoster(camp).forEach(function(nm){if(isGiven(nm))return;box.append(drow(nm,'to give'))});
+    given.forEach(function(g){box.append(drowA(g.to,'given',brick,'D'))});
+    assignedRoster(camp).forEach(function(nm){if(isGiven(nm))return;box.append(drowA(nm,'to give',brick,'D'))});
+    addApprovalRow(box,brick,'D');
   } else { box.append(h('div',{style:'font-weight:700;margin-bottom:4px'},retail?'Retailers':'Doctors'));
-    given.forEach(function(g){box.append(drow(g.to,'✅ given'))});
-    if(!given.length)box.append(h('div',{style:'color:var(--muted);font-size:12.5px'},'Given-to is recorded in Ventasys and shows here after Sync.')); }
+    given.forEach(function(g){box.append(drowA(g.to,'given',brick,'D'))});
+    if(!given.length)box.append(h('div',{style:'color:var(--muted);font-size:12.5px'},'Given-to is recorded in Ventasys and shows here after Sync.'));
+    addApprovalRow(box,brick,'D'); }
   app.append(box);
   var pinp=h('input',{type:'file',accept:'image/*',style:'display:none'});
   pinp.addEventListener('change',function(){var fl=pinp.files&&pinp.files[0];if(!fl)return;if(typeof uploadPhoto!=='function'){toast&&toast('Upload not ready — Sync.');return}toast&&toast('Uploading…');

@@ -28,8 +28,7 @@ var css=document.createElement('style');css.textContent=`
 `;document.head.appendChild(css);
 
 var MENU=[
- ['👨‍⚕️','Inputs','Doctor approval list — Yes / No','inputs'],
- ['📦','Brand Inputs','Quantity, balance & doctor lists','brands'],
+ ['📦','Brand Inputs','Quantity, balance, doctors & approval','brands'],
  ['🗓️','Primary plan','Stockist-wise plan & milestones','primary'],
  ['📊','Performance','Incentive · monthly / quarterly / YTD','perf'],
  ['💉','Shakti Campaign','Pick 8 doctors (2 / week)','shakti'],
