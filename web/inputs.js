@@ -27,6 +27,7 @@ var st=document.createElement('style');st.id='ftinpcss';st.textContent=`
 .inpst.wait{background:#FBE6C4;color:#8A5A00}
 .inpst.no{background:#F3E7E7;color:#9A3B3B}
 .inpst.no button{all:unset;cursor:pointer;color:#0F5257;font-weight:800}
+.chgb{all:unset;cursor:pointer;display:inline-block;margin-left:8px;font-size:11px;font-weight:800;color:var(--accent,#0F5257);border-bottom:1px dotted var(--accent,#0F5257)}
 .inpadd{padding:12px 14px;background:var(--soft,#F7FAF9);border-top:1px solid var(--line,#eef2f1)}
 .inpadd select{width:100%;padding:9px;border:1px solid var(--line,#ddd);border-radius:10px;margin-bottom:7px;background:var(--card,#fff);color:var(--ink)}
 .inpadd button.go{width:100%}
@@ -38,10 +39,10 @@ var TITLE=/^(dr|prof|mr|mrs|ms|md|smt|sri|shri)\.?$/;
 function toks(s){return String(s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(function(w){return w.length>=3&&!TITLE.test(w);});}
 function nameEq(a,b){var ta=toks(a),tb=toks(b);if(!ta.length||!tb.length)return false;return ta.some(function(w){return tb.indexOf(w)>=0;});}
 
-/* doctors in the register (already approved) for this HQ — the roster the CSO covers */
-function isDoc(c){var ty=String(c.type||c.ty||'').toUpperCase();return /HCP|DOCTOR|DR|GP|RMP|PHYS/.test(ty)||/physician|mbbs|md\b/i.test(c.spec||'')||!ty;}
+/* register (already approved) for this HQ — the doctors + retailers the CSO covers */
+function kindOf(c){var ty=String(c.type||c.ty||'').toUpperCase();if(/RETAIL|CHEMIST|^R$|PHARMACY|STORE/.test(ty))return 'R';if(/HCP|DOCTOR|^DR|GP|RMP|PHYS/.test(ty)||/physician|mbbs|md\b/i.test(c.spec||''))return 'D';if(/WHOLE|^W$|DISTRIB|STOCKIST/.test(ty))return '';return ty?'':'D';}
 function roster(){try{if(typeof CUST==='undefined'||!CUST)return[];var hq=myHQ3(),out=[];
-  Object.keys(CUST).forEach(function(code){var c=CUST[code];if(!c)return;if(hq&&hqName(c.hq)&&hqName(c.hq)!==hq)return;if(!isDoc(c))return;out.push({dr:c.name||String(code),brick:c.brick||''});});
+  Object.keys(CUST).forEach(function(code){var c=CUST[code];if(!c)return;if(hq&&hqName(c.hq)&&hqName(c.hq)!==hq)return;var k=kindOf(c);if(k!=='D'&&k!=='R')return;out.push({dr:c.name||String(code),brick:c.brick||'',kind:k});});
   return out;}catch(e){return[];}}
 /* doctors already GIVEN inputs/samples (from the synced inputs_<HQ> feed) — these are approved · Yes */
 function givenNames(){try{var hq=myHQ3();var f=(S.feeds||{})['inputs_'+hq];if(!f||!f.brands)return[];var out={};
@@ -52,22 +53,44 @@ function feedOk(){try{var hq=myHQ3();var f=(S.feeds||{})['drlist_'+hq];if(!f||!f
 /* the CSO's own add-and-send entries (pending/approved/returned) */
 function myDrEntries(){try{return (S.entries||[]).filter(function(e){return e.type==='dr_approval'&&(!e.email||e.email===myEmail());});}catch(e){return[];}}
 
-/* one flat, de-duplicated list: roster + any sent/approved not in roster; status = yes/wait/no */
+/* one flat, de-duplicated list: roster + any sent/approved not in roster; status = yes/wait/no.
+   A pending entry keyed by its target (new add -> dr; a change -> orig) locks that row as 'wait'. */
 function allRows(){
   var given=givenNames(),fok=feedOk();
   var pend={},appr={};
-  myDrEntries().forEach(function(e){var k=nameKey(e.dr);if(e.status==='approved')appr[k]=e;else if(e.status!=='returned')pend[k]=e;});
+  myDrEntries().forEach(function(e){var tgt=nameKey(e.orig||e.dr);if(e.status==='approved')appr[nameKey(e.dr)]=e;else if(e.status!=='returned')pend[tgt]=e;});
   var map={},order=[];
-  function put(dr,brick){var k=nameKey(dr);if(!k)return;if(!map[k]){order.push(k);map[k]={dr:dr,brick:brick||''};}else if(brick&&!map[k].brick)map[k].brick=brick;}
-  roster().forEach(function(r){put(r.dr,r.brick);});
-  myDrEntries().forEach(function(e){put(e.dr,e.brick);});
-  return order.map(function(k){var r=map[k];var status=(given[k]||fok[k]||appr[k])?'yes':pend[k]?'wait':'no';return {dr:r.dr,brick:r.brick,status:status};})
+  function put(dr,brick,kind){var k=nameKey(dr);if(!k)return;if(!map[k]){order.push(k);map[k]={dr:dr,brick:brick||'',kind:kind||'D'};}else{if(brick&&!map[k].brick)map[k].brick=brick;if(kind&&map[k].kind!=='R')map[k].kind=kind;}}
+  roster().forEach(function(r){put(r.dr,r.brick,r.kind);});
+  myDrEntries().forEach(function(e){if(!e.orig)put(e.dr,e.brick,e.kind||'D');});
+  return order.map(function(k){var r=map[k];var status=pend[k]?'wait':(given[k]||fok[k]||appr[k])?'yes':'no';return {dr:r.dr,brick:r.brick,kind:r.kind||'D',status:status,pend:pend[k]||null};})
     .sort(function(a,b){var o={no:0,wait:1,yes:2};return (o[a.status]-o[b.status])||a.dr.localeCompare(b.dr);});
 }
 
-function sendForApproval(dr,brick){
+function sendForApproval(dr,brick,kind){
   if(typeof save!=='function'){toast&&toast('Cannot save here.');return;}
-  save('dr_approval',{dr:dr,brick:brick||'',status:'pending'}).then(function(ok){if(ok){toast&&toast('Sent to Ratan Roy for approval');try{render();}catch(e){}}});
+  save('dr_approval',{dr:dr,brick:brick||'',kind:kind||'D',status:'pending'}).then(function(ok){if(ok){toast&&toast('Sent to Ratan Roy for approval');try{render();}catch(e){}}});
+}
+/* change an already-approved doctor/retailer — explanation required; locks until approved */
+function openChange(r){
+  var body=h('div'),bricks=bricksHQ();
+  var nm=h('input',{type:'text',value:r.dr,style:'width:100%;padding:9px;border:1px solid var(--line,#ddd);border-radius:10px;box-sizing:border-box'});
+  var bsel=h('select',{style:'width:100%;padding:9px;border:1px solid var(--line,#ddd);border-radius:10px;margin-top:8px'},[h('option',{value:''},'— brick —')].concat(bricks.map(function(b){return h('option',{value:b,selected:b===r.brick?'selected':null},b);})));
+  if(r.brick&&bricks.indexOf(r.brick)<0)bsel.insertBefore(h('option',{value:r.brick,selected:'selected'},r.brick),bsel.children[1]);
+  var ks=h('select',{style:'width:100%;padding:9px;border:1px solid var(--line,#ddd);border-radius:10px;margin-top:8px'},[['D','👨‍⚕️ Doctor'],['R','🏪 Retailer']].map(function(x){return h('option',{value:x[0],selected:x[0]===(r.kind||'D')?'selected':null},x[1]);}));
+  var ex=h('textarea',{placeholder:'Explain the change (required) — why is this being changed?',style:'width:100%;min-height:80px;padding:9px;border:1px solid var(--line,#ddd);border-radius:10px;margin-top:8px;box-sizing:border-box;font:inherit'});
+  body.append(h('p',{style:'font-size:12.5px;color:var(--muted);margin:0 0 8px'},'Edit the details and give a reason. Once saved it is locked and shows “Waiting for approval” until Ratan Roy approves.'),
+    h('label',{style:'font-size:12px;color:var(--muted);font-weight:700'},'Name'),nm,
+    h('label',{style:'font-size:12px;color:var(--muted);font-weight:700;display:block;margin-top:8px'},'Brick'),bsel,
+    h('label',{style:'font-size:12px;color:var(--muted);font-weight:700;display:block;margin-top:8px'},'Type'),ks,
+    h('label',{style:'font-size:12px;color:var(--muted);font-weight:700;display:block;margin-top:8px'},'Explanation'),ex,
+    h('button',{style:'width:100%;margin-top:12px',onclick:function(){
+      var reason=(ex.value||'').trim();if(reason.length<4){toast&&toast('Please write the reason for the change');return;}
+      var newName=(nm.value||'').trim()||r.dr;
+      save('dr_approval',{change:true,orig:r.dr,dr:newName,brick:bsel.value||r.brick||'',kind:ks.value||r.kind||'D',reason:reason,status:'pending'}).then(function(ok){if(ok){close();toast&&toast('Change sent to Ratan Roy — waiting for approval');try{render();}catch(e){}}});
+    }},'📤 Save change & send for approval'));
+  var ov=h('div',{class:'ftsheet'},h('div',{class:'pn'},h('div',{class:'grab'}),h('div',{class:'hd'},h('b',{},'✏️ Change '+(r.kind==='R'?'retailer':'doctor')),h('button',{class:'ghost',onclick:function(){close();}},'✕')),body));
+  function close(){ov.remove();}ov.addEventListener('click',function(e){if(e.target===ov)close();});document.body.append(ov);
 }
 
 function inputsScreen(app){try{
@@ -83,17 +106,19 @@ function inputsScreen(app){try{
   if(!show.length)tbl.append(h('tr',{},h('td',{class:'sl'},'—'),h('td',{colspan:'3',style:'color:var(--muted)'},flt==='todo'?(rows.length?'🎉 All doctors approved — nothing to send.':'No doctors synced yet. Add one below, or Sync.'):'No doctors yet. Add one below and send for approval.')));
   show.forEach(function(r,i){
     var cell;
-    if(r.status==='yes')cell=h('span',{class:'inpst yes'},'✅ Yes');
-    else if(r.status==='wait')cell=h('span',{class:'inpst wait'},'⏳ Sent');
-    else cell=h('span',{class:'inpst no'},h('button',{onclick:function(){sendForApproval(r.dr,r.brick);}},'Send ▸'));
-    tbl.append(h('tr',{},h('td',{class:'sl'},String(i+1)),h('td',{},r.dr),h('td',{class:'br'},r.brick||'—'),h('td',{},cell)));
+    if(r.status==='yes')cell=h('div',{},h('span',{class:'inpst yes'},'✅ Yes'),h('button',{class:'chgb',onclick:function(){openChange(r);}},'Change'));
+    else if(r.status==='wait')cell=h('span',{class:'inpst wait'},'⏳ Waiting for approval');
+    else cell=h('span',{class:'inpst no'},h('button',{onclick:function(){sendForApproval(r.dr,r.brick,r.kind);}},'Send ▸'));
+    var nm=(r.kind==='R'?'🏪 ':'')+r.dr;
+    tbl.append(h('tr',{},h('td',{class:'sl'},String(i+1)),h('td',{},nm),h('td',{class:'br'},r.brick||'—'),h('td',{},cell)));
   });
   card.append(tbl);
   /* add a brand-new doctor (not in the register) -> send for approval */
   var bsel=h('select',[h('option',{value:''},'— brick —')].concat(bricksHQ().map(function(b){return h('option',{value:b},b);})));
-  var dname=h('input',{type:'text',placeholder:'New doctor name',style:'width:100%;padding:9px;border:1px solid var(--line,#ddd);border-radius:10px;margin-bottom:7px;box-sizing:border-box'});
-  var add=h('div',{class:'inpadd'},h('div',{style:'font-weight:800;font-size:12.5px;margin-bottom:7px'},'➕ Add a new doctor for approval'),bsel,dname,
-    h('button',{class:'go',onclick:function(){if(!bsel.value){toast&&toast('Choose a brick');return;}var nm=(dname.value||'').trim();if(nm.length<3){toast&&toast('Type the doctor\'s name');return;}sendForApproval(nm,bsel.value);}},'📤 Save & send to Ratan Roy'));
+  var kadd=h('select',[['D','👨‍⚕️ Doctor'],['R','🏪 Retailer']].map(function(x){return h('option',{value:x[0]},x[1]);}));
+  var dname=h('input',{type:'text',placeholder:'New name',style:'width:100%;padding:9px;border:1px solid var(--line,#ddd);border-radius:10px;margin-bottom:7px;box-sizing:border-box'});
+  var add=h('div',{class:'inpadd'},h('div',{style:'font-weight:800;font-size:12.5px;margin-bottom:7px'},'➕ Add a new doctor / retailer for approval'),kadd,bsel,dname,
+    h('button',{class:'go',onclick:function(){if(!bsel.value){toast&&toast('Choose a brick');return;}var nm=(dname.value||'').trim();if(nm.length<3){toast&&toast('Type the name');return;}sendForApproval(nm,bsel.value,kadd.value);}},'📤 Save & send to Ratan Roy'));
   card.append(add);
   app.append(card);
 }catch(e){app.append(h('div',{class:'note'},'Could not open Inputs: '+e.message));}}
@@ -102,8 +127,10 @@ U.inputsScreen=inputsScreen;U.routes.inputs=function(app){inputsScreen(app);};
 /* manager: approve the doctors CSOs sent (adds to the Approvals tab) */
 U.drApprovals=function(){try{var L=(S.entries||[]).filter(function(e){return e.type==='dr_approval'&&e.status==='pending';});if(!L.length)return null;
   var box=h('div',{class:'phase'},h('div',{class:'ph'},h('b',{},'👨‍⚕️ Doctors to approve'),h('small',{},String(L.length))));
-  L.forEach(function(e){box.append(h('div',{class:'lrow',style:'cursor:default'},
-    h('div',{class:'tx'},h('b',{},(e.name||'CSO')+' · '+(e.dr||'doctor')),h('small',{},(e.brick||'—')+' · '+(e.hq||''))),
+  L.forEach(function(e){var kindLbl=e.kind==='R'?'🏪 retailer':'👨‍⚕️ doctor';
+    var title=e.change?('✏️ Change: '+(e.orig||'')+' → '+(e.dr||'')):('➕ New '+kindLbl+': '+(e.dr||''));
+    box.append(h('div',{class:'lrow',style:'cursor:default;align-items:flex-start'},
+    h('div',{class:'tx'},h('b',{},(e.name||'CSO')+' · '+title),h('small',{},(e.brick||'—')+(e.hq?' · '+e.hq:'')+(e.reason?' · “'+e.reason+'”':''))),
     h('div',{style:'display:flex;gap:6px'},
       h('button',{style:'min-height:auto;padding:8px 12px',onclick:function(){S.db.collection('entries').doc(e._id).update({status:'approved',approvedTs:Date.now()}).then(function(){toast&&toast('Approved');render();});}},'✅'),
       h('button',{class:'ghost',style:'min-height:auto;padding:8px 12px',onclick:function(){var n=prompt('Reason to return (optional)')||'';S.db.collection('entries').doc(e._id).update({status:'returned',note:n}).then(function(){toast&&toast('Returned');render();});}},'↩️'))));});
