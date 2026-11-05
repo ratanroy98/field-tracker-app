@@ -1,4 +1,4 @@
-window.FT_BUILD='20261105110922';
+window.FT_BUILD='20261105112615';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -3357,9 +3357,10 @@ U.progressCard=function(){try{if(S.mgr&&!S.viewAs)return'';var mp=mprog();
   var open=function(){go('progress')};
   if(!mp)return h('div',{class:'dcard prog',onclick:open},h('div',{class:'dh'},h('b',{},'📈 Progress'),h('span',{class:'arr'},'›')),h('p',{class:'dhint'},'Your brand-wise progress — Target, Closing, POB, Achievement and Performance — appears right after a Sync.'));
   var G=mpGroups(mp),T=mp.total||{},tp=T.perf!=null?T.perf:P(T.ach,T.tgt);
+  var LC=(U.localClosing&&U.localClosing())||{},lcAny=Object.keys(LC).length,totCl=lcAny?Object.keys(LC).reduce(function(a,k){return a+(+LC[k]||0)},0):T.cl;
   var card=h('div',{class:'dcard prog',onclick:open},h('div',{class:'dh'},h('b',{},'📈 Progress'),h('span',{class:'sub'},(mp.month||'')+(mp.asOf?' · '+mp.asOf:'')),h('span',{class:'arr'},'›')));
   card.append(h('div',{class:'ovr'},h('div',{class:'op '+perfCls(tp)},pf(tp)),
-    h('div',{class:'ogrid'},h('span',{},'Tgt ',h('b',{},pLak(T.tgt))),h('span',{},'Close ',h('b',{},pLak(T.cl))),h('span',{},'POB ',h('b',{},pLak(T.pob))),h('span',{},'Ach ',h('b',{},pLak(T.ach))))));
+    h('div',{class:'ogrid'},h('span',{},'Tgt ',h('b',{},pLak(T.tgt))),h('span',{},'Close ',h('b',{},pLak(totCl))),h('span',{},'POB ',h('b',{},pLak(T.pob))),h('span',{},'Ach ',h('b',{},pLak(T.ach))))));
   function line(label,r){var perf=r.perf!=null?r.perf:P(r.ach,r.tgt);
     card.append(h('div',{class:'pln'},h('span',{class:'nm'},label),h('span',{class:'ba'},h('i',{class:perfCls(perf),style:'width:'+Math.max(2,Math.min(100,perf||0))+'%'})),h('span',{class:'pc '+perfCls(perf)},pf(perf))))}
   if(G.impact.length){card.append(h('div',{class:'glbl'},'IMPACT'));G.impact.forEach(function(r){line(r.b,r)})}
@@ -3374,9 +3375,10 @@ U.routes.progress=function(app){try{if(S.mgr&&!S.viewAs){app.append(h('div',{cla
   var mp=mprog();
   app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📈 Month progress'+(mp&&mp.month?' · '+mp.month:'')),h('p',{},'Target & achievement are brand-wise from frontline, POB from Ventasys, and closing stock is computed from your stock statements — it falls as POB rises.')));
   if(!mp){app.append(h('div',{class:'coachc',style:'background:var(--soft,#F2F5F4);border-color:var(--line,#e5ece9)'},h('p',{style:'margin:0'},'Your month progress appears here right after a Sync.')));return}
-  var G=mpGroups(mp);
+  var G=mpGroups(mp),LC=(U.localClosing&&U.localClosing())||{};
+  function clOf(r){return LC[r.b]!=null?LC[r.b]:r.cl}
   function brandCard(r){var perf=r.perf!=null?r.perf:P(r.ach,r.tgt),bal=(r.tgt!=null&&r.ach!=null)?(r.tgt-r.ach):null;
-    var rows=[['Target',pLak(r.tgt),''],['Closing',pLak(r.cl),'muted'],['POB',pLak(r.pob),'pob'],['Ach',pLak(r.ach),'ach']];
+    var rows=[['Target',pLak(r.tgt),''],['Closing',pLak(clOf(r)),'muted'],['POB',pLak(r.pob),'pob'],['Ach',pLak(r.ach),'ach']];
     var card=h('div',{class:'brcard'},h('div',{class:'bh'},h('b',{},r.b),h('span',{class:'bp '+perfCls(perf)},pf(perf))));
     rows.forEach(function(x){card.append(h('div',{class:'brl'},h('span',{},x[0]),h('b',{class:x[2]},x[1])))});
     if(bal!=null)card.append(h('div',{class:'brl bal'},h('span',{},'Balance to do'),h('b',{class:bal>0?'r':'g'},bal>0?pLak(bal):'Done ✓')));
@@ -3385,7 +3387,7 @@ U.routes.progress=function(app){try{if(S.mgr&&!S.viewAs){app.append(h('div',{cla
   function section(title,arr){if(!arr.length)return;app.append(h('div',{class:'psec'},title));arr.forEach(function(r){app.append(brandCard(r))})}
   section('IMPACT BRANDS',G.impact);
   section('NPD',G.npd);
-  if(G.other.length){var t={b:'Others (clubbed)',tgt:0,cl:null,pob:null,ach:null};G.other.forEach(function(r){t.tgt+=r.tgt||0;if(r.cl!=null)t.cl=(t.cl||0)+r.cl;if(r.pob!=null)t.pob=(t.pob||0)+r.pob;if(r.ach!=null)t.ach=(t.ach||0)+r.ach});app.append(h('div',{class:'psec'},'OTHERS'));app.append(brandCard(t))}
+  if(G.other.length){var t={b:'Others (clubbed)',tgt:0,cl:null,pob:null,ach:null};G.other.forEach(function(r){t.tgt+=r.tgt||0;var c=clOf(r);if(c!=null)t.cl=(t.cl||0)+c;if(r.pob!=null)t.pob=(t.pob||0)+r.pob;if(r.ach!=null)t.ach=(t.ach||0)+r.ach});app.append(h('div',{class:'psec'},'OTHERS'));app.append(brandCard(t))}
 }catch(e){app.append(h('div',{class:'note'},'Could not open progress: '+e.message))}};
 
 /* ---------- Incentive: compact dashboard card + 3-tab screen (This month / The quarter / Special) ---------- */
@@ -3572,22 +3574,52 @@ U.carryCard=function(){try{if(isMgr())return'';var brick=(typeof brickToday==='f
 
 /* ---------- stock statement upload (photo or PDF) ---------- */
 function stmtEntries(){try{return (S.entries||[]).filter(function(e){return e.type==='stock_statement'&&(!e.email||e.email===myEmail())}).sort(function(a,b){return (b.ts||0)-(a.ts||0)})}catch(e){return[]}}
+/* ---- in-app statement reader: the app calculates closing stock itself (ML Kit OCR in the APK fills it; manual confirm otherwise) ---- */
+var STMTBRANDS=[['R-Loc Raft',/raft/i],['Skinlite Facewash',/face\s*wash/i],['Skinlite Day Care',/day\s*care/i],['Deca Durabolin',/deca\s*dur/i],['Dexona',/dexona/i],['R-Loc',/r[\s\-]*loc/i],['Skinlite',/skin\s*lite/i],['Ciprobid',/ciprobid/i],['Oflin',/oflin/i],['Oriprim',/oriprim/i],['Zipcet',/zipcet/i],['Tiniba',/tiniba/i],['Itchcam',/itchcam/i],['Cadiphylate',/cadiphylate/i],['Falcigo',/falcigo/i]];
+var STMT_ALL=['Deca Durabolin','Dexona','R-Loc','Skinlite','R-Loc Raft','Skinlite Facewash','Skinlite Day Care','Ciprobid','Oflin','Oriprim','Zipcet','Tiniba','Itchcam','Cadiphylate','Falcigo'];
+function guessStockist(lines){for(var i=0;i<Math.min(lines.length,25);i++){var l=(lines[i]||'').trim();if(l.length>4&&l.length<60&&/DRUG|PHARMA|MEDICAL|AGENC|ENTERPRIS|DISTRIBUT|TRADER|STORES?|MEDICOS?/i.test(l))return l}return''}
+function parseStatement(text){var out={stockist:'',b:{}};if(!text)return out;var lines=text.split(/[\n\r]+/);out.stockist=guessStockist(lines);
+  var taken={};STMTBRANDS.forEach(function(br){for(var i=0;i<lines.length;i++){if(taken[i])continue;if(br[1].test(lines[i])){var nums=(lines[i].match(/[\d,]+\.\d{2}/g)||lines[i].match(/[\d,]{3,}/g)||[]);if(nums.length){var v=parseFloat(String(nums[nums.length-1]).replace(/,/g,''));if(!isNaN(v)&&v>0){out.b[br[0]]=(out.b[br[0]]||0)+v;taken[i]=1}}break}}});
+  return out}
+window.ftOcrResult=function(id,text){try{var cb=(window.__ocrCbs||{})[id];if(cb){delete window.__ocrCbs[id];cb(text||'')}}catch(e){}};
+function ocrFile(f){return new Promise(function(res){try{
+  if(!(window.AndroidApp&&AndroidApp.ocrStart)){res('');return}
+  var isPdf=/pdf/i.test(f.type||'')||/\.pdf$/i.test(f.name||'');
+  function send(b64,mime){var id='o'+Date.now()+Math.floor(Math.random()*9999);window.__ocrCbs=window.__ocrCbs||{};window.__ocrCbs[id]=res;try{AndroidApp.ocrStart(b64,mime,id)}catch(e){delete window.__ocrCbs[id];res('')}setTimeout(function(){if(window.__ocrCbs[id]){delete window.__ocrCbs[id];res('')}},90000)}
+  var r=new FileReader();
+  if(isPdf){r.onload=function(){send(String(r.result).split(',')[1]||'','application/pdf')};r.onerror=function(){res('')};r.readAsDataURL(f)}
+  else{r.onload=function(){var img=new Image();img.onload=function(){try{var mx=1800,sc=Math.min(1,mx/Math.max(img.width,img.height)),cv=document.createElement('canvas');cv.width=Math.round(img.width*sc);cv.height=Math.round(img.height*sc);cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);send(cv.toDataURL('image/jpeg',0.85).split(',')[1]||'','image/jpeg')}catch(e){res('')}};img.onerror=function(){res('')};img.src=r.result};r.onerror=function(){res('')};r.readAsDataURL(f)}
+}catch(e){res('')}})}
+/* the app's own closing: newest statement per stockist, summed by brand (no backend) */
+U.localClosing=function(){try{var es=(S.entries||[]).filter(function(e){return e.type==='stock_statement'&&e.b});var byStk={};es.forEach(function(e){var k=e.stockist||e.fileId||e._id||Math.random();var p=byStk[k];if(!p||(e.ts||0)>(p.ts||0))byStk[k]=e});var out={};Object.keys(byStk).forEach(function(k){var b=byStk[k].b||{};Object.keys(b).forEach(function(br){out[br]=(out[br]||0)+(+b[br]||0)})});return out}catch(e){return{}}};
+
 function stmtScreen(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Stock statements are uploaded by the CSO.'));return}
   st();
-  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📄 Stock statement'),h('p',{},'Upload your stockist\'s stock statement — a photo or a PDF, in whatever format their software gives. The app reads it on its own and works out the closing stock brand-wise; you don\'t type anything. It appears in your Progress and falls as POB is booked.')));
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📄 Stock statement'),h('p',{},'Upload your stockist\'s statement — photo or PDF, any software\'s format. The app reads it and fills in the closing stock brand-wise. Check the figures and Save; it goes into your Progress and falls as POB is booked.')));
   var inp=h('input',{type:'file',accept:'image/*,application/pdf',style:'display:none'});
   var stx=h('div',{style:'text-align:center;color:var(--muted);font-size:13px;min-height:18px;margin-top:6px'});
-  var btn=h('button',{style:'width:100%',onclick:function(){inp.click()}},'📄 Upload statement (photo or PDF)');
-  inp.addEventListener('change',function(){var f=inp.files&&inp.files[0];if(!f)return;
-    if(typeof uploadPhoto!=='function'){stx.textContent='Upload not ready — Sync and try again.';return}
-    btn.disabled=true;stx.textContent='Uploading…';
-    uploadPhoto(f).then(function(p){var done=(typeof save==='function')?save('stock_statement',{url:p.url,fileId:p.id,name:f.name||'statement',mime:f.type||'',month:(typeof TODAY!=='undefined'?TODAY:'').slice(0,7)}):Promise.resolve(true);
-      Promise.resolve(done).then(function(){stx.textContent='✅ Sent to Ratan Roy';btn.disabled=false;try{render()}catch(e){}})},
-      function(e){btn.disabled=false;stx.textContent=(e&&e.message)||'Upload failed. Try again.'})});
+  var btn=h('button',{style:'width:100%',onclick:function(){inp.click()}},'📄 Read a statement (photo or PDF)');
   app.append(h('div',{class:'selc'},btn,inp,stx));
+  var formWrap=h('div');app.append(formWrap);
+  function showForm(guess,fileInfo){formWrap.innerHTML='';
+    var stk=h('input',{type:'text',placeholder:'Stockist name',value:(guess&&guess.stockist)||'',style:'width:100%;margin-bottom:8px'});
+    var rows={},box=h('div',{class:'selc'},h('div',{style:'font-weight:800;margin-bottom:4px'},'Closing stock — ₹ value per brand'),h('p',{style:'font-size:12px;color:var(--muted);margin:0 0 8px'},'The app filled these from the statement. Fix any that look wrong; leave blank to skip.'),stk);
+    [['IMPACT',['Deca Durabolin','Dexona','R-Loc','Skinlite']],['NPD',['R-Loc Raft','Skinlite Facewash','Skinlite Day Care']],['OTHERS',['Ciprobid','Oflin','Oriprim','Zipcet','Tiniba','Itchcam','Cadiphylate','Falcigo']]].forEach(function(g){
+      box.append(h('div',{style:'font-size:11px;font-weight:800;color:var(--accent,#0F5257);margin:8px 0 2px;letter-spacing:.4px'},g[0]));
+      g[1].forEach(function(b){var val=(guess&&guess.b&&guess.b[b]!=null)?Math.round(guess.b[b]):'';var ip=h('input',{type:'number',inputmode:'decimal',placeholder:'₹',style:'width:130px;text-align:right'});if(val!=='')ip.value=String(val);rows[b]=ip;
+        box.append(h('div',{style:'display:flex;align-items:center;justify-content:space-between;margin:4px 0;gap:8px'},h('span',{style:'font-size:13px'},b),ip))})});
+    var sv=h('button',{style:'width:100%;margin-top:10px',onclick:function(){var bval={};Object.keys(rows).forEach(function(b){var v=parseFloat(rows[b].value);if(!isNaN(v)&&v>0)bval[b]=Math.round(v)});
+      var rec={url:(fileInfo&&fileInfo.url)||'',fileId:(fileInfo&&fileInfo.id)||'',name:(fileInfo&&fileInfo.name)||'statement',mime:(fileInfo&&fileInfo.mime)||'',month:(typeof TODAY!=='undefined'?TODAY:'').slice(0,7),stmtDate:TODAY,stockist:stk.value||'',b:bval};
+      (typeof save==='function'?save('stock_statement',rec):Promise.resolve(true)).then(function(){stx.textContent='✅ Saved — closing added to your Progress';formWrap.innerHTML='';try{render()}catch(e){}})}},'✅ Save closing to Progress');
+    box.append(sv);formWrap.append(box)}
+  inp.addEventListener('change',function(){var f=inp.files&&inp.files[0];if(!f)return;btn.disabled=true;stx.textContent='Uploading…';
+    var up=(typeof uploadPhoto==='function')?uploadPhoto(f):Promise.resolve({});
+    up.then(function(p){var fileInfo={url:p&&p.url,id:p&&p.id,name:f.name,mime:f.type};btn.disabled=false;stx.textContent='📖 Reading your statement…';
+      ocrFile(f).then(function(text){var guess=parseStatement(text);showForm(guess,fileInfo);stx.textContent=text?'✅ Read — check the figures below':'Enter the closing below';})},
+      function(){btn.disabled=false;showForm({},{name:f.name,mime:f.type});stx.textContent='Upload failed — you can still enter the closing below.'})});
   var prev=stmtEntries();
-  if(prev.length){var box=h('div',{class:'coachc'},h('div',{class:'k'},'Uploaded'));prev.slice(0,10).forEach(function(e){box.append(h('p',{style:'margin:3px 0'},'📄 '+(e.name||'statement')+(e.date?' · '+e.date:'')))});app.append(box)}
-}catch(e){app.append(h('div',{class:'note'},'Could not open statement upload: '+e.message))}}
+  if(prev.length){var box2=h('div',{class:'coachc'},h('div',{class:'k'},'Saved statements'));prev.slice(0,10).forEach(function(e){var bs=e.b?Object.keys(e.b).length:0;box2.append(h('p',{style:'margin:3px 0'},'📄 '+(e.stockist||e.name||'statement')+(e.date?' · '+e.date:'')+(bs?' · '+bs+' brands':'')))});app.append(box2)}
+}catch(e){app.append(h('div',{class:'note'},'Could not open statement reader: '+e.message))}}
 U.stmtScreen=stmtScreen;U.routes.stock=function(app){stmtScreen(app)};
 
 /* ---------- field photo: take, tag the dr/retailer, submit (reaches Ratan to share) ---------- */
@@ -4016,9 +4048,10 @@ U.updatesCard=function(){try{if(!isCSO())return'';
   meets.forEach(function(m){var hw=m.how==='phone'?'📞':m.how==='whatsapp'?'💬':'🎥',url=joinUrl(m),jl=m.how==='phone'?'Call':m.how==='whatsapp'?'WhatsApp':'Join';
     card.append(h('div',{class:'updrow',onclick:function(ev){ev.stopPropagation();markSeen();if(url){try{if(window.openUrl)openUrl(url);else window.open(url,'_blank')}catch(e){location.href=url}}}},
       h('span',{class:'ic'},hw),h('div',{class:'tx'},h('b',{},m.title||'Meeting with Ratan Roy'),h('small',{},meetWhen(m)+(m.agenda?' · '+m.agenda:''))),url?h('span',{class:'join'},jl):''));});
-  if(msg){var first=(msg.text||'').split('\n').filter(Boolean)[0]||'';
-    card.append(h('div',{class:'updrow msg',onclick:function(ev){ev.stopPropagation();markSeen();U.lsSet&&U.lsSet('ft_me','msgs');go('msgs')}},h('span',{class:'ic'},'📋'),h('div',{class:'tx'},h('b',{},'From Ratan Roy'),h('small',{},first)),h('span',{class:'join gh'},'Read')));}
-  if(!meets.length&&!msg)card.append(h('div',{class:'none'},'✅ No meeting or new message. Sync anytime to refresh.'));
+  /* Immediate note only: a short urgent message flagged by Ratan (never the daily plan — that lives on its own tab, and this card never navigates away). */
+  if(msg&&(msg.urgent||msg.slot==='now'||msg.slot==='immediate')){var first=(msg.text||'').split('\n').filter(Boolean)[0]||'';
+    card.append(h('div',{class:'updrow msg'},h('span',{class:'ic'},'⚡'),h('div',{class:'tx'},h('b',{},'From Ratan Roy'),h('small',{},first))));}
+  if(!meets.length&&!(msg&&(msg.urgent||msg.slot==='now'||msg.slot==='immediate')))card.append(h('div',{class:'none'},'✅ No meeting or urgent note right now.'));
   var q=quoteBlock();if(q)card.append(q);
   return card;
 }catch(e){return''}};
@@ -4071,5 +4104,16 @@ var st2=document.createElement('style');st2.textContent=`
 .bestpanel .bpk .tx{flex:1;min-width:0}.bestpanel .bpk .tx b{font-size:14px}.bestpanel .bpk .tx small{display:block;color:var(--muted);font-size:11.5px}
 .bestpanel .bpk .set{flex:0 0 auto;background:#5B2E8C;color:#fff;border-radius:10px;padding:7px 13px;font-size:12.5px;font-weight:800}
 .bestpanel .bpk.on .set{background:#1B8A5A}
+/* Tablet / landscape: keep a comfortable centred column instead of a stretched or tiny layout */
+@media (min-width:700px){
+  #app{max-width:640px!important;margin-left:auto!important;margin-right:auto!important}
+  .fthead .row,.bnav{max-width:640px;margin-left:auto;margin-right:auto}
+  .bnav{left:0;right:0}
+  body{background:#E7ECEA}
+}
+@media (min-width:1000px){
+  #app{max-width:720px!important}
+  .fthead .row,.bnav{max-width:720px}
+}
 `;document.head.appendChild(st2);
 })();

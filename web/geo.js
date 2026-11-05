@@ -488,9 +488,10 @@ U.progressCard=function(){try{if(S.mgr&&!S.viewAs)return'';var mp=mprog();
   var open=function(){go('progress')};
   if(!mp)return h('div',{class:'dcard prog',onclick:open},h('div',{class:'dh'},h('b',{},'📈 Progress'),h('span',{class:'arr'},'›')),h('p',{class:'dhint'},'Your brand-wise progress — Target, Closing, POB, Achievement and Performance — appears right after a Sync.'));
   var G=mpGroups(mp),T=mp.total||{},tp=T.perf!=null?T.perf:P(T.ach,T.tgt);
+  var LC=(U.localClosing&&U.localClosing())||{},lcAny=Object.keys(LC).length,totCl=lcAny?Object.keys(LC).reduce(function(a,k){return a+(+LC[k]||0)},0):T.cl;
   var card=h('div',{class:'dcard prog',onclick:open},h('div',{class:'dh'},h('b',{},'📈 Progress'),h('span',{class:'sub'},(mp.month||'')+(mp.asOf?' · '+mp.asOf:'')),h('span',{class:'arr'},'›')));
   card.append(h('div',{class:'ovr'},h('div',{class:'op '+perfCls(tp)},pf(tp)),
-    h('div',{class:'ogrid'},h('span',{},'Tgt ',h('b',{},pLak(T.tgt))),h('span',{},'Close ',h('b',{},pLak(T.cl))),h('span',{},'POB ',h('b',{},pLak(T.pob))),h('span',{},'Ach ',h('b',{},pLak(T.ach))))));
+    h('div',{class:'ogrid'},h('span',{},'Tgt ',h('b',{},pLak(T.tgt))),h('span',{},'Close ',h('b',{},pLak(totCl))),h('span',{},'POB ',h('b',{},pLak(T.pob))),h('span',{},'Ach ',h('b',{},pLak(T.ach))))));
   function line(label,r){var perf=r.perf!=null?r.perf:P(r.ach,r.tgt);
     card.append(h('div',{class:'pln'},h('span',{class:'nm'},label),h('span',{class:'ba'},h('i',{class:perfCls(perf),style:'width:'+Math.max(2,Math.min(100,perf||0))+'%'})),h('span',{class:'pc '+perfCls(perf)},pf(perf))))}
   if(G.impact.length){card.append(h('div',{class:'glbl'},'IMPACT'));G.impact.forEach(function(r){line(r.b,r)})}
@@ -505,9 +506,10 @@ U.routes.progress=function(app){try{if(S.mgr&&!S.viewAs){app.append(h('div',{cla
   var mp=mprog();
   app.append(h('div',{class:'coachc'},h('div',{class:'k'},'📈 Month progress'+(mp&&mp.month?' · '+mp.month:'')),h('p',{},'Target & achievement are brand-wise from frontline, POB from Ventasys, and closing stock is computed from your stock statements — it falls as POB rises.')));
   if(!mp){app.append(h('div',{class:'coachc',style:'background:var(--soft,#F2F5F4);border-color:var(--line,#e5ece9)'},h('p',{style:'margin:0'},'Your month progress appears here right after a Sync.')));return}
-  var G=mpGroups(mp);
+  var G=mpGroups(mp),LC=(U.localClosing&&U.localClosing())||{};
+  function clOf(r){return LC[r.b]!=null?LC[r.b]:r.cl}
   function brandCard(r){var perf=r.perf!=null?r.perf:P(r.ach,r.tgt),bal=(r.tgt!=null&&r.ach!=null)?(r.tgt-r.ach):null;
-    var rows=[['Target',pLak(r.tgt),''],['Closing',pLak(r.cl),'muted'],['POB',pLak(r.pob),'pob'],['Ach',pLak(r.ach),'ach']];
+    var rows=[['Target',pLak(r.tgt),''],['Closing',pLak(clOf(r)),'muted'],['POB',pLak(r.pob),'pob'],['Ach',pLak(r.ach),'ach']];
     var card=h('div',{class:'brcard'},h('div',{class:'bh'},h('b',{},r.b),h('span',{class:'bp '+perfCls(perf)},pf(perf))));
     rows.forEach(function(x){card.append(h('div',{class:'brl'},h('span',{},x[0]),h('b',{class:x[2]},x[1])))});
     if(bal!=null)card.append(h('div',{class:'brl bal'},h('span',{},'Balance to do'),h('b',{class:bal>0?'r':'g'},bal>0?pLak(bal):'Done ✓')));
@@ -516,7 +518,7 @@ U.routes.progress=function(app){try{if(S.mgr&&!S.viewAs){app.append(h('div',{cla
   function section(title,arr){if(!arr.length)return;app.append(h('div',{class:'psec'},title));arr.forEach(function(r){app.append(brandCard(r))})}
   section('IMPACT BRANDS',G.impact);
   section('NPD',G.npd);
-  if(G.other.length){var t={b:'Others (clubbed)',tgt:0,cl:null,pob:null,ach:null};G.other.forEach(function(r){t.tgt+=r.tgt||0;if(r.cl!=null)t.cl=(t.cl||0)+r.cl;if(r.pob!=null)t.pob=(t.pob||0)+r.pob;if(r.ach!=null)t.ach=(t.ach||0)+r.ach});app.append(h('div',{class:'psec'},'OTHERS'));app.append(brandCard(t))}
+  if(G.other.length){var t={b:'Others (clubbed)',tgt:0,cl:null,pob:null,ach:null};G.other.forEach(function(r){t.tgt+=r.tgt||0;var c=clOf(r);if(c!=null)t.cl=(t.cl||0)+c;if(r.pob!=null)t.pob=(t.pob||0)+r.pob;if(r.ach!=null)t.ach=(t.ach||0)+r.ach});app.append(h('div',{class:'psec'},'OTHERS'));app.append(brandCard(t))}
 }catch(e){app.append(h('div',{class:'note'},'Could not open progress: '+e.message))}};
 
 /* ---------- Incentive: compact dashboard card + 3-tab screen (This month / The quarter / Special) ---------- */

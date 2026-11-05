@@ -120,9 +120,10 @@ U.updatesCard=function(){try{if(!isCSO())return'';
   meets.forEach(function(m){var hw=m.how==='phone'?'📞':m.how==='whatsapp'?'💬':'🎥',url=joinUrl(m),jl=m.how==='phone'?'Call':m.how==='whatsapp'?'WhatsApp':'Join';
     card.append(h('div',{class:'updrow',onclick:function(ev){ev.stopPropagation();markSeen();if(url){try{if(window.openUrl)openUrl(url);else window.open(url,'_blank')}catch(e){location.href=url}}}},
       h('span',{class:'ic'},hw),h('div',{class:'tx'},h('b',{},m.title||'Meeting with Ratan Roy'),h('small',{},meetWhen(m)+(m.agenda?' · '+m.agenda:''))),url?h('span',{class:'join'},jl):''));});
-  if(msg){var first=(msg.text||'').split('\n').filter(Boolean)[0]||'';
-    card.append(h('div',{class:'updrow msg',onclick:function(ev){ev.stopPropagation();markSeen();U.lsSet&&U.lsSet('ft_me','msgs');go('msgs')}},h('span',{class:'ic'},'📋'),h('div',{class:'tx'},h('b',{},'From Ratan Roy'),h('small',{},first)),h('span',{class:'join gh'},'Read')));}
-  if(!meets.length&&!msg)card.append(h('div',{class:'none'},'✅ No meeting or new message. Sync anytime to refresh.'));
+  /* Immediate note only: a short urgent message flagged by Ratan (never the daily plan — that lives on its own tab, and this card never navigates away). */
+  if(msg&&(msg.urgent||msg.slot==='now'||msg.slot==='immediate')){var first=(msg.text||'').split('\n').filter(Boolean)[0]||'';
+    card.append(h('div',{class:'updrow msg'},h('span',{class:'ic'},'⚡'),h('div',{class:'tx'},h('b',{},'From Ratan Roy'),h('small',{},first))));}
+  if(!meets.length&&!(msg&&(msg.urgent||msg.slot==='now'||msg.slot==='immediate')))card.append(h('div',{class:'none'},'✅ No meeting or urgent note right now.'));
   var q=quoteBlock();if(q)card.append(q);
   return card;
 }catch(e){return''}};
@@ -175,5 +176,16 @@ var st2=document.createElement('style');st2.textContent=`
 .bestpanel .bpk .tx{flex:1;min-width:0}.bestpanel .bpk .tx b{font-size:14px}.bestpanel .bpk .tx small{display:block;color:var(--muted);font-size:11.5px}
 .bestpanel .bpk .set{flex:0 0 auto;background:#5B2E8C;color:#fff;border-radius:10px;padding:7px 13px;font-size:12.5px;font-weight:800}
 .bestpanel .bpk.on .set{background:#1B8A5A}
+/* Tablet / landscape: keep a comfortable centred column instead of a stretched or tiny layout */
+@media (min-width:700px){
+  #app{max-width:640px!important;margin-left:auto!important;margin-right:auto!important}
+  .fthead .row,.bnav{max-width:640px;margin-left:auto;margin-right:auto}
+  .bnav{left:0;right:0}
+  body{background:#E7ECEA}
+}
+@media (min-width:1000px){
+  #app{max-width:720px!important}
+  .fthead .row,.bnav{max-width:720px}
+}
 `;document.head.appendChild(st2);
 })();
