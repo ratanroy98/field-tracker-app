@@ -126,7 +126,7 @@ U.campaignApprovals=function(){try{var L=(S.entries||[]).filter(function(e){retu
   return box}catch(e){return null}};
 
 /* ---------- daily carry-per-brick list ---------- */
-function inputsPendBrand(brand){try{var k=Object.keys(S.feeds||{}).filter(function(z){return z.indexOf('inputs_')===0})[0];var f=k?S.feeds[k]:null;if(!f||!f.brands||!f.brands[brand])return[];return (f.brands[brand].li||[]).map(function(x){return x.it})}catch(e){return[]}}
+function inputsPendBrand(brand){try{var f=(typeof ff==='function')?ff():null;if(!f){var k=Object.keys(S.feeds||{}).filter(function(z){return z.indexOf('inputs_')===0})[0];f=k?S.feeds[k]:null}if(!f||!f.brands||!f.brands[brand])return[];return (f.brands[brand].li||[]).map(function(x){return x.it})}catch(e){return[]}}
 function skinRoster(){try{var hq=myHQ2();return (((window.FT_ROSTERS||{}).skin||{})[hq])||[]}catch(e){return[]}}
 function custName(code){try{return (CUST&&CUST[code]&&CUST[code].name)||code}catch(e){return code}}
 /* tolerant brick/beat match: exact, contains, or shared significant token (TP brick names vs chemist beat names differ) */
@@ -270,7 +270,7 @@ U.relayPanel=function(){try{if(!isMgr())return null;var E=relayList();if(!E.leng
 
 /* ================= Brand drill-down: brand → input → quantity + doctor/retailer list (pick/approve/photo) ================= */
 var ROUTEB={raft:'R-Loc Raft',deca:'Deca Durabolin',rloc:'R-Loc',skin:'Skinlite',dexona:'Dexona',gifts:'Gifts & General'};
-function ff(){try{var k=Object.keys(S.feeds||{}).filter(function(z){return z.indexOf('inputs_')===0})[0];return k?S.feeds[k]:null}catch(e){return null}}
+function ff(){try{var hq=myHQ2();if(window.FT_INPUTS){var key='inputs_'+hq;if(hq&&FT_INPUTS[key])return FT_INPUTS[key]}var k=Object.keys(S.feeds||{}).filter(function(z){return z.indexOf('inputs_')===0})[0];return k?S.feeds[k]:null}catch(e){return null}}
 function normItem(s){return String(s||'').toUpperCase().replace(/\s+/g,' ').trim()}
 /* inputs under a brand, de-duplicated by normalized name (so "R Loc RAFT Pen" and "R LOC RAFT PEN" are one) */
 function brandItems(brand){var f=ff();if(!f||!f.brands||!f.brands[brand])return[];var b=f.brands[brand],set={},ord=[];['gi','gs','li','ls'].forEach(function(k){(b[k]||[]).forEach(function(x){var key=normItem(x.it);if(!set[key]){set[key]=1;ord.push(x.it)}})});return ord}
