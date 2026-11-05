@@ -1,4 +1,4 @@
-window.FT_BUILD='20261105115940';
+window.FT_BUILD='20261105132603';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -3151,8 +3151,9 @@ function scopeChips(DA){return DA.scopes.length>1?chips(DA.scopes,DA.scope,'sc',
 /* ---------- Performance ---------- */
 function vPerf(app,DA){
   app.append(scopeChips(DA));
-  var md=get('md','nm');
-  app.append(h('div',{class:'seg2'},[['nm','Normal'],['ip','Incentive basis']].map(function(x){return h('button',{class:x[0]===md?'on':'',onclick:function(){set('md',x[0])}},x[1])})));
+  // Multiple = multiplied/incentive value (CSO performance + incentive). Normal = actual value, manager only.
+  var md=DA.isMgr?get('md','ip'):'ip';
+  if(DA.isMgr)app.append(h('div',{class:'seg2'},[['ip','Multiple'],['nm','Normal']].map(function(x){return h('button',{class:x[0]===md?'on':'',onclick:function(){set('md',x[0])}},x[1])})));
   app.append(periodTabs());
   var p=curP();
   if(md==='nm')perfNormal(app,DA,p);else perfInc(app,DA,p);
@@ -3176,7 +3177,7 @@ function perfNormal(app,DA,p){var R=DA.rows('ALL'),a=agg(R,p),hh=hit(R),bk=DA.bu
 function perfInc(app,DA,p){var R=DA.rows('ALL'),a=agg(R,p),net=a[2],tgt=a[1],ly=a[0],sret=a[3]||0,gross=net+sret+(a[4]||0),
   ach=P(net,tgt),g=gr(net,ly),isQ=/Q/.test(String(p)),pcpm=isQ?net/3:(p==='YTD'?net/10:net),retpc=gross?sret/gross*100:0,bi=band(ach),si=slabIdx(pcpm),
   rate=bi<0?null:(isQ?RATE_Q:RATE_M)[si][bi];
-  app.append(h('div',{class:'hero'},h('div',{class:'k'},'Incentive basis · '+plab(p)),h('h2',{},DA.title+(DA.sub?' · '+DA.sub:'')),h('div',{class:'hrow'},ring(ach,76),h('div',{},h('div',{class:'big'},L(net)),h('small',{},'of '+L(tgt)+' target · LY '+L(ly)),h('small',{},'Growth '+sg(g)+' · '+(isQ?'quarterly':'monthly')+' rate '+(rate==null?'—':rate+'%'))))));
+  app.append(h('div',{class:'hero'},h('div',{class:'k'},'Multiple (incentive) · '+plab(p)),h('h2',{},DA.title+(DA.sub?' · '+DA.sub:'')),h('div',{class:'hrow'},ring(ach,76),h('div',{},h('div',{class:'big'},L(net)),h('small',{},'of '+L(tgt)+' target · LY '+L(ly)),h('small',{},'Growth '+sg(g)+' · '+(isQ?'quarterly':'monthly')+' rate '+(rate==null?'—':rate+'%'))))));
   app.append(h('div',{class:'card'},h('h3',{},'What decides your incentive',h('small',{},plab(p))),kgrid([
     ['Net sale',L(net)],['Target',L(tgt)],
     ['Achievement',pf(ach),pcls(ach)],['Growth',sg(g),gcls(g)],
@@ -3326,11 +3327,11 @@ function vMonthProgress(box,DA){
 }
 
 /* ---------- shell: tabbar + render both roles ---------- */
-function tabbar(T0){return h('div',{class:'tabbar'},[['perf','📊 Performance'],['mp','📅 Month Progress'],['imp','⭐ Impact Brands'],['inc','💰 Incentive'],['npd','🧪 NPDs']].map(function(x){return h('button',{class:x[0]===T0?'on':'',onclick:function(){set('T',x[0])}},x[1])}))}
+function tabbar(T0){return h('div',{class:'tabbar'},[['perf','📊 Performance'],['mp','📅 Month Progress'],['imp','⭐ Impact Brands'],['npd','🧪 NPDs']].map(function(x){return h('button',{class:x[0]===T0?'on':'',onclick:function(){set('T',x[0])}},x[1])}))}
 function renderReports(app,DA){var box=h('div',{class:'geo cso'});app.append(box);
-  var T0=get('T','perf');
+  var T0=get('T','perf');if(T0==='inc')T0='perf';
   box.append(tabbar(T0));
-  var names={perf:'Performance',mp:'Month Progress',imp:'Impact Brands',inc:'Incentive',npd:'NPDs'};
+  var names={perf:'Performance',mp:'Month Progress',imp:'Impact Brands',npd:'NPDs'};
   if(DA.isMgr)box.append(h('div',{class:'sharebar'},h('button',{onclick:function(){shareView(names[T0])}},'📸 Save / Share for WhatsApp'),h('button',{class:'alt',onclick:function(){shareView(names[T0])}},'⬇️ Download')));
   box.append(h('p',{class:'note',style:'margin:-2px 0 10px'},DA.title+(DA.isMgr?'':' HQ')+' · company incentive & sales data · '+(DA.asOf||'')+' · ₹ in lakh'+(DA.isMgr?' · only you can see this':'')));
   try{(T0==='perf'?vPerf:T0==='mp'?vMonthProgress:T0==='imp'?vImpact:T0==='inc'?vInc:vNPD)(box,DA)}catch(e){box.append(h('div',{class:'note'},'Could not draw this view: '+e.message))}
@@ -3347,7 +3348,7 @@ U.geoReady=function(){return !!G};U.geoReset=function(){if(window.__GEO)return;G
 function novPot(o){var t=o&&o[1]||0;if(t<=0)return null;var p100=t*1e5*RATE_M[slabIdx(t)][1]/100,n=1.1*t,p110=n*1e5*RATE_M[slabIdx(n)][2]/100;return{p100:p100,p110:p110}}
 U.earnCard=function(){try{var DA=mkDA(true);if(!DA)return'';var oh=DA.onhold()||{q3:0,sept:0},tot=(oh.q3||0)+(oh.sept||0);
   var o=agg(DA.rows('ALL'),9),oa=P(o[2],o[1]),open=oa!=null&&oa>=100,closed=(o[1]>0||o[2]>0),lost=(closed&&!open&&tot>0)?tot:0,pot=novPot(o);
-  var go2=function(){try{S.tab.perf='brands';S.tab.geo_T='inc';go('perf')}catch(e){}};
+  var go2=function(){try{S.tab.perf='brands';S.tab.geo_T='perf';go('perf')}catch(e){}};
   if(!pot)return h('div',{class:'geo'},h('div',{class:'estrip neu',onclick:go2},h('span',{style:'font-size:20px'},'💰'),h('div',{},h('div',{class:'lbl'},'Incentive'),h('div',{class:'amt'},'Tap to see')),h('span',{class:'st'},'›')));
   var tag=lost>0?('₹'+Math.round(lost).toLocaleString('en-IN')+' slipped in Oct — win it back'):(open&&tot>0?(R(tot)+' from Oct is released ✓'):(open?'October '+pf(oa)+' ✓ — keep it going':'A strong month starts the money'));
   return h('div',{class:'geo'},h('div',{class:'money',style:'margin:0;cursor:pointer',onclick:go2},
@@ -3935,7 +3936,7 @@ var MENU=[
 ];
 function close(){var o=document.querySelector('.ftmenu-ov');if(o){o.classList.remove('on');setTimeout(function(){try{o.remove()}catch(e){}},220)}}
 U.closeMenu=close;
-function goItem(r){try{if(r==='perf'){S.tab=S.tab||{};S.tab.perf='brands';S.tab.geo_T='inc';go('perf');return}go(r)}catch(e){}}
+function goItem(r){try{if(r==='perf'){S.tab=S.tab||{};S.tab.perf='brands';S.tab.geo_T='perf';go('perf');return}go(r)}catch(e){}}
 U.openMenu=function(){if(isMgr()||document.querySelector('.ftmenu-ov'))return;
   var panel=h('div',{class:'ftmenu'},h('div',{class:'mh'},h('b',{},'Menu'),h('small',{},'Everything in one place')));
   MENU.forEach(function(m){panel.append(h('button',{class:'mi',onclick:function(){close();goItem(m[3])}},h('span',{class:'mic'},m[0]),h('span',{},m[1],h('small',{},m[2])),h('span',{class:'ar'},'›')))});

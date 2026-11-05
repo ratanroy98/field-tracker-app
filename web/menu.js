@@ -37,7 +37,7 @@ var MENU=[
 ];
 function close(){var o=document.querySelector('.ftmenu-ov');if(o){o.classList.remove('on');setTimeout(function(){try{o.remove()}catch(e){}},220)}}
 U.closeMenu=close;
-function goItem(r){try{if(r==='perf'){S.tab=S.tab||{};S.tab.perf='brands';S.tab.geo_T='inc';go('perf');return}go(r)}catch(e){}}
+function goItem(r){try{if(r==='perf'){S.tab=S.tab||{};S.tab.perf='brands';S.tab.geo_T='perf';go('perf');return}go(r)}catch(e){}}
 U.openMenu=function(){if(isMgr()||document.querySelector('.ftmenu-ov'))return;
   var panel=h('div',{class:'ftmenu'},h('div',{class:'mh'},h('b',{},'Menu'),h('small',{},'Everything in one place')));
   MENU.forEach(function(m){panel.append(h('button',{class:'mi',onclick:function(){close();goItem(m[3])}},h('span',{class:'mic'},m[0]),h('span',{},m[1],h('small',{},m[2])),h('span',{class:'ar'},'›')))});
