@@ -72,14 +72,28 @@ function vbar(){return h('div',{class:'vbar'},h('span',{},'📋'),h('div',{},h('
 
 /* ---------- selfie check-in ---------- */
 var REASONS=['Doctor / chemist not available','Joint work with Ratan Roy','Urgent stockist order','Rain / road problem','Other'];
+var LEAVES=['Casual / personal leave','Sick leave','Travel / transfer day','Holiday','Other'];
 U.beforeCheckin=function(go){var x=who()||{},b=brickToday(),tpv=tpDay(myEmail(),TODAY);
-  var body=h('div'),ch={brick:'',reason:''};
-  function step1(){body.innerHTML='';body.append(h('div',{class:'lcard',style:'text-align:center'},h('div',{class:'meta'},new Date(TODAY+'T00:00:00').toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'})),h('h3',{style:'margin:6px 0'},(x.Name||'').split(' ')[0]+', today your brick is'),h('div',{class:'big',style:'color:var(--accent)'},b||tpv.beat||'—'),h('small',{style:'color:var(--muted)'},'As per your plan')),
-      h('button',{style:'width:100%',onclick:function(){close();go({})}},'✅ Yes, correct'),h('button',{class:'ghost',style:'width:100%;margin-top:8px',onclick:step2},'🔀 No, I am working another brick'))}
+  var body=h('div'),ch={brick:'',reason:''},lv={reason:''};
+  /* Step 1 — three choices: keep the planned brick (automated), change brick, or leave. */
+  function step1(){body.innerHTML='';
+    body.append(h('div',{class:'lcard',style:'text-align:center'},h('div',{class:'meta'},new Date(TODAY+'T00:00:00').toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'})),h('h3',{style:'margin:6px 0'},(x.Name||'').split(' ')[0]+', today your brick is'),h('div',{class:'big',style:'color:var(--accent)'},b||tpv.beat||'—'),h('small',{style:'color:var(--muted)'},'As per your plan')),
+      h('button',{style:'width:100%',onclick:function(){close();go({})}},'✅ Keep this brick (as planned)'),
+      h('button',{class:'ghost',style:'width:100%;margin-top:8px',onclick:step2},'🔀 Change brick'),
+      h('button',{class:'ghost',style:'width:100%;margin-top:8px',onclick:step3},'🌴 On leave today'))}
+  /* Step 2 — change brick (goes to Ratan for approval). */
   function step2(){body.innerHTML='';var bricks=bricksOf(myHQ()).filter(function(z){return z!==b});
     body.append(h('small',{},'Which brick today?'),h('div',{class:'chips'},bricks.map(function(z){return h('button',{class:ch.brick===z?'on':'',onclick:function(){ch.brick=z;step2()}},z)})),h('small',{},'Why?'),h('div',{class:'chips'},REASONS.map(function(z){return h('button',{class:ch.reason===z?'on':'',onclick:function(){ch.reason=z;step2()}},z)})),
       h('button',{style:'width:100%;margin-top:8px',disabled:!(ch.brick&&ch.reason),onclick:function(){save('beat_change',{actual:ch.brick,planned:b,reason:ch.reason,status:'pending'}).then(function(ok){if(ok){close();go({})}})}},'📤 Send to Ratan Roy for approval'),h('button',{class:'ghost',style:'width:100%;margin-top:8px',onclick:step1},'‹ Back'))}
+  /* Step 3 — leave: records the day off for Ratan; no selfie / check-in. */
+  function step3(){body.innerHTML='';
+    body.append(h('div',{class:'lcard',style:'text-align:center'},h('h3',{style:'margin:2px 0 4px'},'🌴 On leave today?'),h('small',{style:'color:var(--muted)'},'Ratan Roy will see you are on leave. No selfie needed.')),
+      h('small',{},'Reason'),h('div',{class:'chips'},LEAVES.map(function(z){return h('button',{class:lv.reason===z?'on':'',onclick:function(){lv.reason=z;step3()}},z)})),
+      h('button',{style:'width:100%;margin-top:8px',disabled:!lv.reason,onclick:function(){save('leave',{reason:lv.reason,planned:b}).then(function(ok){if(ok){close();toast&&toast('Marked on leave — Ratan Roy is informed');try{render()}catch(e){}}})}},'🌴 Confirm leave'),
+      h('button',{class:'ghost',style:'width:100%;margin-top:8px',onclick:step1},'‹ Back'))}
   var ov=h('div',{class:'ftsheet'},h('div',{class:'pn'},h('div',{class:'grab'}),h('div',{class:'hd'},h('b',{},'📍 Start my day'),h('button',{class:'ghost',onclick:function(){close()}},'✕')),body));function close(){ov.remove()}document.body.append(ov);step1()};
+/* leave today? (used to stop the morning nudges once the CSO marks leave) */
+U.leaveToday=function(){try{return (S.entries||[]).some(function(e){return e.type==='leave'&&e.date===TODAY&&(!e.email||e.email===myEmail());});}catch(e){return false;}};
 U.selfie=function(cb){selfie(function(r){cb&&cb(r)})};
 // Only the latest selfie is kept: the server renames it and removes this CSO's older selfies.
 function keepOnlySelfie(id){try{var a=JSON.parse(U.lsGet('ft_auth','null'));if(!id||!a||!window.google||!google.script)return;google.script.run.withFailureHandler(function(){}).api(a,'selfie',{id:id})}catch(e){}}

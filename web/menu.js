@@ -28,6 +28,7 @@ var css=document.createElement('style');css.textContent=`
 `;document.head.appendChild(css);
 
 var MENU=[
+ ['👨‍⚕️','Inputs','Doctor approval list — Yes / No','inputs'],
  ['📦','Brand Inputs','Quantity, balance & doctor lists','brands'],
  ['🗓️','Primary plan','Stockist-wise plan & milestones','primary'],
  ['📊','Performance','Incentive · monthly / quarterly / YTD','perf'],

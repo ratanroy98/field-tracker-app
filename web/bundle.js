@@ -1,4 +1,4 @@
-window.FT_BUILD='20261105132603';
+window.FT_BUILD='20261105135426';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -1638,7 +1638,9 @@ U.today=function(app,tk,rest){var x=me(),hq=x.HQ;
 function teamPanel(){var box=h('div',{class:'phase'},h('div',{class:'ph'},h('b',{},'👥 '+w('team')),h('small',{},TODAY)));
   var csos=D.users.filter(function(u){return u.Role==='CSO'&&u.Status==='Active'});
   csos.forEach(function(u){var c=checkinToday(u.Email),les=entriesOf('lesson_done',u.Email).filter(function(e){return e.date===TODAY}).length,p=S.feeds['pob_'+u.HQ],req=entriesOf('stock_request',u.Email).filter(function(e){return e.status!=='sent'}).length;
-    box.append(h('div',{class:'lrow',onclick:function(){S.viewAs=u;render()}},(c&&c.selfie?h('img',{src:c.selfie,class:'ic',style:'object-fit:cover;border-radius:50%;border:2px solid var(--gold)'}):h('div',{class:'ic'},(u.Name||'?')[0])),h('div',{class:'tx'},h('b',{},u.Name.split(' ')[0]+' · '+u.HQ),h('small',{},(c?'✅ '+c.time+(c.lat?' 📍':''):'⏳ not checked in')+' · 🎓 '+les+' · POB '+(p?pc(p.done,p.target60)+'%':'—')+(req?' · 📦 '+req+' request':''))),h('span',{class:'st'},'›')))});
+    var lv=entriesOf('leave',u.Email).filter(function(e){return e.date===TODAY})[0];
+    var statusTxt=c?('✅ '+c.time+(c.lat?' 📍':'')):lv?('🌴 On leave'+(lv.reason?' · '+lv.reason:'')):'⏳ not checked in';
+    box.append(h('div',{class:'lrow',onclick:function(){S.viewAs=u;render()}},(c&&c.selfie?h('img',{src:c.selfie,class:'ic',style:'object-fit:cover;border-radius:50%;border:2px solid var(--gold)'}):h('div',{class:'ic'},lv?'🌴':(u.Name||'?')[0])),h('div',{class:'tx'},h('b',{},u.Name.split(' ')[0]+' · '+u.HQ),h('small',{},statusTxt+' · 🎓 '+les+' · POB '+(p?pc(p.done,p.target60)+'%':'—')+(req?' · 📦 '+req+' request':''))),h('span',{class:'st'},'›')))});
   var reqs=(S.entries||[]).filter(function(e){return e.type==='stock_request'&&e.status!=='sent'});
   if(reqs.length){box.append(h('div',{class:'sect'},h('b',{},'📦 Stock requests')));reqs.forEach(function(r){var items=Object.keys(r.items||{}).map(function(k){return k+' × '+r.items[k]}).join(', ');
     box.append(h('div',{class:'note'},h('b',{},r.name+' · '+r.date),h('div',{},items),r.note?h('small',{},r.note):null,h('button',{style:'margin-top:6px',onclick:function(){S.db.collection('entries').doc(r._id).update({status:'sent',sentTs:Date.now()}).then(function(){toast('Marked as sent');render()})}},'✅ Mark sent')))})}
@@ -2002,14 +2004,28 @@ function vbar(){return h('div',{class:'vbar'},h('span',{},'📋'),h('div',{},h('
 
 /* ---------- selfie check-in ---------- */
 var REASONS=['Doctor / chemist not available','Joint work with Ratan Roy','Urgent stockist order','Rain / road problem','Other'];
+var LEAVES=['Casual / personal leave','Sick leave','Travel / transfer day','Holiday','Other'];
 U.beforeCheckin=function(go){var x=who()||{},b=brickToday(),tpv=tpDay(myEmail(),TODAY);
-  var body=h('div'),ch={brick:'',reason:''};
-  function step1(){body.innerHTML='';body.append(h('div',{class:'lcard',style:'text-align:center'},h('div',{class:'meta'},new Date(TODAY+'T00:00:00').toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'})),h('h3',{style:'margin:6px 0'},(x.Name||'').split(' ')[0]+', today your brick is'),h('div',{class:'big',style:'color:var(--accent)'},b||tpv.beat||'—'),h('small',{style:'color:var(--muted)'},'As per your plan')),
-      h('button',{style:'width:100%',onclick:function(){close();go({})}},'✅ Yes, correct'),h('button',{class:'ghost',style:'width:100%;margin-top:8px',onclick:step2},'🔀 No, I am working another brick'))}
+  var body=h('div'),ch={brick:'',reason:''},lv={reason:''};
+  /* Step 1 — three choices: keep the planned brick (automated), change brick, or leave. */
+  function step1(){body.innerHTML='';
+    body.append(h('div',{class:'lcard',style:'text-align:center'},h('div',{class:'meta'},new Date(TODAY+'T00:00:00').toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'})),h('h3',{style:'margin:6px 0'},(x.Name||'').split(' ')[0]+', today your brick is'),h('div',{class:'big',style:'color:var(--accent)'},b||tpv.beat||'—'),h('small',{style:'color:var(--muted)'},'As per your plan')),
+      h('button',{style:'width:100%',onclick:function(){close();go({})}},'✅ Keep this brick (as planned)'),
+      h('button',{class:'ghost',style:'width:100%;margin-top:8px',onclick:step2},'🔀 Change brick'),
+      h('button',{class:'ghost',style:'width:100%;margin-top:8px',onclick:step3},'🌴 On leave today'))}
+  /* Step 2 — change brick (goes to Ratan for approval). */
   function step2(){body.innerHTML='';var bricks=bricksOf(myHQ()).filter(function(z){return z!==b});
     body.append(h('small',{},'Which brick today?'),h('div',{class:'chips'},bricks.map(function(z){return h('button',{class:ch.brick===z?'on':'',onclick:function(){ch.brick=z;step2()}},z)})),h('small',{},'Why?'),h('div',{class:'chips'},REASONS.map(function(z){return h('button',{class:ch.reason===z?'on':'',onclick:function(){ch.reason=z;step2()}},z)})),
       h('button',{style:'width:100%;margin-top:8px',disabled:!(ch.brick&&ch.reason),onclick:function(){save('beat_change',{actual:ch.brick,planned:b,reason:ch.reason,status:'pending'}).then(function(ok){if(ok){close();go({})}})}},'📤 Send to Ratan Roy for approval'),h('button',{class:'ghost',style:'width:100%;margin-top:8px',onclick:step1},'‹ Back'))}
+  /* Step 3 — leave: records the day off for Ratan; no selfie / check-in. */
+  function step3(){body.innerHTML='';
+    body.append(h('div',{class:'lcard',style:'text-align:center'},h('h3',{style:'margin:2px 0 4px'},'🌴 On leave today?'),h('small',{style:'color:var(--muted)'},'Ratan Roy will see you are on leave. No selfie needed.')),
+      h('small',{},'Reason'),h('div',{class:'chips'},LEAVES.map(function(z){return h('button',{class:lv.reason===z?'on':'',onclick:function(){lv.reason=z;step3()}},z)})),
+      h('button',{style:'width:100%;margin-top:8px',disabled:!lv.reason,onclick:function(){save('leave',{reason:lv.reason,planned:b}).then(function(ok){if(ok){close();toast&&toast('Marked on leave — Ratan Roy is informed');try{render()}catch(e){}}})}},'🌴 Confirm leave'),
+      h('button',{class:'ghost',style:'width:100%;margin-top:8px',onclick:step1},'‹ Back'))}
   var ov=h('div',{class:'ftsheet'},h('div',{class:'pn'},h('div',{class:'grab'}),h('div',{class:'hd'},h('b',{},'📍 Start my day'),h('button',{class:'ghost',onclick:function(){close()}},'✕')),body));function close(){ov.remove()}document.body.append(ov);step1()};
+/* leave today? (used to stop the morning nudges once the CSO marks leave) */
+U.leaveToday=function(){try{return (S.entries||[]).some(function(e){return e.type==='leave'&&e.date===TODAY&&(!e.email||e.email===myEmail());});}catch(e){return false;}};
 U.selfie=function(cb){selfie(function(r){cb&&cb(r)})};
 // Only the latest selfie is kept: the server renames it and removes this CSO's older selfies.
 function keepOnlySelfie(id){try{var a=JSON.parse(U.lsGet('ft_auth','null'));if(!id||!a||!window.google||!google.script)return;google.script.run.withFailureHandler(function(){}).api(a,'selfie',{id:id})}catch(e){}}
@@ -2324,7 +2340,7 @@ html,body{max-width:100vw;overflow-x:hidden}
 `;document.head.appendChild(st);
 
 /* ---------- which tab each screen belongs to ---------- */
-var WORKR=['raft','deca','rloc','skin','dexona','pulse','pick','carry','photo','samples','stockists','stock','beat','tp'];
+var WORKR=['raft','deca','rloc','skin','dexona','pulse','pick','carry','photo','samples','stockists','stock','beat','tp','inputs'];
 function tabFor(r){if(isMgr()){if(r==='home'||r==='mgr')return'team';if(r==='approve')return'approve';if(r==='meet')return'meet';if(r==='geo'||r==='perf'||r==='mail')return'reports';if(r==='msgs'||r==='hof')return'me';if(r==='sell')return'sell';return'team'}
   if(r==='home'||r==='inc'||r==='progress')return'today';if(r==='sell')return'sell';if(r==='learn')return'learn';if(r==='perf'||r==='msgs'||r==='hof')return'me';return'work'}
 function NAV(){return isMgr()?[['team','👥','Team',function(){go('home')}],['approve','✅','Approvals',function(){go('approve')}],['meet','📅','Meetings',function(){go('meet')}],['reports','📈','Reports',function(){go('geo')}],['me','👤','Me',function(){go(U.lsGet('ft_me','msgs'))}]]
@@ -2482,7 +2498,7 @@ function todayCSO(app){var keep=[app.querySelector('.fthead')];
   var list=[(U.updatesCard&&U.updatesCard())||'',(U.bestCard&&U.bestCard())||'',(U.incCard&&U.incCard())||'',(U.progressCard&&U.progressCard())||''];
   list.forEach(function(n){if(n)app.append(n)});}
 /* "Start my day" (brick confirm + selfie) now lives on the Work tab. */
-function startStrip(){if(isMgr()||!field()||(U.checkinToday&&U.checkinToday()))return'';
+function startStrip(){if(isMgr()||!field()||(U.checkinToday&&U.checkinToday())||(U.leaveToday&&U.leaveToday()))return'';
   return h('div',{style:'display:flex;align-items:center;gap:11px;border-radius:16px;padding:13px 15px;margin:4px 0 12px;color:#2B2000;background:linear-gradient(135deg,#F6D776,#F5C451);box-shadow:0 8px 20px rgba(245,196,81,.35);cursor:pointer;animation:rise .3s ease both',onclick:function(){U.doCheckin&&U.doCheckin()}},h('span',{style:'font-size:20px'},'📍'),h('div',{style:'flex:1'},h('b',{style:'font-size:15px'},'Start my day'),h('small',{style:'display:block;opacity:.82'},'Confirm today\'s brick & selfie')),h('span',{style:'font-weight:800'},'›'))}
 function todayMgr(app){var keep=[app.querySelector('.fthead')];var team=U.teamPanel?U.teamPanel():null,share=[].slice.call(app.querySelectorAll('.tdone'))[0];
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
@@ -2531,7 +2547,7 @@ var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(doc
       setTimeout(function(){try{var on=app.querySelector('.subtabs:not(.l2) .on');if(on)on.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}},0);
       var ss=startStrip();if(ss)after.after(ss);
       // Morning: auto-pop the brick confirmation once per day when the CSO opens Work (field day, not yet confirmed).
-      try{if(field()&&U.checkinToday&&!U.checkinToday()){var kd='ft_brickpop_'+TODAY;if(U.lsGet&&U.lsGet(kd,'')!=='1'){U.lsSet(kd,'1');setTimeout(function(){try{U.doCheckin&&U.doCheckin()}catch(e){}},450)}}}catch(e){}
+      try{if(field()&&U.checkinToday&&!U.checkinToday()&&!(U.leaveToday&&U.leaveToday())){var kd='ft_brickpop_'+TODAY;if(U.lsGet&&U.lsGet(kd,'')!=='1'){U.lsSet(kd,'1');setTimeout(function(){try{U.doCheckin&&U.doCheckin()}catch(e){}},450)}}}catch(e){}
       }
     if(t==='me'){var mt=meTabs(r);hd.after(mt);if(r==='perf')app.querySelectorAll('.hof').forEach(function(x){x.remove()})}
     var nb=app.querySelector('.bnav');if(nb)nb.replaceWith(nav(r));else app.append(nav(r));
@@ -2546,6 +2562,7 @@ var DEEP={
   carry:function(){go('carry')},
   pick:function(){go('pick')},
   brands:function(){go('brands')},
+  inputs:function(){go('inputs')},
   primary:function(){go('primary')},
   shakti:function(){go('shakti')},
   inc:function(){go('inc')},
@@ -3693,7 +3710,7 @@ U.doSelfie=doSelfie;
 
 /* Today cards: photo (always) + no-brick nudge */
 U.photoCard=function(){try{if(isMgr())return'';return h('div',{class:'coachc',style:'cursor:pointer',onclick:function(){go('photo')}},h('div',{class:'k'},'📷 Add a visit / input photo'),h('p',{},'Tag the doctor or retailer and submit — it reaches Ratan Roy to share in the group.'))}catch(e){return''}};
-U.noBrickCard=function(){try{if(isMgr())return'';var ci=!!(U.checkinToday&&U.checkinToday());if(ci)return'';
+U.noBrickCard=function(){try{if(isMgr())return'';var ci=!!(U.checkinToday&&U.checkinToday());if(ci)return'';if(U.leaveToday&&U.leaveToday())return'';
   return h('div',{class:'coachc',style:'cursor:pointer;background:linear-gradient(135deg,#FFF4D6,#FDE8B8);border-color:#F0D18A',onclick:function(){go('photo')}},h('div',{class:'k',style:'color:#5A4300'},'📷 No brick selected yet'),h('p',{style:'color:#6a5320'},'If you are on leave, ignore this. If you are working, keep uploading photos of the doctors/retailers you give inputs to.'))}catch(e){return''}};
 
 /* compact home quick-access row */
@@ -3798,6 +3815,118 @@ function pulseView(app){try{if(isMgr()){app.append(h('div',{class:'note'},'Pulse
     byc[ct].forEach(function(d){box.append(drow(d.n+(d.sp?' · '+d.sp:''),isGiven(d.n)?'✅ Yes':'• No'))});app.append(box)});
 }catch(e){app.append(h('div',{class:'note'},'Could not open Pulse: '+e.message))}}
 U.routes.pulse=function(app){pulseView(app)};
+})();
+/* Field Tracker — Inputs tab: the doctor approval list.
+   One flat table: Serial · Doctor · Brick · Yes/No.
+   • A doctor already given/approved (found in Ratan's Outlook inbox/sent, fed in as drlist_<HQ>) shows ✅ Yes and stays for tracking.
+   • A doctor not yet approved is left blank — the CSO picks him here and Save sends the approval to Ratan automatically.
+   Approval re-uses the save→pending→manager pattern (entry type 'dr_approval'). Nothing is typed into Ventasys here. */
+(function(){
+'use strict';
+var U=window.FTUI;if(!U||!U.t)return;
+function isMgr(){return S.mgr&&!S.viewAs}
+var HQL={A:'Agartala',B:'Bongaigaon',D:'Dhubri',G:'Guwahati'};
+function hqName(v){v=String(v==null?'':v);return HQL[v]||v}
+function myHQ3(){try{return (typeof csoHQ==='function'&&csoHQ())||((S.viewAs||S.me||{}).HQ)||'';}catch(e){return''}}
+function bricksHQ(){try{return (typeof bricksOf==='function'?bricksOf(myHQ3()):[])||[];}catch(e){return[];}}
+
+var st=document.createElement('style');st.id='ftinpcss';st.textContent=`
+.inpc{background:var(--card,#fff);border:1px solid var(--line,#e5ece9);border-radius:16px;padding:0;margin:0 0 12px;overflow:hidden}
+.inpc .ih{display:flex;align-items:center;gap:8px;padding:11px 14px;background:linear-gradient(135deg,var(--h1,#0F5257),var(--h3,#1B7F79));color:#fff;font-weight:800;font-size:14px}
+.inpc .ih .n{margin-left:auto;background:rgba(255,255,255,.2);border-radius:999px;padding:3px 10px;font-size:12px}
+.inptbl{width:100%;border-collapse:collapse}
+.inptbl th{font-size:10.5px;letter-spacing:.3px;text-transform:uppercase;color:var(--muted,#5B716E);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line,#eef2f1);background:var(--soft,#F7FAF9)}
+.inptbl td{padding:9px 10px;border-bottom:1px solid var(--line,#eef2f1);font-size:13px;vertical-align:middle}
+.inptbl td.sl{width:34px;color:var(--muted);font-weight:700;text-align:center}
+.inptbl td.br{color:var(--muted);font-size:11.5px;white-space:nowrap}
+.inptbl tr:last-child td{border-bottom:0}
+.inpst{display:inline-block;font-size:11.5px;font-weight:800;border-radius:999px;padding:4px 10px;white-space:nowrap}
+.inpst.yes{background:#D6F0E0;color:#13684A}
+.inpst.wait{background:#FBE6C4;color:#8A5A00}
+.inpst.no{background:#F3E7E7;color:#9A3B3B}
+.inpst.no button{all:unset;cursor:pointer;color:#0F5257;font-weight:800}
+.inpadd{padding:12px 14px;background:var(--soft,#F7FAF9);border-top:1px solid var(--line,#eef2f1)}
+.inpadd select{width:100%;padding:9px;border:1px solid var(--line,#ddd);border-radius:10px;margin-bottom:7px;background:var(--card,#fff);color:var(--ink)}
+.inpadd button.go{width:100%}
+`;document.head.appendChild(st);
+
+/* approved / known list from the feed (populated from Ratan's Outlook inbox+sent) */
+function feedRows(){try{var hq=myHQ3();var f=(S.feeds||{})['drlist_'+hq];if(!f||!f.rows)return[];
+  return f.rows.map(function(r){return {dr:r.dr||r.name||'',brick:r.brick||r.beat||'',ok:!!r.ok,src:'feed'};}).filter(function(r){return r.dr;});}catch(e){return[];}}
+/* the CSO's own add-and-send entries (pending/approved/returned) */
+function myDrEntries(){try{return (S.entries||[]).filter(function(e){return e.type==='dr_approval'&&(!e.email||e.email===myEmail());});}catch(e){return[];}}
+/* merge feed + own entries into one de-duplicated list, newest status wins */
+function nameKey(s){return String(s||'').toLowerCase().replace(/^(dr|prof|mr|mrs|ms|smt|sri|shri)\.?\s*/,'').replace(/[^a-z0-9]/g,'').slice(0,16);}
+function allRows(){
+  var map={},order=[];
+  feedRows().forEach(function(r){var k=nameKey(r.dr);if(!map[k]){order.push(k);map[k]={dr:r.dr,brick:r.brick,status:r.ok?'yes':'no'};}else if(r.ok)map[k].status='yes';});
+  myDrEntries().forEach(function(e){var k=nameKey(e.dr);var stt=e.status==='approved'?'yes':e.status==='returned'?'no':'wait';
+    if(!map[k]){order.push(k);map[k]={dr:e.dr,brick:e.brick||'',status:stt};}else{map[k].status=stt;if(e.brick)map[k].brick=e.brick;}});
+  return order.map(function(k){return map[k];}).sort(function(a,b){var o={yes:0,wait:1,no:2};return (o[a.status]-o[b.status])||a.dr.localeCompare(b.dr);});
+}
+
+/* doctors in a brick, from the customer master, not already in the list */
+function isDoc(c){var ty=String(c.type||c.ty||'').toUpperCase();return /HCP|DOCTOR|DR|GP|RMP|PHYS/.test(ty)||!ty;}
+function brickDoctors(brick){try{if(typeof CUST==='undefined'||!CUST||!brick)return[];var hq=myHQ3(),out=[];
+  Object.keys(CUST).forEach(function(code){var c=CUST[code];if(!c||c.brick!==brick)return;if(hq&&hqName(c.hq)&&hqName(c.hq)!==hq)return;if(!isDoc(c))return;out.push(c.name||String(code));});
+  out.sort(function(a,b){return a.localeCompare(b);});return out;}catch(e){return[];}}
+
+function sendForApproval(dr,brick){
+  if(typeof save!=='function'){toast&&toast('Cannot save here.');return;}
+  save('dr_approval',{dr:dr,brick:brick||'',status:'pending'}).then(function(ok){if(ok){toast&&toast('Sent to Ratan Roy for approval');try{render();}catch(e){}}});
+}
+
+function inputsScreen(app){try{
+  if(isMgr()){app.append(h('div',{class:'note'},'The Inputs doctor list is the CSO\'s screen. Approvals are on your Approvals tab.'));return;}
+  app.append(h('div',{class:'coachc'},h('div',{class:'k'},'👨‍⚕️ Inputs — doctor approval list'),h('p',{},'Every doctor you give inputs to. ✅ Yes means already approved — keep tracking him. For a new doctor, pick him below and Save — it goes to Ratan Roy for approval automatically.')));
+  var rows=allRows();
+  var yes=rows.filter(function(r){return r.status==='yes';}).length;
+  var card=h('div',{class:'inpc'},h('div',{class:'ih'},'👨‍⚕️ Doctors',h('span',{class:'n'},yes+' / '+rows.length+' approved')));
+  var tbl=h('table',{class:'inptbl'},h('tr',{},h('th',{},'#'),h('th',{},'Doctor'),h('th',{},'Brick'),h('th',{},'Approved')));
+  if(!rows.length)tbl.append(h('tr',{},h('td',{class:'sl'},'—'),h('td',{colspan:'3',style:'color:var(--muted)'},'No doctors yet. Add one below and send for approval.')));
+  rows.forEach(function(r,i){
+    var cell;
+    if(r.status==='yes')cell=h('span',{class:'inpst yes'},'✅ Yes');
+    else if(r.status==='wait')cell=h('span',{class:'inpst wait'},'⏳ Sent');
+    else cell=h('span',{class:'inpst no'},h('button',{onclick:function(){sendForApproval(r.dr,r.brick);}},'Send ▸'));
+    tbl.append(h('tr',{},h('td',{class:'sl'},String(i+1)),h('td',{},r.dr),h('td',{class:'br'},r.brick||'—'),h('td',{},cell)));
+  });
+  card.append(tbl);
+  /* add a new doctor -> send for approval */
+  S.tab=S.tab||{};
+  var bsel=h('select',[h('option',{value:''},'— brick —')].concat(bricksHQ().map(function(b){return h('option',{value:b},b);})));
+  var dsel=h('select',[h('option',{value:''},'— pick a doctor —')]);
+  function fillDocs(){var b=bsel.value;dsel.innerHTML='';dsel.append(h('option',{value:''},b?'— pick a doctor —':'— choose a brick first —'));
+    if(b){var have={};allRows().forEach(function(r){have[nameKey(r.dr)]=1;});brickDoctors(b).forEach(function(nm){if(have[nameKey(nm)])return;dsel.append(h('option',{value:nm},nm));});}}
+  bsel.onchange=fillDocs;
+  var add=h('div',{class:'inpadd'},h('div',{style:'font-weight:800;font-size:12.5px;margin-bottom:7px'},'➕ Add a doctor for approval'),bsel,dsel,
+    h('button',{class:'go',onclick:function(){if(!bsel.value){toast&&toast('Choose a brick');return;}if(!dsel.value){toast&&toast('Pick a doctor');return;}sendForApproval(dsel.value,bsel.value);}},'📤 Save & send to Ratan Roy'));
+  card.append(add);
+  app.append(card);
+  fillDocs();
+}catch(e){app.append(h('div',{class:'note'},'Could not open Inputs: '+e.message));}}
+U.inputsScreen=inputsScreen;U.routes.inputs=function(app){inputsScreen(app);};
+
+/* manager: approve the doctors CSOs sent (adds to the Approvals tab) */
+U.drApprovals=function(){try{var L=(S.entries||[]).filter(function(e){return e.type==='dr_approval'&&e.status==='pending';});if(!L.length)return null;
+  var box=h('div',{class:'phase'},h('div',{class:'ph'},h('b',{},'👨‍⚕️ Doctors to approve'),h('small',{},String(L.length))));
+  L.forEach(function(e){box.append(h('div',{class:'lrow',style:'cursor:default'},
+    h('div',{class:'tx'},h('b',{},(e.name||'CSO')+' · '+(e.dr||'doctor')),h('small',{},(e.brick||'—')+' · '+(e.hq||''))),
+    h('div',{style:'display:flex;gap:6px'},
+      h('button',{style:'min-height:auto;padding:8px 12px',onclick:function(){S.db.collection('entries').doc(e._id).update({status:'approved',approvedTs:Date.now()}).then(function(){toast&&toast('Approved');render();});}},'✅'),
+      h('button',{class:'ghost',style:'min-height:auto;padding:8px 12px',onclick:function(){var n=prompt('Reason to return (optional)')||'';S.db.collection('entries').doc(e._id).update({status:'returned',note:n}).then(function(){toast&&toast('Returned');render();});}},'↩️'))));});
+  return box;}catch(e){return null;}};
+
+/* splice dr approvals into the manager Approvals route */
+var prevApprove=U.routes.approve;
+U.routes.approve=function(app){prevApprove&&prevApprove(app);try{var dr=U.drApprovals&&U.drApprovals();if(dr){var note=app.querySelector('.note');if(note&&/Nothing waiting/.test(note.textContent)){note.remove();}app.append(dr);}}catch(e){}};
+
+/* a Today/Work card nudging unfinished approvals */
+U.inputsCard=function(){try{if(isMgr())return'';var rows=allRows();var pend=rows.filter(function(r){return r.status!=='yes';}).length;
+  if(!rows.length)return h('div',{class:'coachc',style:'cursor:pointer',onclick:function(){go('inputs');}},h('div',{class:'k'},'👨‍⚕️ Set up your doctor list'),h('p',{},'Add the doctors you give inputs to and send them for approval. Tap to open.'));
+  if(!pend)return h('div',{class:'coachc',style:'background:linear-gradient(135deg,#E8F6EE,#D6F0E0);border-color:#9FD9B6;cursor:pointer',onclick:function(){go('inputs');}},h('div',{class:'k',style:'color:#13684A'},'✅ All doctors approved'),h('p',{style:'color:#1b6b4a'},rows.length+' doctors approved and tracked. Tap to view.'));
+  return h('div',{class:'coachc',style:'cursor:pointer',onclick:function(){go('inputs');}},h('div',{class:'k'},'👨‍⚕️ '+pend+' doctor'+(pend>1?'s':'')+' to approve'),h('p',{},'Pick and send them to Ratan Roy for approval. Tap to open your Inputs list.'));
+}catch(e){return'';}};
 })();
 /* Field Tracker – Review mail (manager, best on a laptop): the evening review laid out as an email,
    ready to copy or open in Outlook. Nothing is sent by the app itself. */
@@ -3927,6 +4056,7 @@ var css=document.createElement('style');css.textContent=`
 `;document.head.appendChild(css);
 
 var MENU=[
+ ['👨‍⚕️','Inputs','Doctor approval list — Yes / No','inputs'],
  ['📦','Brand Inputs','Quantity, balance & doctor lists','brands'],
  ['🗓️','Primary plan','Stockist-wise plan & milestones','primary'],
  ['📊','Performance','Incentive · monthly / quarterly / YTD','perf'],

@@ -49,7 +49,7 @@ html,body{max-width:100vw;overflow-x:hidden}
 `;document.head.appendChild(st);
 
 /* ---------- which tab each screen belongs to ---------- */
-var WORKR=['raft','deca','rloc','skin','dexona','pulse','pick','carry','photo','samples','stockists','stock','beat','tp'];
+var WORKR=['raft','deca','rloc','skin','dexona','pulse','pick','carry','photo','samples','stockists','stock','beat','tp','inputs'];
 function tabFor(r){if(isMgr()){if(r==='home'||r==='mgr')return'team';if(r==='approve')return'approve';if(r==='meet')return'meet';if(r==='geo'||r==='perf'||r==='mail')return'reports';if(r==='msgs'||r==='hof')return'me';if(r==='sell')return'sell';return'team'}
   if(r==='home'||r==='inc'||r==='progress')return'today';if(r==='sell')return'sell';if(r==='learn')return'learn';if(r==='perf'||r==='msgs'||r==='hof')return'me';return'work'}
 function NAV(){return isMgr()?[['team','👥','Team',function(){go('home')}],['approve','✅','Approvals',function(){go('approve')}],['meet','📅','Meetings',function(){go('meet')}],['reports','📈','Reports',function(){go('geo')}],['me','👤','Me',function(){go(U.lsGet('ft_me','msgs'))}]]
@@ -207,7 +207,7 @@ function todayCSO(app){var keep=[app.querySelector('.fthead')];
   var list=[(U.updatesCard&&U.updatesCard())||'',(U.bestCard&&U.bestCard())||'',(U.incCard&&U.incCard())||'',(U.progressCard&&U.progressCard())||''];
   list.forEach(function(n){if(n)app.append(n)});}
 /* "Start my day" (brick confirm + selfie) now lives on the Work tab. */
-function startStrip(){if(isMgr()||!field()||(U.checkinToday&&U.checkinToday()))return'';
+function startStrip(){if(isMgr()||!field()||(U.checkinToday&&U.checkinToday())||(U.leaveToday&&U.leaveToday()))return'';
   return h('div',{style:'display:flex;align-items:center;gap:11px;border-radius:16px;padding:13px 15px;margin:4px 0 12px;color:#2B2000;background:linear-gradient(135deg,#F6D776,#F5C451);box-shadow:0 8px 20px rgba(245,196,81,.35);cursor:pointer;animation:rise .3s ease both',onclick:function(){U.doCheckin&&U.doCheckin()}},h('span',{style:'font-size:20px'},'📍'),h('div',{style:'flex:1'},h('b',{style:'font-size:15px'},'Start my day'),h('small',{style:'display:block;opacity:.82'},'Confirm today\'s brick & selfie')),h('span',{style:'font-weight:800'},'›'))}
 function todayMgr(app){var keep=[app.querySelector('.fthead')];var team=U.teamPanel?U.teamPanel():null,share=[].slice.call(app.querySelectorAll('.tdone'))[0];
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
@@ -256,7 +256,7 @@ var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(doc
       setTimeout(function(){try{var on=app.querySelector('.subtabs:not(.l2) .on');if(on)on.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}},0);
       var ss=startStrip();if(ss)after.after(ss);
       // Morning: auto-pop the brick confirmation once per day when the CSO opens Work (field day, not yet confirmed).
-      try{if(field()&&U.checkinToday&&!U.checkinToday()){var kd='ft_brickpop_'+TODAY;if(U.lsGet&&U.lsGet(kd,'')!=='1'){U.lsSet(kd,'1');setTimeout(function(){try{U.doCheckin&&U.doCheckin()}catch(e){}},450)}}}catch(e){}
+      try{if(field()&&U.checkinToday&&!U.checkinToday()&&!(U.leaveToday&&U.leaveToday())){var kd='ft_brickpop_'+TODAY;if(U.lsGet&&U.lsGet(kd,'')!=='1'){U.lsSet(kd,'1');setTimeout(function(){try{U.doCheckin&&U.doCheckin()}catch(e){}},450)}}}catch(e){}
       }
     if(t==='me'){var mt=meTabs(r);hd.after(mt);if(r==='perf')app.querySelectorAll('.hof').forEach(function(x){x.remove()})}
     var nb=app.querySelector('.bnav');if(nb)nb.replaceWith(nav(r));else app.append(nav(r));
@@ -271,6 +271,7 @@ var DEEP={
   carry:function(){go('carry')},
   pick:function(){go('pick')},
   brands:function(){go('brands')},
+  inputs:function(){go('inputs')},
   primary:function(){go('primary')},
   shakti:function(){go('shakti')},
   inc:function(){go('inc')},
