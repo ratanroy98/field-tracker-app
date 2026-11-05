@@ -1,4 +1,4 @@
-window.FT_BUILD='20261105102118';
+window.FT_BUILD='20261105102420';
 /* Field Tracker – premium line icons. Replaces emoji everywhere in the app with one consistent SVG set. */
 (function(){
 'use strict';
@@ -2478,13 +2478,12 @@ U.workStatus=workStatus;
 /* CSO dashboard — one clean, non-scrolling screen: Updates (meeting/manager info + daily quote) · Yesterday's best field work · Incentive · Progress.
    The daily brick confirmation is an auto-popping sheet (not a dashboard card); a slim "Start my day" strip stays until it's done. */
 function todayCSO(app){var keep=[app.querySelector('.fthead')];
-  var field0=field(),ci=!!(U.checkinToday&&U.checkinToday());
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
-  var strip=(field0&&!ci)?h('div',{style:'display:flex;align-items:center;gap:11px;border-radius:16px;padding:13px 15px;margin:0 0 11px;color:#2B2000;background:linear-gradient(135deg,#F6D776,#F5C451);box-shadow:0 8px 20px rgba(245,196,81,.35);cursor:pointer;animation:rise .3s ease both',onclick:function(){U.doCheckin&&U.doCheckin()}},h('span',{style:'font-size:20px'},'📍'),h('div',{style:'flex:1'},h('b',{style:'font-size:15px'},'Start my day'),h('small',{style:'display:block;opacity:.82'},'Confirm today\'s brick & selfie')),h('span',{style:'font-weight:800'},'›')):'';
-  var list=[strip,(U.updatesCard&&U.updatesCard())||'',(U.bestCard&&U.bestCard())||'',(U.incCard&&U.incCard())||'',(U.progressCard&&U.progressCard())||''];
-  list.forEach(function(n){if(n)app.append(n)});
-  // Morning: auto-pop the brick confirmation once per day on open (field day, not yet confirmed).
-  try{if(field0&&!ci){var kd='ft_brickpop_'+TODAY;if(U.lsGet&&U.lsGet(kd,'')!=='1'){U.lsSet(kd,'1');setTimeout(function(){try{U.doCheckin&&U.doCheckin()}catch(e){}},450)}}}catch(e){}}
+  var list=[(U.updatesCard&&U.updatesCard())||'',(U.bestCard&&U.bestCard())||'',(U.incCard&&U.incCard())||'',(U.progressCard&&U.progressCard())||''];
+  list.forEach(function(n){if(n)app.append(n)});}
+/* "Start my day" (brick confirm + selfie) now lives on the Work tab. */
+function startStrip(){if(isMgr()||!field()||(U.checkinToday&&U.checkinToday()))return'';
+  return h('div',{style:'display:flex;align-items:center;gap:11px;border-radius:16px;padding:13px 15px;margin:4px 0 12px;color:#2B2000;background:linear-gradient(135deg,#F6D776,#F5C451);box-shadow:0 8px 20px rgba(245,196,81,.35);cursor:pointer;animation:rise .3s ease both',onclick:function(){U.doCheckin&&U.doCheckin()}},h('span',{style:'font-size:20px'},'📍'),h('div',{style:'flex:1'},h('b',{style:'font-size:15px'},'Start my day'),h('small',{style:'display:block;opacity:.82'},'Confirm today\'s brick & selfie')),h('span',{style:'font-weight:800'},'›'))}
 function todayMgr(app){var keep=[app.querySelector('.fthead')];var team=U.teamPanel?U.teamPanel():null,share=[].slice.call(app.querySelectorAll('.tdone'))[0];
   [].slice.call(app.children).forEach(function(c){if(keep.indexOf(c)<0)c.remove()});
   [team,(U.relayPanel&&U.relayPanel())||null,share,quoteLine()].forEach(function(n){if(n)app.append(n)})}
@@ -2524,7 +2523,11 @@ var prevAfter=U.after;U.after=function(app,r){prevAfter&&prevAfter(app,r);if(doc
   try{topbar(app,r);var t=tabFor(r),hd=app.querySelector('.fthead');
     if(r==='home'){if(isMgr())todayMgr(app);else todayCSO(app)}
     // replace the old sub-tab row on Work screens
-    if(t==='work'&&BRANDR[r]){U.lsSet('ft_work',r);var old=app.querySelector('.fthead~.subtabs');if(old&&old.textContent.indexOf('Raft')>=0&&!old.classList.contains('l2'))old.remove();var rows=workTabs(r);var after=hd;rows.forEach(function(x){after.after(x);after=x});
+    if(t==='work'&&BRANDR[r]){U.lsSet('ft_work',r);var old=app.querySelector('.fthead~.subtabs');if(old&&old.textContent.indexOf('Raft')>=0&&!old.classList.contains('l2'))old.remove();
+      var rows=workTabs(r),after=hd;rows.forEach(function(x){after.after(x);after=x});
+      var ss=startStrip();if(ss)after.after(ss);
+      // Morning: auto-pop the brick confirmation once per day when the CSO opens Work (field day, not yet confirmed).
+      try{if(field()&&U.checkinToday&&!U.checkinToday()){var kd='ft_brickpop_'+TODAY;if(U.lsGet&&U.lsGet(kd,'')!=='1'){U.lsSet(kd,'1');setTimeout(function(){try{U.doCheckin&&U.doCheckin()}catch(e){}},450)}}}catch(e){}
       }
     if(t==='me'){var mt=meTabs(r);hd.after(mt);if(r==='perf')app.querySelectorAll('.hof').forEach(function(x){x.remove()})}
     var nb=app.querySelector('.bnav');if(nb)nb.replaceWith(nav(r));else app.append(nav(r));
