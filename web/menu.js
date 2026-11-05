@@ -30,6 +30,7 @@ var css=document.createElement('style');css.textContent=`
 var MENU=[
  ['📦','Brand Inputs','Quantity, balance, doctors & approval','brands'],
  ['🗒️','Daily Call Report','Log today\'s calls — doctors & chemists (DCR)','dcr'],
+ ['🧾','POB — orders booked','Log orders: retailer, product, qty, value','pob'],
  ['🗓️','Primary plan','Stockist-wise plan & milestones','primary'],
  ['📊','Performance','Incentive · monthly / quarterly / YTD','perf'],
  ['💉','Shakti Campaign','Pick 8 doctors (2 / week)','shakti'],
